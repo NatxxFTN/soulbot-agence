@@ -1,7 +1,7 @@
 'use strict';
 
-// Référence pixel-perfect : image/image.png (DraftBot Premium Orange)
-// Structure : setAuthor bot · setThumbnail · Version · [Catégories | Syntaxes] · Stats · Pagination emoji
+// Référence pixel-perfect : image/image.png — DraftBot Premium Orange
+// Structure validée sur 8 captures : overview + pages catégorie
 
 const {
   ButtonBuilder, ActionRowBuilder, ButtonStyle, ComponentType,
@@ -9,37 +9,34 @@ const {
 const E = require('../../utils/embeds');
 const { version } = require('../../../package.json');
 
-// ─── ANSI color codes (blocs ```ansi``` Discord uniquement) ──────────────────
-const A = {
-  RESET  : '\u001b[0m',
-  BOLD   : '\u001b[1m',
-  CYAN   : '\u001b[36m',    // catégories — reproduit le cyan de l'image de référence
-  YELLOW : '\u001b[33m',    // owner + accents syntaxe
-  GREEN  : '\u001b[32m',    // catégories positives (niveaux)
-  GRAY   : '\u001b[2;37m',  // séparateurs
-  WHITE  : '\u001b[37m',
-};
-
-// ─── Catalogue catégories ────────────────────────────────────────────────────
+// ─── Catalogue catégories — clés = noms de dossiers réels ───────────────────
 const CATEGORIES = {
-  owner      : { label: 'Owner',         icon: '👑', ansi: A.YELLOW },
-  moderation : { label: 'Modération',    icon: '🛡️', ansi: A.CYAN   },
-  public     : { label: 'Information',   icon: '📢', ansi: A.CYAN   },
-  utility    : { label: 'Utile',         icon: '🔧', ansi: A.CYAN   },
-  gestion    : { label: 'Configuration', icon: '⚙️', ansi: A.CYAN   },
-  levels     : { label: 'Niveaux',       icon: '⬆️', ansi: A.GREEN  },
-  fun        : { label: 'Fun',           icon: '🎮', ansi: A.CYAN   },
-  stats      : { label: 'Statistique',   icon: '📊', ansi: A.CYAN   },
-  invitations: { label: 'Invitations',   icon: '📨', ansi: A.CYAN   },
+  owner        : { label: 'Owner',        icon: '👑' },
+  moderation   : { label: 'Modération',   icon: '🛡️' },
+  information  : { label: 'Information',  icon: '📢' },
+  utility      : { label: 'Utile',        icon: '🔧' },
+  configuration: { label: 'Configuration',icon: '⚙️' },
+  protection   : { label: 'Protection',   icon: '🔒' },
+  fun          : { label: 'Fun',          icon: '🎮' },
+  stats        : { label: 'Statistique',  icon: '📊' },
+  ticket       : { label: 'Ticket',       icon: '🎫' },
+  game         : { label: 'Game',         icon: '🕹️' },
+  custom       : { label: 'Custom',       icon: '🔵' },
+  giveaway     : { label: 'Giveaway',     icon: '🎁' },
+  greeting     : { label: 'Greeting',     icon: '👋' },
+  invitation   : { label: 'Invitation',   icon: '📨' },
+  level        : { label: 'Niveau',       icon: '⬆️' },
+  role         : { label: 'Rôle',         icon: '🎭' },
 };
 
 const CATEGORY_ORDER = [
-  'owner','moderation','public','utility','gestion','levels','fun','stats','invitations',
+  'owner','moderation','information','utility','configuration','protection',
+  'fun','stats','ticket','game','custom','giveaway','greeting','invitation',
+  'level','role',
 ];
 
-const TIMEOUT = 90_000;
-
-// ─── Module ──────────────────────────────────────────────────────────────────
+const MAX_DESC_CHARS = 3800;
+const TIMEOUT        = 90_000;
 
 module.exports = {
   name       : 'help',
@@ -70,7 +67,7 @@ module.exports = {
             .setTitle(`${cat.icon}  Commande : \`${cmd.name}\``)
             .addFields(
               { name: '📝 Description', value: cmd.description || '*Aucune description.*', inline: false },
-              { name: '📌 Usage',       value: `\`${cmd.usage  || `;${cmd.name}`}\``,      inline: true  },
+              { name: '📌 Usage',       value: `\`${cmd.usage || `;${cmd.name}`}\``,       inline: true  },
               { name: '📂 Catégorie',   value: `${cat.icon} ${cat.label}`,                 inline: true  },
               { name: '⏱️ Cooldown',    value: cmd.cooldown ? `${cmd.cooldown}s` : 'Aucun', inline: true  },
               {
@@ -81,7 +78,6 @@ module.exports = {
                 inline: false,
               },
             )
-            .setTimestamp()
             .setFooter({ text: ';help pour revenir à la liste complète' }),
         ],
       });
@@ -95,6 +91,7 @@ module.exports = {
       grouped.get(cat).push(cmd);
     }
 
+    // Trier selon CATEGORY_ORDER, catégories inconnues à la fin
     const categories = [...grouped.entries()].sort(([a], [b]) => {
       const ia = CATEGORY_ORDER.indexOf(a);
       const ib = CATEGORY_ORDER.indexOf(b);
@@ -105,7 +102,7 @@ module.exports = {
     });
 
     const userId = message.author.id;
-    const pages  = buildPages(categories, client);
+    const pages  = buildPages(categories, client, version);
     let   page   = 0;
 
     const sent = await message.channel.send({
@@ -131,8 +128,6 @@ module.exports = {
         components: [buildRow(page, pages.length, userId)],
       };
 
-      // POURQUOI editReply : interactionCreate.js a appelé deferUpdate() avant
-      // que le collector reçoive l'interaction — update() échouerait.
       if (interaction.deferred) {
         await interaction.editReply(payload).catch(() => {});
       } else {
@@ -140,63 +135,59 @@ module.exports = {
       }
     });
 
-    // Retire les boutons quand la session expire (évite "This interaction failed")
     collector.on('end', () => sent.edit({ components: [] }).catch(() => {}));
   },
 };
 
 // ─── Page builders ───────────────────────────────────────────────────────────
 
-function buildPages(categories, client) {
+function buildPages(categories, client, ver) {
   const pages = [];
   const total = categories.length + 1;
 
-  // ── Page 0 : Overview pixel-perfect ───────────────────────────────────
-  //
-  // Layout exact de l'image de référence :
-  //   [Author : nom + avatar]
-  //   [Thumbnail : avatar bot (carré, haut-droite)]
-  //   Title : "Information"
-  //   [Field pleine largeur : ► Version X.X.X]
-  //   [Field inline gauche : Catégories (ANSI cyan)]  [Field inline droite : Syntaxes (codeblock)]
-  //   [Field pleine largeur : stats commandes]
-  //   Footer : Page 1/N
-  //   Timestamp
-
-  // ── Catégories : Nom  (count) ─────────────────────────────────────────
+  // ── Page 0 : Overview ─────────────────────────────────────────────────
   const MAX_VISIBLE = 10;
-  const visibleCats = categories.slice(0, MAX_VISIBLE);
-  const hiddenCount = categories.length - visibleCats.length;
+  const visible     = categories.slice(0, MAX_VISIBLE);
+  const hidden      = categories.length - visible.length;
+
   const catLines = [
-    ...visibleCats.map(([cat, cmds]) => {
+    ...visible.map(([cat]) => {
       const c = CATEGORIES[cat] ?? { label: cat };
-      return `${c.label}  (${cmds.length})`;
+      return c.label;
     }),
-    ...(hiddenCount > 0 ? [`+${hiddenCount} catégories`] : []),
+    ...(hidden > 0 ? [`+${hidden} catégories`] : []),
   ].join('\n');
 
-  // ── Syntaxes : style ╭➤￤ + ┊ ─────────────────────────────────────────
-  const botName = client.user.username;
   const syntaxLines = [
-    `╭➤￤${botName}`,
-    `┊ - ;help <commande>`,
-    `┊ <>・Obligatoire`,
-    `┊ []・Optionnel`,
-    `┊ ()・Spécification`,
-    `┊ /  ・Sépare syntaxes`,
+    `➤ | ${client.user.username}`,
+    ` - ;help <commande>`,
+    `<> · Obligatoire`,
+    `[] · Optionnel`,
+    `() · Spécification`,
+    `/  · Sépare syntaxes`,
   ].join('\n');
 
-  // ── Stats (pleine largeur) ────────────────────────────────────────────
   const statsLines = [
     `Nombre de commandes: ${client.commands.size}`,
     `Commandes custom: 0`,
   ].join('\n');
 
+  // Catégorie suivante pour le footer
+  const firstCat  = categories[0];
+  const firstMeta = firstCat ? (CATEGORIES[firstCat[0]] ?? { label: firstCat[0], icon: '📁' }) : null;
+  const firstFooter = firstMeta ? `| ${firstMeta.icon} ${firstMeta.label}` : '';
+
   const overview = E.base()
     .setTimestamp(null)
     .setAuthor({ name: client.user.username, iconURL: client.user.displayAvatarURL({ size: 64 }) })
+    .setThumbnail(client.user.displayAvatarURL({ size: 256 }))
     .setTitle('Information')
     .addFields(
+      {
+        name  : '\u200B',
+        value : `\`\`\`\n► Version ${ver}\n\`\`\``,
+        inline: false,
+      },
       {
         name  : 'Catégories',
         value : `\`\`\`\n${catLines}\n\`\`\``,
@@ -209,29 +200,52 @@ function buildPages(categories, client) {
       },
       {
         name  : '\u200B',
-        value : `\`\`\`\n${statsLines}\n\`\`\``,
+        value : `\`\`\`\nNombre de commandes: ${client.commands.size}\nCommandes custom: 0\n\`\`\``,
         inline: false,
       },
     )
-    .setFooter({ text: `Page 1/${total} · ;help <commande>` });
+    .setFooter({ text: `Page 1/${total} ${firstFooter}` });
 
   pages.push(overview);
 
   // ── Pages 1..N : une par catégorie ───────────────────────────────────
   for (let i = 0; i < categories.length; i++) {
-    const [cat, cmds] = categories[i];
-    const meta  = CATEGORIES[cat] ?? { label: cat, icon: '📁' };
+    const [cat, cmds]   = categories[i];
+    const meta          = CATEGORIES[cat] ?? { label: cat, icon: '📁' };
+    const nextEntry     = categories[i + 1];
+    const nextMeta      = nextEntry ? (CATEGORIES[nextEntry[0]] ?? { label: nextEntry[0], icon: '📁' }) : null;
 
-    const cmdLines = [...cmds]
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map(c => `\`${c.name}\` — ${c.description || '*Aucune description.*'}`)
-      .join('\n');
+    const sorted = [...cmds].sort((a, b) => a.name.localeCompare(b.name));
+
+    // Format 2 lignes : "name [usage_args]\nDescription"
+    const lines = [];
+    for (const c of sorted) {
+      const usageArgs = c.usage
+        ? c.usage.replace(/^;?\S+\s*/, '').trim()
+        : '';
+      const nameLine = usageArgs ? `${c.name} ${usageArgs}` : c.name;
+      lines.push(`**${nameLine}**\n${c.description || 'Aucune description.'}`);
+    }
+
+    // Tronquer si dépassement (embed description max 4096)
+    let desc = '';
+    for (const line of lines) {
+      const candidate = desc ? `${desc}\n\n${line}` : line;
+      if (candidate.length > MAX_DESC_CHARS) {
+        desc += '\n\n*… et d\'autres commandes. Tape `;help <commande>` pour le détail.*';
+        break;
+      }
+      desc = candidate;
+    }
+
+    const footerNext  = nextMeta ? `| ${nextMeta.label} ${nextMeta.icon}` : '';
+    const footerText  = `Page ${i + 2}/${total} | ${meta.icon} ${meta.label} ${footerNext}`;
 
     const embed = E.base()
       .setTimestamp(null)
-      .setTitle(`${meta.icon}  ${meta.label}`)
-      .setDescription(cmdLines || '*Aucune commande dans cette catégorie.*')
-      .setFooter({ text: `Page ${i + 2}/${total} | ${meta.label} | ;help <commande>` });
+      .setTitle(`Help » ${meta.label}`)
+      .setDescription(desc || '*Aucune commande dans cette catégorie.*')
+      .setFooter({ text: footerText });
 
     pages.push(embed);
   }
@@ -239,11 +253,6 @@ function buildPages(categories, client) {
   return pages;
 }
 
-/**
- * 4 boutons de navigation avec emojis Unicode (reproduit les flèches de l'image).
- * Premier/Précédent désactivés sur page 0.
- * Suivant/Dernier désactivés sur la dernière page.
- */
 function buildRow(page, total, userId) {
   const isFirst = page === 0;
   const isLast  = page === total - 1;
