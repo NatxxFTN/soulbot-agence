@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "language": "fr",
+    "version": "1.0.0",
+    "maintained_by": "CV1 Copywriter + CV4 Tone Guardian",
+    "rules": {
+      "color": "#F39C12",
+      "avatar": "author.iconURL uniquement — jamais thumbnail",
+      "footer": "Page X/Y · Version X.X.X",
+      "max_title": 256,
+      "max_description": 4096
+    }
+  },
+
+  "footer": {
+    "default": "+help pour la liste des commandes",
+    "paginated": "Page {page}/{total} · Version {version}",
+    "help": "Page {page}/19 · {prev} · {next}"
+  },
+
+  "labels": {
+    "success": "✓",
+    "error": "✗",
+    "warning": "⚠",
+    "info": "ℹ",
+    "loading": "…"
+  }
+}

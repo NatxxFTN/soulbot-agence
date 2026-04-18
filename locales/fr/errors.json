@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "language": "fr",
+    "version": "1.0.0",
+    "maintained_by": "CV1 Copywriter + CV4 Tone Guardian",
+    "principle": "Toujours : QUOI s'est passé + QUOI FAIRE. Jamais alarmiste."
+  },
+
+  "permissions": {
+    "missing_admin": "Tu n'as pas la permission d'utiliser cette commande. Elle est réservée aux administrateurs.",
+    "missing_role": "Il te manque le rôle requis pour utiliser cette commande.",
+    "bot_missing_perms": "Le bot n'a pas les permissions nécessaires dans ce salon. Vérifie ses droits."
+  },
+
+  "inputs": {
+    "invalid_format": "Le format saisi n'est pas valide. Consulte `;help {command}` pour voir les exemples.",
+    "out_of_range": "La valeur doit être comprise entre {min} et {max}.",
+    "not_found": "Aucun résultat pour cette recherche. Vérifie l'orthographe ou essaie un autre terme."
+  },
+
+  "rate_limit": {
+    "cooldown": "Cette commande est en cooldown. Réessaie dans {seconds} secondes."
+  },
+
+  "generic": {
+    "internal": "Une erreur interne est survenue. Si ça persiste, contacte le support."
+  }
+}

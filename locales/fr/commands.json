@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "language": "fr",
+    "version": "1.0.0",
+    "maintained_by": "CV1 Copywriter + CV5 I18n Lead",
+    "convention": "commands.[nom_commande].[champ]"
+  },
+
+  "ping": {
+    "name": "ping",
+    "description_short": "Vérifie la latence du bot",
+    "embed_title": "Latence Soulbot",
+    "success_message": "Pong ! {latency}ms",
+    "error_messages": {
+      "generic": "Impossible de mesurer la latence pour l'instant."
+    }
+  },
+
+  "help": {
+    "name": "help",
+    "description_short": "Affiche la liste des commandes disponibles",
+    "embed_title": "Commandes Soulbot",
+    "error_messages": {
+      "page_not_found": "Cette page n'existe pas. Utilise les boutons pour naviguer."
+    }
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "guilds": {
+    "1063235865071063122": {
+      "id": "1063235865071063122",
+      "name": "👁👄👁",
+      "icon": null,
+      "prefix": "!",
+      "welcome_channel": "",
+      "welcome_message": "Welcome {user} to {server}!",
+      "log_channel": "",
+      "auto_role": "",
+      "mute_role": "",
+      "anti_spam": 0,
+      "anti_links": 0,
+      "anti_caps": 0,
+      "created_at": 1775862070
+    },
+    "1477687187817500863": {
+      "id": "1477687187817500863",
+      "name": "discord.gg/neige",
+      "icon": "4b96c3abf4d32af01e7df6ab2ecf8e00",
+      "prefix": "!",
+      "welcome_channel": "",
+      "welcome_message": "Welcome {user} to {server}!",
+      "log_channel": "",
+      "auto_role": "",
+      "mute_role": "",
+      "anti_spam": 0,
+      "anti_links": 0,
+      "anti_caps": 0,
+      "created_at": 1775862070
+    }
+  },
+  "warnings": [],
+  "mod_logs": [
+    {
+      "id": 1,
+      "created_at": 1775862927,
+      "guild_id": "1477687187817500863",
+      "action": "KICK",
+      "user_id": "988119461619957780",
+      "user_tag": "opchricri77",
+      "moderator_id": "964637481129623612",
+      "moderator_tag": "nlnatxx",
+      "reason": "aurevoir bro"
+    },
+    {
+      "id": 2,
+      "created_at": 1775862966,
+      "guild_id": "1477687187817500863",
+      "action": "CLEAR",
+      "moderator_id": "964637481129623612",
+      "moderator_tag": "nlnatxx",
+      "reason": "10 messages dans #annonce"
+    }
+  ],
+  "command_logs": [
+    {
+      "id": 1,
+      "created_at": 1775862310,
+      "guild_id": "1477687187817500863",
+      "user_id": "964637481129623612",
+      "user_tag": "nlnatxx",
+      "command": "help",
+      "args": "",
+      "channel_id": "1487555584319426673"
+    },
+    {
+      "id": 2,
+      "created_at": 1775862895,
+      "guild_id": "1477687187817500863",
+      "user_id": "964637481129623612",
+      "user_tag": "nlnatxx",
+      "command": "help",
+      "args": "ban",
+      "channel_id": "1487555584319426673"
+    },
+    {
+      "id": 3,
+      "created_at": 1775862926,
+      "guild_id": "1477687187817500863",
+      "user_id": "964637481129623612",
+      "user_tag": "nlnatxx",
+      "command": "kick",
+      "args": "<@988119461619957780> aurevoir bro",
+      "channel_id": "1487555493219270787"
+    },
+    {
+      "id": 4,
+      "created_at": 1775862965,
+      "guild_id": "1477687187817500863",
+      "user_id": "964637481129623612",
+      "user_tag": "nlnatxx",
+      "command": "clear",
+      "args": "",
+      "channel_id": "1487555493219270787"
+    },
+    {
+      "id": 5,
+      "created_at": 1775912450,
+      "guild_id": "1477687187817500863",
+      "user_id": "964637481129623612",
+      "user_tag": "nlnatxx",
+      "command": "help",
+      "args": "",
+      "channel_id": "1487555584319426673"
+    },
+    {
+      "id": 6,
+      "created_at": 1775912567,
+      "guild_id": "1477687187817500863",
+      "user_id": "964637481129623612",
+      "user_tag": "nlnatxx",
+      "command": "help",
+      "args": "",
+      "channel_id": "1487555584319426673"
+    },
+    {
+      "id": 7,
+      "created_at": 1775912650,
+      "guild_id": "1477687187817500863",
+      "user_id": "964637481129623612",
+      "user_tag": "nlnatxx",
+      "command": "userinfo",
+      "args": "<@399179812046110723>",
+      "channel_id": "1487555584319426673"
+    },
+    {
+      "id": 8,
+      "created_at": 1775913046,
+      "guild_id": "1477687187817500863",
+      "user_id": "964637481129623612",
+      "user_tag": "nlnatxx",
+      "command": "help",
+      "args": "",
+      "channel_id": "1487555584319426673"
+    },
+    {
+      "id": 9,
+      "created_at": 1775913064,
+      "guild_id": "1477687187817500863",
+      "user_id": "964637481129623612",
+      "user_tag": "nlnatxx",
+      "command": "help",
+      "args": "userinfo",
+      "channel_id": "1487555584319426673"
+    },
+    {
+      "id": 10,
+      "created_at": 1775913110,
+      "guild_id": "1477687187817500863",
+      "user_id": "964637481129623612",
+      "user_tag": "nlnatxx",
+      "command": "userinfo",
+      "args": "<@1434630412948344924> *",
+      "channel_id": "1487555584319426673"
+    }
+  ],
+  "custom_commands": [],
+  "stats": {
+    "1477687187817500863": {
+      "guild_id": "1477687187817500863",
+      "messages_today": 41,
+      "commands_today": 10,
+      "joins_today": 0,
+      "leaves_today": 0,
+      "last_reset": 1775862310
+    }
+  },
+  "_seq": {
+    "warnings": 1,
+    "mod_logs": 3,
+    "command_logs": 11,
+    "custom_commands": 1
+  }
+}

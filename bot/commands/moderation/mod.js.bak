@@ -1,0 +1,382 @@
+'use strict';
+
+// POURQUOI 'use strict' : force la détection des erreurs silencieuses (variables
+// non déclarées, this mal bindé). Absent de la version originale — ajouté.
+
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { db } = require('../../database');
+// POURQUOI { db } et non { getDB } : getDB n'existe pas dans les exports
+// de database/index.js — c'était la source du crash silencieux sur toutes
+// les commandes de modération. db est l'instance directly exportée.
+
+// AVERTISSEMENT STRUCTUREL [HAUTE] — signalé par l'Auditeur :
+// Ce fichier exporte plusieurs commandes dans un seul objet { ban, kick, ... }.
+// Le CommandHandler attend un fichier = une commande avec cmd.name au niveau racine.
+// Conséquence actuelle : toutes les commandes de ce fichier sont ignorées au chargement.
+// Correction définitive prévue en Phase 2 : éclater en ban.js, kick.js, warn.js, etc.
+// Pour l'instant : l'import DB est réparé pour ne pas bloquer la Phase 2.
+
+// Prepared statements compilés une seule fois au chargement du module.
+// POURQUOI module-level : better-sqlite3 compile le statement à l'appel de prepare().
+// Les appeler dans execute() les recompile à chaque commande — inutile et coûteux.
+const STMT_INSERT_MOD_LOG = db.prepare(
+  'INSERT OR IGNORE INTO mod_logs (guild_id, action, user_id, user_tag, moderator_id, moderator_tag, reason) VALUES (?, ?, ?, ?, ?, ?, ?)'
+);
+const STMT_INSERT_MOD_LOG_DURATION = db.prepare(
+  'INSERT OR IGNORE INTO mod_logs (guild_id, action, user_id, user_tag, moderator_id, moderator_tag, reason, duration) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+);
+const STMT_INSERT_MOD_LOG_CLEAR = db.prepare(
+  'INSERT OR IGNORE INTO mod_logs (guild_id, action, moderator_id, moderator_tag, reason) VALUES (?, ?, ?, ?, ?)'
+);
+const STMT_INSERT_WARNING = db.prepare(
+  'INSERT INTO warnings (guild_id, user_id, user_tag, moderator_id, moderator_tag, reason) VALUES (?, ?, ?, ?, ?, ?)'
+);
+const STMT_COUNT_WARNINGS = db.prepare(
+  'SELECT COUNT(*) AS count FROM warnings WHERE guild_id = ? AND user_id = ?'
+);
+const STMT_GET_WARNINGS = db.prepare(
+  'SELECT * FROM warnings WHERE guild_id = ? AND user_id = ? ORDER BY created_at DESC LIMIT 10'
+);
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// BAN
+// ═══════════════════════════════════════════════════════════════════════════════
+const ban = {
+  name        : 'ban',
+  aliases     : ['bannir'],
+  description : 'Bannir définitivement un membre du serveur.',
+  usage       : 'ban @membre [raison]',
+  category    : 'moderation',
+  cooldown    : 5,
+  permissions : ['BanMembers'],
+  guildOnly   : true,
+
+  async execute(message, args, client) {
+    // POURQUOI double check permission : Discord ne bloque pas l'API si le bot
+    // manque de permission — il retourne une 403 qui crash le handler non protégé.
+    if (!message.member.permissions.has(PermissionFlagsBits.BanMembers)) {
+      return message.reply({ embeds: [buildErrorEmbed('Permission insuffisante', 'Tu as besoin de **Bannir des membres**.')] });
+    }
+    if (!message.guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) {
+      return message.reply({ embeds: [buildErrorEmbed('Permission bot insuffisante', 'Je n\'ai pas la permission de bannir.')] });
+    }
+
+    const target = message.mentions.members.first();
+    if (!target) return message.reply({ embeds: [buildErrorEmbed('Cible manquante', 'Mentionne un membre à bannir.')] });
+    if (!target.bannable) return message.reply({ embeds: [buildErrorEmbed('Action impossible', 'Je ne peux pas bannir ce membre (hiérarchie des rôles).')] });
+
+    const reason = args.slice(1).join(' ') || 'Aucune raison fournie';
+    await target.ban({ reason, deleteMessageSeconds: 86400 });
+
+    STMT_INSERT_MOD_LOG.run(
+      message.guild.id, 'BAN',
+      target.id, target.user.tag,
+      message.author.id, message.author.tag,
+      reason
+    );
+
+    return message.channel.send({ embeds: [
+      new EmbedBuilder()
+        .setColor(0xE74C3C)
+        .setAuthor({ name: 'Modération — Ban' })
+        .addFields(
+          { name: 'Utilisateur', value: `${target.user.tag} (\`${target.id}\`)`, inline: true },
+          { name: 'Modérateur', value: message.author.tag, inline: true },
+          { name: 'Raison', value: reason }
+        )
+        .setTimestamp()
+    ]});
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// KICK
+// ═══════════════════════════════════════════════════════════════════════════════
+const kick = {
+  name        : 'kick',
+  aliases     : ['expulser'],
+  description : 'Expulser un membre du serveur.',
+  usage       : 'kick @membre [raison]',
+  category    : 'moderation',
+  cooldown    : 5,
+  permissions : ['KickMembers'],
+  guildOnly   : true,
+
+  async execute(message, args, client) {
+    if (!message.member.permissions.has(PermissionFlagsBits.KickMembers)) {
+      return message.reply({ embeds: [buildErrorEmbed('Permission insuffisante', 'Tu as besoin de **Expulser des membres**.')] });
+    }
+
+    const target = message.mentions.members.first();
+    if (!target) return message.reply({ embeds: [buildErrorEmbed('Cible manquante', 'Mentionne un membre à expulser.')] });
+    if (!target.kickable) return message.reply({ embeds: [buildErrorEmbed('Action impossible', 'Je ne peux pas expulser ce membre.')] });
+
+    const reason = args.slice(1).join(' ') || 'Aucune raison fournie';
+    await target.kick(reason);
+
+    STMT_INSERT_MOD_LOG.run(
+      message.guild.id, 'KICK',
+      target.id, target.user.tag,
+      message.author.id, message.author.tag,
+      reason
+    );
+
+    return message.channel.send({ embeds: [
+      new EmbedBuilder()
+        .setColor(0xF39C12)
+        .setAuthor({ name: 'Modération — Kick' })
+        .addFields(
+          { name: 'Utilisateur', value: `${target.user.tag} (\`${target.id}\`)`, inline: true },
+          { name: 'Modérateur', value: message.author.tag, inline: true },
+          { name: 'Raison', value: reason }
+        )
+        .setTimestamp()
+    ]});
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// WARN
+// ═══════════════════════════════════════════════════════════════════════════════
+const warn = {
+  name        : 'warn',
+  aliases     : ['avertir'],
+  description : 'Émettre un avertissement formel contre un membre.',
+  usage       : 'warn @membre [raison]',
+  category    : 'moderation',
+  cooldown    : 3,
+  permissions : ['ModerateMembers'],
+  guildOnly   : true,
+
+  async execute(message, args, client) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
+      return message.reply({ embeds: [buildErrorEmbed('Permission insuffisante', 'Tu as besoin de **Modérer les membres**.')] });
+    }
+
+    const target = message.mentions.members.first();
+    if (!target) return message.reply({ embeds: [buildErrorEmbed('Cible manquante', 'Mentionne un membre à avertir.')] });
+    if (target.user.bot) return message.reply({ embeds: [buildErrorEmbed('Action impossible', 'On ne peut pas avertir un bot.')] });
+
+    const reason = args.slice(1).join(' ') || 'Aucune raison fournie';
+
+    STMT_INSERT_WARNING.run(
+      message.guild.id, target.id, target.user.tag,
+      message.author.id, message.author.tag, reason
+    );
+
+    const { count } = STMT_COUNT_WARNINGS.get(message.guild.id, target.id);
+
+    STMT_INSERT_MOD_LOG.run(
+      message.guild.id, 'WARN',
+      target.id, target.user.tag,
+      message.author.id, message.author.tag,
+      reason
+    );
+
+    // DM non bloquant — l'absence de perm DM ne doit pas faire rater la commande
+    target.send(`⚠️ Tu as reçu un avertissement sur **${message.guild.name}**.\nRaison : ${reason}\nTotal : **${count}** avertissement(s)`).catch(() => {});
+
+    return message.channel.send({ embeds: [
+      new EmbedBuilder()
+        .setColor(0xF1C40F)
+        .setAuthor({ name: 'Modération — Avertissement' })
+        .addFields(
+          { name: 'Utilisateur', value: `${target.user.tag} (\`${target.id}\`)`, inline: true },
+          { name: 'Total avertissements', value: `**${count}**`, inline: true },
+          { name: 'Raison', value: reason }
+        )
+        .setTimestamp()
+    ]});
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// WARNINGS LIST
+// ═══════════════════════════════════════════════════════════════════════════════
+const warnings = {
+  name        : 'warnings',
+  aliases     : ['warns'],
+  description : 'Consulter les avertissements d\'un membre.',
+  usage       : 'warnings [@membre]',
+  category    : 'moderation',
+  cooldown    : 5,
+  guildOnly   : true,
+
+  async execute(message, args, client) {
+    const target = message.mentions.members.first() ?? message.member;
+    const rows   = STMT_GET_WARNINGS.all(message.guild.id, target.id);
+
+    const description = rows.length === 0
+      ? '*Aucun avertissement enregistré.*'
+      : rows.map((w, i) => `**${i + 1}.** ${w.reason} — *par ${w.moderator_tag}* — <t:${w.created_at}:R>`).join('\n');
+
+    return message.channel.send({ embeds: [
+      new EmbedBuilder()
+        .setColor(0xF39C12)
+        .setAuthor({ name: `Avertissements — ${target.user.tag}` })
+        .setThumbnail(target.user.displayAvatarURL())
+        .setDescription(description)
+        .setFooter({ text: `Total : ${rows.length} avertissement(s)` })
+        .setTimestamp()
+    ]});
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CLEAR
+// ═══════════════════════════════════════════════════════════════════════════════
+const clear = {
+  name        : 'clear',
+  aliases     : ['purge'],
+  description : 'Supprimer des messages en masse (1–100).',
+  usage       : 'clear [nombre]',
+  category    : 'moderation',
+  cooldown    : 5,
+  permissions : ['ManageMessages'],
+  guildOnly   : true,
+
+  async execute(message, args, client) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+      return message.reply({ embeds: [buildErrorEmbed('Permission insuffisante', 'Tu as besoin de **Gérer les messages**.')] });
+    }
+
+    const amount = parseInt(args[0], 10) || 10;
+    if (amount < 1 || amount > 100) {
+      return message.reply({ embeds: [buildErrorEmbed('Valeur invalide', 'Entre un nombre entre **1** et **100**.')] });
+    }
+
+    // +1 pour inclure le message de commande lui-même
+    await message.channel.bulkDelete(amount + 1, true).catch(() => {});
+
+    STMT_INSERT_MOD_LOG_CLEAR.run(
+      message.guild.id, 'CLEAR',
+      message.author.id, message.author.tag,
+      `${amount} messages dans #${message.channel.name}`
+    );
+
+    const confirm = await message.channel.send(`🗑️ **${amount}** message(s) supprimé(s).`);
+    // POURQUOI setTimeout et non await : on ne veut pas bloquer l'exécution
+    // pour une suppression cosmétique. Si le delete échoue, ce n'est pas grave.
+    setTimeout(() => confirm.delete().catch(() => {}), 3000);
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MUTE (timeout natif v14)
+// ═══════════════════════════════════════════════════════════════════════════════
+const mute = {
+  name        : 'mute',
+  aliases     : ['timeout', 'silence'],
+  description : 'Mettre un membre en sourdine (timeout Discord natif).',
+  usage       : 'mute @membre [durée ex: 10m 1h] [raison]',
+  category    : 'moderation',
+  cooldown    : 5,
+  permissions : ['ModerateMembers'],
+  guildOnly   : true,
+
+  async execute(message, args, client) {
+    if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
+      return message.reply({ embeds: [buildErrorEmbed('Permission insuffisante', 'Tu as besoin de **Modérer les membres**.')] });
+    }
+
+    const target = message.mentions.members.first();
+    if (!target) return message.reply({ embeds: [buildErrorEmbed('Cible manquante', 'Mentionne un membre à muter.')] });
+    if (!target.moderatable) return message.reply({ embeds: [buildErrorEmbed('Action impossible', 'Je ne peux pas muter ce membre (hiérarchie).')] });
+
+    // POURQUOI require('ms') inline : dépendance optionnelle.
+    // Si ms n'est pas installé, le fallback sur 10 min reste valide.
+    let duration   = 10 * 60 * 1000;
+    let reasonStart = 1;
+    try {
+      const ms = require('ms');
+      if (args[1] && ms(args[1])) { duration = ms(args[1]); reasonStart = 2; }
+    } catch { /* ms non installé — durée par défaut */ }
+
+    const MAX_TIMEOUT_MS = 28 * 24 * 60 * 60 * 1000; // 28 jours — limite Discord
+    if (duration > MAX_TIMEOUT_MS) {
+      return message.reply({ embeds: [buildErrorEmbed('Durée excessive', 'La durée maximale est **28 jours**.')] });
+    }
+
+    const reason = args.slice(reasonStart).join(' ') || 'Aucune raison fournie';
+    await target.timeout(duration, reason);
+
+    const durationLabel = `${Math.round(duration / 60000)} min`;
+    STMT_INSERT_MOD_LOG_DURATION.run(
+      message.guild.id, 'MUTE',
+      target.id, target.user.tag,
+      message.author.id, message.author.tag,
+      reason, durationLabel
+    );
+
+    return message.channel.send({ embeds: [
+      new EmbedBuilder()
+        .setColor(0xE74C3C)
+        .setAuthor({ name: 'Modération — Mute' })
+        .addFields(
+          { name: 'Utilisateur', value: `${target.user.tag} (\`${target.id}\`)`, inline: true },
+          { name: 'Durée', value: durationLabel, inline: true },
+          { name: 'Raison', value: reason }
+        )
+        .setTimestamp()
+    ]});
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UNBAN
+// ═══════════════════════════════════════════════════════════════════════════════
+const unban = {
+  name        : 'unban',
+  aliases     : [],
+  description : 'Lever le ban d\'un utilisateur par son ID.',
+  usage       : 'unban <userID> [raison]',
+  category    : 'moderation',
+  cooldown    : 5,
+  permissions : ['BanMembers'],
+  guildOnly   : true,
+
+  async execute(message, args, client) {
+    if (!message.member.permissions.has(PermissionFlagsBits.BanMembers)) {
+      return message.reply({ embeds: [buildErrorEmbed('Permission insuffisante', 'Tu as besoin de **Bannir des membres**.')] });
+    }
+    if (!args[0]) return message.reply({ embeds: [buildErrorEmbed('ID manquant', 'Fournis l\'ID Discord de l\'utilisateur à débannir.')] });
+
+    // POURQUOI valider le format Snowflake : éviter une requête API inutile
+    // sur un ID manifestement invalide. Les Snowflakes Discord font 17–19 chiffres.
+    if (!/^\d{17,19}$/.test(args[0])) {
+      return message.reply({ embeds: [buildErrorEmbed('ID invalide', 'L\'ID Discord doit contenir 17 à 19 chiffres.')] });
+    }
+
+    try {
+      await message.guild.bans.remove(args[0]);
+      STMT_INSERT_MOD_LOG.run(message.guild.id, 'UNBAN', args[0], args[0], message.author.id, message.author.tag, 'Unban');
+      return message.reply({ embeds: [
+        new EmbedBuilder()
+          .setColor(0x27AE60)
+          .setAuthor({ name: 'Modération — Unban' })
+          .setDescription(`Utilisateur \`${args[0]}\` débanni avec succès.`)
+          .setTimestamp()
+      ]});
+    } catch {
+      return message.reply({ embeds: [buildErrorEmbed('Utilisateur introuvable', 'Cet ID n\'est pas dans la liste des bans.')] });
+    }
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Helper embed d'erreur local (autonome, ne dépend pas de utils/embeds)
+// POURQUOI local : évite la dépendance circulaire si embeds.js importe database
+// ═══════════════════════════════════════════════════════════════════════════════
+function buildErrorEmbed(title, description) {
+  return new EmbedBuilder()
+    .setColor(0xE74C3C)
+    .setAuthor({ name: `✗ ${title}` })
+    .setDescription(description)
+    .setTimestamp();
+}
+
+// AVERTISSEMENT — ce fichier exporte plusieurs commandes.
+// Le CommandHandler actuel attend un fichier = une commande.
+// Ces exports sont corrects pour une future version éclatée en fichiers séparés.
+// En attendant, ce fichier est SKIPPÉ par le loader — Phase 2 corrigera ça.
+module.exports = { ban, kick, warn, warnings, clear, mute, unban };

@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "language": "fr",
+    "version": "1.0.0",
+    "maintained_by": "CV1 Copywriter + CG6 Onboarding Designer"
+  },
+
+  "welcome_dm": {
+    "title": "Bienvenue sur Soulbot",
+    "description": "Soulbot vient d'être ajouté à **{guild_name}**. Voici comment démarrer en 3 étapes.",
+    "steps": {
+      "step1": "Configure tes logs avec `;logs`",
+      "step2": "Crée ton premier ticket avec `;ticket`",
+      "step3": "Découvre Premium — 14 jours gratuits"
+    },
+    "footer": "Des questions ? Rejoins notre serveur support."
+  }
+}

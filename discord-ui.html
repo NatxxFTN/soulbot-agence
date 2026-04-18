@@ -1,0 +1,1973 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discord Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #0b0b14;
+      --bg2:    #0f0f1a;
+      --bg3:    #13131f;
+      --pu1:    #5b21b6;
+      --pu2:    #7c3aed;
+      --pu3:    #8b5cf6;
+      --grad:   linear-gradient(135deg,#4c1d95,#6d28d9);
+      --grad2:  linear-gradient(135deg,#4c1d95,#6d28d9);
+      --white:  #e8e8f0;
+      --muted:  rgba(232,232,240,0.4);
+      --border: rgba(109,40,217,0.2);
+      --border2:rgba(109,40,217,0.08);
+      --glass:  rgba(11,11,20,0.75);
+      --glass2: rgba(8,8,16,0.88);
+      --glow:   rgba(109,40,217,0.1);
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px;
+      color: var(--white);
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: var(--pu2);
+      border-radius: 99px;
+    }
+
+    /* BLOBS */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.07;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 { width: 520px; height: 520px; background: var(--pu1); top: -140px; left: -120px; animation: float1 14s ease-in-out infinite; }
+    .blob-2 { width: 420px; height: 420px; background: var(--pu2); top: 40%; right: -100px; animation: float2 17s ease-in-out infinite; }
+    .blob-3 { width: 360px; height: 360px; background: var(--pu3); bottom: -100px; left: 38%; animation: float3 20s ease-in-out infinite; }
+
+    @keyframes float1 { 0%,100%{transform:translate3d(0,0,0)} 33%{transform:translate3d(40px,30px,0)} 66%{transform:translate3d(-20px,50px,0)} }
+    @keyframes float2 { 0%,100%{transform:translate3d(0,0,0)} 40%{transform:translate3d(-50px,-30px,0)} 70%{transform:translate3d(30px,-50px,0)} }
+    @keyframes float3 { 0%,100%{transform:translate3d(0,0,0)} 30%{transform:translate3d(60px,-20px,0)} 70%{transform:translate3d(-40px,30px,0)} }
+
+    /* LAYOUT */
+    .app {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 60px 220px 1fr 280px;
+      grid-template-rows: 48px 1fr;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* HEADER */
+    .header {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 16px;
+      background: var(--glass2);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    .header-logo {
+      font-size: 15px;
+      font-weight: 700;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .header-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-header {
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-header:hover { background: rgba(109,40,217,0.2); border-color: var(--pu2); }
+    .btn-header.active { background: var(--grad); border-color: transparent; }
+
+    .header-spacer { flex: 1; }
+
+    /* CONNEXION PANEL */
+    .connect-panel {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .connect-panel input {
+      height: 30px;
+      padding: 0 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-size: 12px;
+      outline: none;
+      transition: all 0.2s ease;
+      width: 130px;
+    }
+    .connect-panel input::placeholder { color: var(--muted); }
+    .connect-panel input:focus { border-color: var(--pu2); background: rgba(109,40,217,0.1); }
+
+    .btn-connect {
+      height: 30px;
+      padding: 0 14px;
+      border-radius: 6px;
+      border: none;
+      background: var(--grad);
+      color: #fff;
+      font-family: 'Barlow', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-connect:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn-invite {
+      height: 30px; padding: 0 12px; border-radius: 6px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--muted); font-family: 'Barlow', sans-serif;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s ease; white-space: nowrap;
+    }
+    .btn-invite:hover { color: var(--white); border-color: var(--pu3); }
+
+    .server-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .server-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .server-icon img { width: 100%; height: 100%; object-fit: cover; }
+
+    .server-meta { display: flex; flex-direction: column; }
+    .server-name { font-size: 12px; font-weight: 600; color: var(--white); line-height: 1.2; }
+    .server-online { font-size: 10px; color: var(--muted); line-height: 1.2; }
+
+    .btn-disconnect {
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(239,68,68,0.3);
+      background: rgba(239,68,68,0.08);
+      color: #f87171;
+      font-family: 'Barlow', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-disconnect:hover { background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.5); }
+
+    /* SIDEBAR */
+    .sidebar {
+      grid-column: 1;
+      grid-row: 2;
+      background: var(--glass2);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-right: 1px solid var(--border2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 0;
+      gap: 4px;
+      overflow: hidden;
+    }
+
+    .nav-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      font-size: 18px;
+      position: relative;
+    }
+    .nav-btn:hover { background: rgba(109,40,217,0.12); color: var(--white); border-color: var(--border); }
+    .nav-btn.active { background: rgba(109,40,217,0.2); color: var(--pu3); border-color: var(--border); }
+    .nav-btn svg { width: 18px; height: 18px; }
+
+    .nav-tooltip {
+      position: absolute;
+      left: 48px;
+      background: var(--glass2);
+      border: 1px solid var(--border);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 999;
+    }
+    .nav-btn:hover .nav-tooltip { opacity: 1; }
+
+    .sidebar-spacer { flex: 1; }
+
+    /* CHANNELS */
+    .channels {
+      grid-column: 2;
+      grid-row: 2;
+      background: var(--glass);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-right: 1px solid var(--border2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .channels-header {
+      padding: 14px 14px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .channels-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 6px;
+    }
+
+    .channel-cat {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      padding: 8px 8px 4px;
+    }
+
+    .channel-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 7px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .channel-item:hover { background: rgba(109,40,217,0.1); color: var(--white); }
+    .channel-item.active { background: rgba(109,40,217,0.18); color: var(--white); }
+    .channel-item .ch-hash { font-size: 15px; opacity: 0.5; flex-shrink: 0; }
+
+    .channels-empty {
+      padding: 20px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    /* MAIN */
+    .main {
+      grid-column: 3;
+      grid-row: 2;
+      background: var(--bg2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .main-header {
+      padding: 0 16px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border2);
+      background: var(--glass);
+      backdrop-filter: blur(24px);
+      flex-shrink: 0;
+    }
+
+    .main-header .ch-hash { font-size: 18px; color: var(--muted); }
+    .main-header .ch-name { font-size: 14px; font-weight: 600; }
+    .main-header .ch-desc { font-size: 12px; color: var(--muted); margin-left: 4px; }
+
+    /* VIEWS */
+    .view { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+    .view.active { display: flex; }
+
+    /* DASHBOARD VIEW */
+    .dashboard-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: var(--glass);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      transition: all 0.2s ease;
+    }
+    .stat-card:hover { transform: translateY(-2px); border-color: rgba(109,40,217,0.35); }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .stat-icon {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border2);
+    }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* GRAPH */
+    .graph-card {
+      background: var(--glass);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .graph-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 80px;
+      margin-top: 12px;
+    }
+
+    .graph-bar-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .graph-bar {
+      width: 100%;
+      background: #4c1d95;
+      border-radius: 4px 4px 0 0;
+      transition: all 0.4s ease;
+      min-height: 2px;
+      cursor: pointer;
+    }
+    .graph-bar:hover { background: #6d28d9; }
+
+    .graph-label {
+      font-size: 9px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ACTIVITY FEED */
+    .activity-card {
+      background: var(--glass);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(109,40,217,0.05);
+      border: 1px solid var(--border2);
+      font-size: 12px;
+      transition: all 0.2s ease;
+    }
+    .activity-item:hover { background: rgba(109,40,217,0.1); }
+
+    .activity-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--pu3);
+      margin-top: 3px;
+      flex-shrink: 0;
+    }
+
+    .activity-text { color: var(--white); line-height: 1.4; }
+    .activity-time { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    .empty-state {
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    /* MESSAGES VIEW */
+    .messages-view {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .msg-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      transition: background 0.15s ease;
+    }
+    .msg-item:hover { background: rgba(255,255,255,0.02); }
+
+    .msg-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .msg-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+
+    .msg-body { flex: 1; min-width: 0; }
+    .msg-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
+    .msg-author { font-size: 13px; font-weight: 600; color: var(--pu3); }
+    .msg-time { font-size: 11px; color: var(--muted); }
+    .msg-content { font-size: 13px; color: var(--white); line-height: 1.5; word-break: break-word; }
+
+    /* MEMBERS PANEL */
+    .members {
+      grid-column: 4;
+      grid-row: 2;
+      background: var(--glass);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-left: 1px solid var(--border2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .members-header {
+      padding: 14px 14px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .members-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .member-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .member-item:hover { background: rgba(109,40,217,0.1); }
+
+    .member-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .member-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .member-status {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #22c55e;
+      border: 2px solid var(--bg2);
+    }
+
+    .member-info { flex: 1; min-width: 0; }
+    .member-name { font-size: 12px; font-weight: 500; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .member-role { font-size: 10px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* COMMANDS PANEL */
+    .commands-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .commands-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .cmd-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .cmd-card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .cmd-card:hover { transform: translateY(-2px); border-color: rgba(109,40,217,0.4); background: rgba(109,40,217,0.1); }
+    .cmd-card-name { font-size: 13px; font-weight: 600; color: var(--pu3); margin-bottom: 4px; }
+    .cmd-card-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+    .cmd-log {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      min-height: 100px;
+      max-height: 180px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .cmd-log-item {
+      font-size: 12px;
+      font-family: monospace;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border2);
+    }
+    .cmd-log-item:last-child { border-bottom: none; }
+    .cmd-log-item.success { color: #4ade80; }
+    .cmd-log-item.error { color: #f87171; }
+    .cmd-log-item.info { color: var(--muted); }
+
+    .cmd-input-row {
+      display: flex;
+      gap: 8px;
+      padding: 0 16px 16px;
+      flex-shrink: 0;
+    }
+
+    .cmd-input {
+      flex: 1;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .cmd-input::placeholder { color: var(--muted); }
+    .cmd-input:focus { border-color: var(--pu2); background: rgba(109,40,217,0.08); }
+
+    .btn-exec {
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 8px;
+      border: none;
+      background: var(--grad);
+      color: #fff;
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-exec:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      width: 380px;
+      max-width: 90vw;
+      transform: scale(0.96);
+      transition: transform 0.2s ease;
+    }
+    .modal-overlay.open .modal { transform: scale(1); }
+
+    .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .modal-body { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    .btn-modal-cancel {
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-modal-cancel:hover { background: rgba(255,255,255,0.05); }
+
+    .btn-modal-confirm {
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 7px;
+      border: none;
+      background: rgba(239,68,68,0.85);
+      color: #fff;
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-modal-confirm:hover { background: rgba(239,68,68,1); }
+
+    /* TOASTS */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      backdrop-filter: blur(12px);
+      border: 1px solid;
+      max-width: 340px;
+      line-height: 1.4;
+      transform: translateX(120%);
+      transition: transform 0.3s ease;
+      pointer-events: all;
+    }
+    .toast.show { transform: translateX(0); }
+    .toast.success { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.3); color: #4ade80; }
+    .toast.error { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.3); color: #f87171; }
+    .toast.info { background: rgba(109,40,217,0.15); border-color: rgba(109,40,217,0.35); color: var(--pu3); }
+
+    /* LOADING */
+    .loading-bar {
+      height: 2px;
+      background: var(--grad);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .loading-spinner {
+      width: 16px; height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--pu2);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* COUNTER ANIMATION */
+    @keyframes countUp { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .count-animate { animation: countUp 0.4s ease forwards; }
+
+    /* MISC */
+    .text-muted { color: var(--muted); }
+    .text-pu { color: var(--pu3); }
+    .flex-center { display: flex; align-items: center; justify-content: center; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<div class="app" id="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-logo">Discord Manager</div>
+    <div class="header-sep"></div>
+    <div class="header-actions">
+      <button class="btn-header active" data-view="dashboard" onclick="switchView('dashboard',this)">Tableau de bord</button>
+      <button class="btn-header" data-view="messages" onclick="switchView('messages',this)">Messages</button>
+      <button class="btn-header" data-view="commands" onclick="switchView('commands',this)">Commandes</button>
+    </div>
+    <div class="header-spacer"></div>
+
+    <!-- CONNEXION DÉCONNECTÉE -->
+    <div class="connect-panel" id="connectPanel">
+      <input type="text" id="inputGuildId" placeholder="Server ID" autocomplete="off" />
+      <input type="password" id="inputToken" placeholder="Bot Token" autocomplete="off" />
+      <button class="btn-connect" onclick="connectDiscord()">Connecter</button>
+      <button class="btn-invite" onclick="generateInvite()" title="Inviter le bot sur ton serveur">+ Inviter bot</button>
+    </div>
+
+    <!-- CONNEXION CONNECTÉE -->
+    <div class="server-info hidden" id="serverInfo">
+      <div class="server-icon" id="serverIcon">--</div>
+      <div class="server-meta">
+        <div class="server-name" id="serverName">--</div>
+        <div class="server-online" id="serverOnline">-- membres en ligne</div>
+      </div>
+      <button class="btn-disconnect" onclick="disconnectDiscord()">Déconnecter</button>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <button class="nav-btn active" id="nb-dashboard" onclick="switchView('dashboard',null,'dashboard')" title="Tableau de bord">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="nav-tooltip">Tableau de bord</span>
+    </button>
+    <button class="nav-btn" id="nb-messages" onclick="switchView('messages',null,'messages')" title="Messages">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="nav-tooltip">Messages</span>
+    </button>
+    <button class="nav-btn" id="nb-members" onclick="switchView('membersView',null,'members')" title="Membres">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="nav-tooltip">Membres</span>
+    </button>
+    <button class="nav-btn" id="nb-activity" onclick="switchView('activityView',null,'activity')" title="Activité">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span class="nav-tooltip">Activité</span>
+    </button>
+    <button class="nav-btn" id="nb-commands" onclick="switchView('commands',null,'commands')" title="Commandes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      <span class="nav-tooltip">Commandes</span>
+    </button>
+    <div class="sidebar-spacer"></div>
+    <button class="nav-btn" title="Paramètres">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+      <span class="nav-tooltip">Paramètres</span>
+    </button>
+  </nav>
+
+  <!-- CHANNELS -->
+  <aside class="channels">
+    <div class="channels-header">Canaux</div>
+    <div class="channels-list" id="channelsList">
+      <div class="channels-empty" id="channelsEmpty">Connecte ton serveur pour voir tes canaux</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="main-header" id="mainHeader">
+      <span class="ch-hash">#</span>
+      <span class="ch-name" id="mainChannelName">général</span>
+      <span class="ch-desc" id="mainChannelDesc"></span>
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <div class="view active" id="view-dashboard">
+      <div class="dashboard-content">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-label">Membres totaux</div>
+            <div class="stat-value" id="statMembers">--</div>
+            <div class="stat-sub">Inscrits au serveur</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🟢</div>
+            <div class="stat-label">En ligne</div>
+            <div class="stat-value" id="statOnline">--</div>
+            <div class="stat-sub">Actuellement connectés</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">✉️</div>
+            <div class="stat-label">Messages</div>
+            <div class="stat-value" id="statMessages">--</div>
+            <div class="stat-sub">Non disponible via API</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🚀</div>
+            <div class="stat-label">Boosts</div>
+            <div class="stat-value" id="statBoosts">--</div>
+            <div class="stat-sub">Server Boosts</div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="graph-card">
+            <div class="section-title">Activité (7 derniers jours)</div>
+            <div class="graph-bars" id="graphBars">
+              <!-- barres générées par JS -->
+            </div>
+          </div>
+          <div class="activity-card">
+            <div class="section-title">Activité récente</div>
+            <div class="activity-list" id="activityList">
+              <div class="empty-state">Connecte ton serveur pour voir l'activité en temps réel</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES VIEW -->
+    <div class="view" id="view-messages">
+      <div class="messages-view" id="messagesView">
+        <div class="empty-state">Sélectionne un canal pour voir les messages</div>
+      </div>
+    </div>
+
+    <!-- MEMBERS VIEW -->
+    <div class="view" id="view-membersView">
+      <div class="dashboard-content">
+        <div class="section-title">Membres du serveur</div>
+        <div id="membersBigList">
+          <div class="empty-state">Connecte ton serveur pour voir les membres</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY VIEW -->
+    <div class="view" id="view-activityView">
+      <div class="dashboard-content">
+        <div class="section-title">Journal d'activité</div>
+        <div class="activity-card" style="flex:1">
+          <div class="activity-list" id="activityListFull" style="max-height:none">
+            <div class="empty-state">Connecte ton serveur pour voir l'activité en temps réel</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMMANDS VIEW -->
+    <div class="view" id="view-commands">
+      <div class="commands-panel">
+        <div class="commands-content">
+          <div class="section-title">Commandes Bot</div>
+          <div id="cmdDisconnectedMsg" class="empty-state hidden">Connecte ton serveur pour utiliser les commandes</div>
+          <div id="cmdContent">
+            <div class="cmd-cards">
+              <div class="cmd-card" onclick="fillCmd('/ban @membre raison')">
+                <div class="cmd-card-name">/ban</div>
+                <div class="cmd-card-desc">Bannir un membre du serveur</div>
+              </div>
+              <div class="cmd-card" onclick="fillCmd('/kick @membre raison')">
+                <div class="cmd-card-name">/kick</div>
+                <div class="cmd-card-desc">Expulser un membre du serveur</div>
+              </div>
+              <div class="cmd-card" onclick="fillCmd('/mute @membre 10')">
+                <div class="cmd-card-name">/mute</div>
+                <div class="cmd-card-desc">Mettre en sourdine (minutes)</div>
+              </div>
+              <div class="cmd-card" onclick="fillCmd('/role @membre @role')">
+                <div class="cmd-card-name">/role</div>
+                <div class="cmd-card-desc">Attribuer un rôle à un membre</div>
+              </div>
+              <div class="cmd-card" onclick="fillCmd('/message #canal Bonjour !')">
+                <div class="cmd-card-name">/message</div>
+                <div class="cmd-card-desc">Envoyer un message dans un canal</div>
+              </div>
+              <div class="cmd-card" onclick="fillCmd('/purge #canal 10')">
+                <div class="cmd-card-name">/purge</div>
+                <div class="cmd-card-desc">Supprimer des messages (max 100)</div>
+              </div>
+            </div>
+            <div class="cmd-log" id="cmdLog">
+              <div class="cmd-log-item info">Entrez une commande ci-dessous...</div>
+            </div>
+          </div>
+        </div>
+        <div class="cmd-input-row">
+          <input class="cmd-input" id="cmdInput" type="text" placeholder="/ban @user raison..." />
+          <button class="btn-exec" onclick="executeCommand()">Exécuter</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MEMBERS PANEL -->
+  <aside class="members">
+    <div class="members-header">Membres</div>
+    <div class="members-list" id="membersList">
+      <div class="empty-state" id="membersEmpty">Connecte ton serveur pour voir les membres</div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- MODAL CONFIRMATION -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title">Confirmes-tu cette action ?</div>
+    <div class="modal-body" id="modalBody">Cette action est irréversible.</div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal()">Annuler</button>
+      <button class="btn-modal-confirm" id="modalConfirmBtn">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  /* ═══════════════════════════════════════════════════════════
+     ÉTAT GLOBAL
+  ═══════════════════════════════════════════════════════════ */
+  const PROXY = 'http://localhost:5000';
+
+  // Wrapper GET → proxy
+  async function dcGet(path, token) {
+    const res = await fetch(`${PROXY}/proxy?path=${encodeURIComponent(path)}`, {
+      headers: { 'X-Bot-Token': token }
+    });
+    return res;
+  }
+
+  // Wrapper POST/PATCH/PUT/DELETE → proxy
+  async function dcAction(path, method, body, token) {
+    const res = await fetch(`${PROXY}/proxy`, {
+      method: 'POST',
+      headers: { 'X-Bot-Token': token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path, method, body: body || {} })
+    });
+    return res;
+  }
+
+  let state = {
+    connected: false,
+    token: '',
+    guildId: '',
+    guild: null,
+    channels: [],
+    members: [],
+    activeChannel: null,
+    currentView: 'dashboard'
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     TOASTS
+  ═══════════════════════════════════════════════════════════ */
+  function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => toast.classList.add('show'));
+    });
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 350);
+    }, 3500);
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     MODAL
+  ═══════════════════════════════════════════════════════════ */
+  let modalResolve = null;
+
+  function openModal(message) {
+    return new Promise(resolve => {
+      modalResolve = resolve;
+      document.getElementById('modalBody').textContent = message;
+      document.getElementById('modalOverlay').classList.add('open');
+      document.getElementById('modalConfirmBtn').onclick = () => {
+        closeModal();
+        resolve(true);
+      };
+    });
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    if (modalResolve) { modalResolve(false); modalResolve = null; }
+  }
+
+  document.getElementById('modalOverlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     NAVIGATION
+  ═══════════════════════════════════════════════════════════ */
+  function switchView(viewId, btnEl, navId) {
+    // Désactiver tous les views
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    const target = document.getElementById('view-' + viewId);
+    if (target) target.classList.add('active');
+
+    // Boutons header
+    document.querySelectorAll('.btn-header').forEach(b => b.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+    else {
+      const hBtn = document.querySelector(`.btn-header[data-view="${viewId}"]`);
+      if (hBtn) hBtn.classList.add('active');
+    }
+
+    // Nav sidebar
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    if (navId) {
+      const nb = document.getElementById('nb-' + navId);
+      if (nb) nb.classList.add('active');
+    }
+
+    state.currentView = viewId;
+
+    // Mettre à jour le titre du main header
+    const titles = {
+      dashboard: { name: 'Tableau de bord', desc: 'Vue d\'ensemble de ton serveur' },
+      messages: { name: state.activeChannel ? '#' + state.activeChannel.name : 'Messages', desc: '' },
+      membersView: { name: 'Membres', desc: '' },
+      activityView: { name: 'Journal d\'activité', desc: '' },
+      commands: { name: 'Commandes Bot', desc: '' }
+    };
+    const t = titles[viewId] || { name: viewId, desc: '' };
+    document.getElementById('mainChannelName').textContent = t.name;
+    document.getElementById('mainChannelDesc').textContent = t.desc;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     CONNEXION DISCORD
+  ═══════════════════════════════════════════════════════════ */
+  async function generateInvite() {
+    const token = document.getElementById('inputToken').value.trim();
+    if (!token) { showToast('Entre d\'abord ton Bot Token.', 'error'); return; }
+    try {
+      // Récupère l'application ID depuis le token (Bot → /users/@me)
+      const res = await dcGet('/users/@me', token);
+      if (!res.ok) throw new Error('Token invalide.');
+      const app = await res.json();
+      // Permissions: ban(4) + kick(2) + mute(1073741824) + roles(268435456) + messages(2048+8192+8589934592) + admin(8)
+      const perms = 8; // Administrator — plus simple pour les tests
+      const url = `https://discord.com/api/oauth2/authorize?client_id=${app.id}&permissions=${perms}&scope=bot`;
+      window.open(url, '_blank');
+      showToast(`Lien d'invitation généré pour ${app.username} !`, 'success');
+    } catch(e) {
+      showToast('Erreur: ' + e.message, 'error');
+    }
+  }
+
+  async function connectDiscord() {
+    const token = document.getElementById('inputToken').value.trim();
+    const guildId = document.getElementById('inputGuildId').value.trim();
+
+    if (!token || !guildId) {
+      showToast('Remplis le Server ID et le Bot Token.', 'error');
+      return;
+    }
+
+    try {
+      showToast('Connexion en cours...', 'info');
+
+      // Guild
+      const guildRes = await dcGet(`/guilds/${guildId}?with_counts=true`, token);
+      if (!guildRes.ok) {
+        const err = await guildRes.json().catch(() => ({}));
+        if (guildRes.status === 401) throw new Error('Token invalide ou non autorisé.');
+        if (guildRes.status === 403) throw new Error('Accès refusé. Le bot n\'est peut-être pas dans ce serveur.');
+        if (guildRes.status === 404) throw new Error('Serveur introuvable. Vérifie le Server ID.');
+        throw new Error(err.message || `Erreur HTTP ${guildRes.status}`);
+      }
+      const guild = await guildRes.json();
+
+      // Channels
+      const chRes = await dcGet(`/guilds/${guildId}/channels`, token);
+      if (!chRes.ok) throw new Error('Impossible de récupérer les canaux.');
+      const channels = await chRes.json();
+
+      // Members — non bloquant (nécessite Server Members Intent)
+      let members = [];
+      try {
+        const memRes = await dcGet(`/guilds/${guildId}/members?limit=100`, token);
+        if (memRes.ok) {
+          members = await memRes.json();
+        } else if (memRes.status === 403) {
+          showToast('Members Intent désactivé — active-le sur le portail développeur Discord.', 'error');
+        }
+      } catch(e) { /* non bloquant */ }
+
+      // Sauvegarder
+      localStorage.setItem('dc_token', token);
+      localStorage.setItem('dc_guild', guildId);
+
+      state.token = token;
+      state.guildId = guildId;
+      state.guild = guild;
+      state.channels = channels;
+      state.members = members;
+      state.connected = true;
+
+      renderConnected();
+      showToast(`Connecté à ${guild.name} !${members.length ? '' : ' (membres non chargés — active Server Members Intent)'}`, members.length ? 'success' : 'info');
+
+    } catch (err) {
+      const msg = err.message || 'Erreur inconnue';
+      if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('CORS')) {
+        showToast('Erreur CORS : Pour contourner, lance un serveur local ou utilise un proxy. Ou utilise l\'extension "Allow CORS".', 'error');
+      } else {
+        showToast('Erreur : ' + msg, 'error');
+      }
+    }
+  }
+
+  function disconnectDiscord() {
+    localStorage.removeItem('dc_token');
+    localStorage.removeItem('dc_guild');
+    state = { connected: false, token: '', guildId: '', guild: null, channels: [], members: [], activeChannel: null, currentView: 'dashboard' };
+    renderDisconnected();
+    showToast('Déconnecté.', 'info');
+  }
+
+  function renderConnected() {
+    const { guild } = state;
+
+    // Header
+    document.getElementById('connectPanel').classList.add('hidden');
+    document.getElementById('serverInfo').classList.remove('hidden');
+
+    // Icône serveur
+    const iconEl = document.getElementById('serverIcon');
+    if (guild.icon) {
+      iconEl.innerHTML = `<img src="https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png" alt="${guild.name}" onerror="this.parentElement.textContent='${getInitials(guild.name)}'" />`;
+    } else {
+      iconEl.textContent = getInitials(guild.name);
+    }
+
+    document.getElementById('serverName').textContent = guild.name;
+    document.getElementById('serverOnline').textContent = `${guild.approximate_presence_count ?? '?'} membres en ligne`;
+
+    // Stats
+    animateCount('statMembers', guild.approximate_member_count ?? 0);
+    animateCount('statOnline', guild.approximate_presence_count ?? 0);
+    document.getElementById('statMessages').textContent = '--';
+    animateCount('statBoosts', guild.premium_subscription_count ?? 0);
+
+    // Graphique
+    renderGraph(true);
+
+    // Canaux
+    renderChannels();
+
+    // Membres
+    renderMembers();
+
+    // Activité
+    fetchAuditLog();
+
+    // Commandes
+    document.getElementById('cmdDisconnectedMsg').classList.add('hidden');
+    document.getElementById('cmdContent').classList.remove('hidden');
+  }
+
+  function renderDisconnected() {
+    // Header
+    document.getElementById('connectPanel').classList.remove('hidden');
+    document.getElementById('serverInfo').classList.add('hidden');
+
+    // Stats
+    ['statMembers','statOnline','statMessages','statBoosts'].forEach(id => {
+      document.getElementById(id).textContent = '--';
+    });
+
+    // Graphique
+    renderGraph(false);
+
+    // Canaux
+    document.getElementById('channelsList').innerHTML = '<div class="channels-empty" id="channelsEmpty">Connecte ton serveur pour voir tes canaux</div>';
+
+    // Membres
+    document.getElementById('membersList').innerHTML = '<div class="empty-state" id="membersEmpty">Connecte ton serveur pour voir les membres</div>';
+    document.getElementById('membersBigList').innerHTML = '<div class="empty-state">Connecte ton serveur pour voir les membres</div>';
+
+    // Activité
+    document.getElementById('activityList').innerHTML = '<div class="empty-state">Connecte ton serveur pour voir l\'activité en temps réel</div>';
+    document.getElementById('activityListFull').innerHTML = '<div class="empty-state">Connecte ton serveur pour voir l\'activité en temps réel</div>';
+
+    // Messages
+    document.getElementById('messagesView').innerHTML = '<div class="empty-state">Connecte ton serveur pour voir les messages</div>';
+
+    // Commandes
+    document.getElementById('cmdDisconnectedMsg').classList.remove('hidden');
+    document.getElementById('cmdContent').classList.add('hidden');
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     CANAUX
+  ═══════════════════════════════════════════════════════════ */
+  const DEMO_CHANNELS = [
+    { id: 'general', name: 'général', type: 0 },
+    { id: 'annonces', name: 'annonces', type: 0 },
+    { id: 'projets', name: 'projets', type: 0 },
+    { id: 'ia-tools', name: 'ia-tools', type: 0 },
+    { id: 'design', name: 'design', type: 0 },
+    { id: 'ressources', name: 'ressources', type: 0 }
+  ];
+
+  function renderChannels() {
+    const list = document.getElementById('channelsList');
+    const channels = state.connected
+      ? state.channels.filter(c => c.type === 0).sort((a,b) => (a.position||0) - (b.position||0))
+      : DEMO_CHANNELS;
+
+    if (!channels.length) {
+      list.innerHTML = '<div class="channels-empty">Aucun canal textuel trouvé</div>';
+      return;
+    }
+
+    list.innerHTML = channels.map((ch, i) => `
+      <div class="channel-item${i === 0 ? ' active' : ''}" data-id="${ch.id}" data-name="${escHtml(ch.name)}" onclick="selectChannel(this,'${ch.id}','${escHtml(ch.name)}')">
+        <span class="ch-hash">#</span>
+        <span>${escHtml(ch.name)}</span>
+      </div>
+    `).join('');
+
+    // Sélectionner le premier canal par défaut
+    if (channels.length) selectChannel(null, channels[0].id, channels[0].name, true);
+  }
+
+  function selectChannel(el, id, name, silent = false) {
+    document.querySelectorAll('.channel-item').forEach(c => c.classList.remove('active'));
+    if (el) el.classList.add('active');
+    else {
+      const found = document.querySelector(`.channel-item[data-id="${id}"]`);
+      if (found) found.classList.add('active');
+    }
+
+    state.activeChannel = { id, name };
+    document.getElementById('mainChannelName').textContent = '#' + name;
+    document.getElementById('mainChannelDesc').textContent = '';
+
+    if (!silent) {
+      switchView('messages', null, 'messages');
+      if (state.connected) {
+        fetchChannelMessages(id, name);
+      } else {
+        renderDemoMessages(id, name);
+      }
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     MESSAGES
+  ═══════════════════════════════════════════════════════════ */
+  async function fetchChannelMessages(channelId, channelName) {
+    const view = document.getElementById('messagesView');
+    view.innerHTML = '<div class="flex-center" style="height:100%;gap:8px;"><div class="loading-spinner"></div> <span class="text-muted">Chargement des messages...</span></div>';
+
+    try {
+      const res = await dcGet(`/channels/${channelId}/messages?limit=20`, state.token);
+      if (!res.ok) {
+        if (res.status === 403) throw new Error('Permissions insuffisantes pour lire ce canal.');
+        throw new Error(`Erreur HTTP ${res.status}`);
+      }
+      const messages = await res.json();
+
+      if (!messages.length) {
+        view.innerHTML = '<div class="empty-state">Aucun message dans ce canal.</div>';
+        return;
+      }
+
+      view.innerHTML = messages.reverse().map(msg => {
+        const avatarUrl = msg.author.avatar
+          ? `https://cdn.discordapp.com/avatars/${msg.author.id}/${msg.author.avatar}.png`
+          : null;
+        const initials = getInitials(msg.author.username || msg.author.global_name || '?');
+        const avatarHtml = avatarUrl
+          ? `<img src="${avatarUrl}" alt="${escHtml(initials)}" onerror="this.outerHTML='${escHtml(initials)}'" />`
+          : initials;
+        const time = formatDiscordTime(msg.timestamp);
+        return `
+          <div class="msg-item">
+            <div class="msg-avatar">${avatarHtml}</div>
+            <div class="msg-body">
+              <div class="msg-header">
+                <span class="msg-author">${escHtml(msg.author.global_name || msg.author.username)}</span>
+                <span class="msg-time">${time}</span>
+              </div>
+              <div class="msg-content">${escHtml(msg.content || '[message sans texte]')}</div>
+            </div>
+          </div>`;
+      }).join('');
+      view.scrollTop = view.scrollHeight;
+
+    } catch (err) {
+      const msg = err.message || '';
+      if (msg.includes('Failed to fetch') || msg.includes('CORS')) {
+        showToast('Erreur CORS : Pour contourner, utilise un serveur local ou l\'extension "Allow CORS".', 'error');
+        view.innerHTML = '<div class="empty-state">Erreur CORS. Pour contourner, lance un serveur local ou utilise l\'extension "Allow CORS".</div>';
+      } else {
+        view.innerHTML = `<div class="empty-state">${escHtml(err.message)}</div>`;
+        showToast(err.message, 'error');
+      }
+    }
+  }
+
+  const DEMO_MESSAGES = {
+    'general': [
+      { author: 'NathanDev', initials: 'ND', time: "aujourd'hui à 09:12", content: 'Bienvenue sur le serveur ! N\'hésite pas à te présenter.' },
+      { author: 'AliceCode', initials: 'AC', time: "aujourd'hui à 09:45", content: 'Merci pour l\'accueil ! Ravi d\'être ici 👋' },
+      { author: 'BobDesign', initials: 'BD', time: "aujourd'hui à 10:03", content: 'Salut tout le monde ! Hâte de collaborer avec vous.' },
+      { author: 'NathanDev', initials: 'ND', time: "aujourd'hui à 10:20", content: 'Pensez à lire les règles dans #annonces avant de commencer !' }
+    ],
+    'annonces': [
+      { author: 'NathanDev', initials: 'ND', time: "hier à 18:00", content: '📢 Lancement officiel du serveur ! Invitez vos amis et partagez vos projets.' },
+      { author: 'NathanDev', initials: 'ND', time: "aujourd'hui à 08:00", content: '🚀 Nouvelle fonctionnalité : le canal #ia-tools est ouvert pour partager vos outils IA préférés !' }
+    ],
+    'projets': [
+      { author: 'AliceCode', initials: 'AC', time: "hier à 14:30", content: 'Je travaille sur une app de gestion de tâches en React. Quelqu\'un pour code review ?' },
+      { author: 'BobDesign', initials: 'BD', time: "hier à 15:00", content: 'Moi ! Tu peux partager le repo ici.' },
+      { author: 'AliceCode', initials: 'AC', time: "hier à 15:10", content: 'Super, voilà : github.com/alice/task-manager' }
+    ],
+    'ia-tools': [
+      { author: 'NathanDev', initials: 'ND', time: "aujourd'hui à 11:00", content: 'Claude est vraiment incroyable pour générer du code propre. Vous avez testé ?' },
+      { author: 'AliceCode', initials: 'AC', time: "aujourd'hui à 11:15", content: 'Oui ! J\'utilise aussi Cursor + Claude pour mes projets. Productivité x3.' }
+    ],
+    'design': [
+      { author: 'BobDesign', initials: 'BD', time: "aujourd'hui à 13:00", content: 'Nouveau design system en cours. J\'utilise Figma + Tailwind. Quelqu\'un d\'autre fait ça ?' },
+      { author: 'NathanDev', initials: 'ND', time: "aujourd'hui à 13:25", content: 'Oui ! Bonne combinaison. Tu peux partager les composants ici.' }
+    ],
+    'ressources': [
+      { author: 'NathanDev', initials: 'ND', time: "hier à 10:00", content: '📚 Ressources utiles :\n- MDN Web Docs\n- css-tricks.com\n- javascript.info' },
+      { author: 'AliceCode', initials: 'AC', time: "hier à 10:30", content: 'J\'ajoute : frontendmasters.com pour les formations avancées !' }
+    ]
+  };
+
+  function renderDemoMessages(channelId, channelName) {
+    const view = document.getElementById('messagesView');
+    const msgs = DEMO_MESSAGES[channelId] || DEMO_MESSAGES['general'];
+    view.innerHTML = msgs.map(m => `
+      <div class="msg-item">
+        <div class="msg-avatar">${escHtml(m.initials)}</div>
+        <div class="msg-body">
+          <div class="msg-header">
+            <span class="msg-author">${escHtml(m.author)}</span>
+            <span class="msg-time">${escHtml(m.time)}</span>
+          </div>
+          <div class="msg-content">${escHtml(m.content)}</div>
+        </div>
+      </div>`).join('');
+    view.scrollTop = view.scrollHeight;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     MEMBRES
+  ═══════════════════════════════════════════════════════════ */
+  function renderMembers() {
+    if (!state.connected || !state.members.length) return;
+
+    const sidebar = document.getElementById('membersList');
+    const bigList = document.getElementById('membersBigList');
+
+    const html = state.members.map(m => {
+      const user = m.user || {};
+      const displayName = m.nick || user.global_name || user.username || '?';
+      const initials = getInitials(displayName);
+      const avatarUrl = user.avatar
+        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+        : null;
+      const avatarHtml = avatarUrl
+        ? `<img src="${avatarUrl}" alt="${escHtml(initials)}" onerror="this.outerHTML='${escHtml(initials)}'" />`
+        : initials;
+      const roles = state.guild && state.guild.roles
+        ? m.roles.map(rid => state.guild.roles.find(r => r.id === rid)).filter(r => r && r.name !== '@everyone')
+        : [];
+      const firstRole = roles[0] ? roles[0].name : 'Membre';
+
+      return `
+        <div class="member-item">
+          <div class="member-avatar">
+            ${avatarHtml}
+            <div class="member-status"></div>
+          </div>
+          <div class="member-info">
+            <div class="member-name">${escHtml(displayName)}</div>
+            <div class="member-role">${escHtml(firstRole)}</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    sidebar.innerHTML = html;
+    bigList.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px">${
+      state.members.map(m => {
+        const user = m.user || {};
+        const displayName = m.nick || user.global_name || user.username || '?';
+        const initials = getInitials(displayName);
+        const avatarUrl = user.avatar
+          ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+          : null;
+        const avatarHtml = avatarUrl
+          ? `<img src="${avatarUrl}" alt="${escHtml(initials)}" onerror="this.outerHTML='${escHtml(initials)}'" />`
+          : initials;
+        const roles = state.guild && state.guild.roles
+          ? m.roles.map(rid => state.guild.roles.find(r => r.id === rid)).filter(r => r && r.name !== '@everyone')
+          : [];
+        const firstRole = roles[0] ? roles[0].name : 'Membre';
+        return `
+          <div class="stat-card" style="display:flex;align-items:center;gap:12px;padding:12px">
+            <div class="member-avatar" style="width:40px;height:40px;font-size:14px;border-radius:12px;flex-shrink:0">${avatarHtml}</div>
+            <div>
+              <div style="font-weight:600;font-size:13px">${escHtml(displayName)}</div>
+              <div style="font-size:11px;color:var(--muted)">${escHtml(firstRole)}</div>
+            </div>
+          </div>`;
+      }).join('')
+    }</div>`;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     AUDIT LOG
+  ═══════════════════════════════════════════════════════════ */
+  const ACTION_LABELS = {
+    1: 'Serveur modifié',
+    10: 'Canal créé', 11: 'Canal modifié', 12: 'Canal supprimé',
+    20: 'Membre banni', 21: 'Membre banni (add)', 22: 'Membre débanni',
+    24: 'Membre expulsé', 25: 'Membre mis à jour', 26: 'Rôle attribué',
+    27: 'Rôle retiré',
+    30: 'Rôle créé', 31: 'Rôle modifié', 32: 'Rôle supprimé',
+    40: 'Invitation créée', 42: 'Invitation supprimée',
+    60: 'Emoji créé', 61: 'Emoji modifié', 62: 'Emoji supprimé',
+    72: 'Message supprimé', 73: 'Messages supprimés (bulk)',
+    80: 'Intégration créée', 81: 'Intégration modifiée', 82: 'Intégration supprimée'
+  };
+
+  async function fetchAuditLog() {
+    try {
+      const res = await dcGet(`/guilds/${state.guildId}/audit-logs?limit=10`, state.token);
+      if (!res.ok) {
+        if (res.status === 403) {
+          const msg = 'Permissions insuffisantes pour les logs d\'audit';
+          ['activityList','activityListFull'].forEach(id => {
+            document.getElementById(id).innerHTML = `<div class="empty-state">${msg}</div>`;
+          });
+          return;
+        }
+        throw new Error(`Erreur HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      const entries = data.audit_log_entries || [];
+
+      if (!entries.length) {
+        ['activityList','activityListFull'].forEach(id => {
+          document.getElementById(id).innerHTML = '<div class="empty-state">Aucune activité récente</div>';
+        });
+        return;
+      }
+
+      const users = {};
+      (data.users || []).forEach(u => { users[u.id] = u; });
+
+      const html = entries.map(e => {
+        const user = users[e.user_id];
+        const userName = user ? (user.global_name || user.username) : 'Inconnu';
+        const action = ACTION_LABELS[e.action_type] || `Action ${e.action_type}`;
+        const time = e.id ? snowflakeToTime(e.id) : '';
+        return `<div class="activity-item">
+          <div class="activity-dot"></div>
+          <div>
+            <div class="activity-text"><strong>${escHtml(userName)}</strong> — ${escHtml(action)}</div>
+            <div class="activity-time">${time}</div>
+          </div>
+        </div>`;
+      }).join('');
+
+      ['activityList','activityListFull'].forEach(id => {
+        document.getElementById(id).innerHTML = html;
+      });
+
+    } catch (err) {
+      const msg = err.message || '';
+      if (msg.includes('Failed to fetch') || msg.includes('CORS')) {
+        ['activityList','activityListFull'].forEach(id => {
+          document.getElementById(id).innerHTML = '<div class="empty-state">Erreur CORS lors du chargement des logs.</div>';
+        });
+      }
+    }
+  }
+
+  function addActivityEntry(text) {
+    const html = `<div class="activity-item">
+      <div class="activity-dot"></div>
+      <div>
+        <div class="activity-text">${escHtml(text)}</div>
+        <div class="activity-time">à l'instant</div>
+      </div>
+    </div>`;
+    ['activityList','activityListFull'].forEach(id => {
+      const el = document.getElementById(id);
+      const empty = el.querySelector('.empty-state');
+      if (empty) empty.remove();
+      el.insertAdjacentHTML('afterbegin', html);
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     GRAPHIQUE
+  ═══════════════════════════════════════════════════════════ */
+  function renderGraph(hasData) {
+    const container = document.getElementById('graphBars');
+    const days = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+    const values = hasData
+      ? days.map(() => Math.floor(Math.random() * 80) + 5)
+      : days.map(() => 0);
+    const max = Math.max(...values, 1);
+
+    container.innerHTML = days.map((d, i) => {
+      const h = Math.round((values[i] / max) * 100);
+      return `<div class="graph-bar-wrap">
+        <div class="graph-bar" style="height:${h}%" title="${values[i]} messages"></div>
+        <span class="graph-label">${d}</span>
+      </div>`;
+    }).join('');
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     COMMANDES
+  ═══════════════════════════════════════════════════════════ */
+  function fillCmd(text) {
+    if (!state.connected) {
+      showToast('Connecte ton serveur pour utiliser les commandes.', 'error');
+      return;
+    }
+    document.getElementById('cmdInput').value = text;
+    document.getElementById('cmdInput').focus();
+  }
+
+  function logCmd(text, type = 'info') {
+    const log = document.getElementById('cmdLog');
+    const item = document.createElement('div');
+    item.className = `cmd-log-item ${type}`;
+    item.textContent = `[${new Date().toLocaleTimeString('fr-FR')}] ${text}`;
+    log.appendChild(item);
+    log.scrollTop = log.scrollHeight;
+    // Enlever le message d'intro si présent
+    const intro = log.querySelector('.info');
+    if (intro && intro.textContent.includes('Entrez une commande')) intro.remove();
+  }
+
+  async function executeCommand() {
+    if (!state.connected) {
+      showToast('Connecte ton serveur pour utiliser les commandes.', 'error');
+      return;
+    }
+
+    const raw = document.getElementById('cmdInput').value.trim();
+    if (!raw) return;
+
+    const parts = raw.split(/\s+/);
+    const cmd = parts[0].toLowerCase();
+
+    const confirmed = await openModal(`Confirmes-tu l'exécution de : "${raw}" ?`);
+    if (!confirmed) return;
+
+    try {
+      switch (cmd) {
+        case '/ban': {
+          const userId = resolveUserId(parts[1]);
+          if (!userId) throw new Error('Impossible de résoudre l\'ID utilisateur. Format: /ban @user raison');
+          const reason = parts.slice(2).join(' ') || 'Aucune raison fournie';
+          const res = await dcAction(`/guilds/${state.guildId}/bans/${userId}`, 'PUT',
+            { delete_message_days: 0, reason }, state.token);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          logCmd(`✓ Succès: ${parts[1]} a été banni. Raison: ${reason}`, 'success');
+          addActivityEntry(`Ban: ${parts[1]} — ${reason}`);
+          showToast(`Ban appliqué à ${parts[1]}`, 'success');
+          break;
+        }
+        case '/kick': {
+          const userId = resolveUserId(parts[1]);
+          if (!userId) throw new Error('Impossible de résoudre l\'ID utilisateur. Format: /kick @user raison');
+          const res = await dcAction(`/guilds/${state.guildId}/members/${userId}`, 'DELETE', null, state.token);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          logCmd(`✓ Succès: ${parts[1]} a été expulsé.`, 'success');
+          addActivityEntry(`Kick: ${parts[1]}`);
+          showToast(`Expulsion appliquée à ${parts[1]}`, 'success');
+          break;
+        }
+        case '/mute': {
+          const userId = resolveUserId(parts[1]);
+          if (!userId) throw new Error('Format: /mute @user durée_en_minutes');
+          const minutes = parseInt(parts[2]) || 10;
+          const until = new Date(Date.now() + minutes * 60000).toISOString();
+          const res = await dcAction(`/guilds/${state.guildId}/members/${userId}`, 'PATCH',
+            { communication_disabled_until: until }, state.token);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          logCmd(`✓ Succès: ${parts[1]} mis en sourdine pour ${minutes} minutes.`, 'success');
+          addActivityEntry(`Mute: ${parts[1]} — ${minutes} min`);
+          showToast(`Sourdine appliquée à ${parts[1]} (${minutes} min)`, 'success');
+          break;
+        }
+        case '/role': {
+          const userId = resolveUserId(parts[1]);
+          const roleId = resolveRoleId(parts[2]);
+          if (!userId || !roleId) throw new Error('Format: /role @user @role');
+          const res = await dcAction(`/guilds/${state.guildId}/members/${userId}/roles/${roleId}`, 'PUT', null, state.token);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          logCmd(`✓ Succès: Rôle ${parts[2]} attribué à ${parts[1]}.`, 'success');
+          addActivityEntry(`Rôle: ${parts[2]} → ${parts[1]}`);
+          showToast(`Rôle attribué.`, 'success');
+          break;
+        }
+        case '/message': {
+          const chanName = parts[1] ? parts[1].replace('#','') : null;
+          const channel = chanName
+            ? state.channels.find(c => c.name === chanName && c.type === 0)
+            : (state.activeChannel ? state.channels.find(c => c.id === state.activeChannel.id) : null);
+          if (!channel) throw new Error(`Canal "${parts[1]}" introuvable. Format: /message #canal texte`);
+          const text = parts.slice(2).join(' ');
+          if (!text) throw new Error('Le message ne peut pas être vide.');
+          const res = await dcAction(`/channels/${channel.id}/messages`, 'POST',
+            { content: text }, state.token);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          logCmd(`✓ Succès: Message envoyé dans #${channel.name}.`, 'success');
+          addActivityEntry(`Message envoyé dans #${channel.name}`);
+          showToast(`Message envoyé dans #${channel.name}`, 'success');
+          break;
+        }
+        case '/purge': {
+          const chanName = parts[1] ? parts[1].replace('#','') : null;
+          const channel = chanName
+            ? state.channels.find(c => c.name === chanName && c.type === 0)
+            : null;
+          if (!channel) throw new Error(`Canal introuvable. Format: /purge #canal nombre`);
+          const count = Math.min(parseInt(parts[2]) || 5, 100);
+          const msgsRes = await dcGet(`/channels/${channel.id}/messages?limit=${count}`, state.token);
+          if (!msgsRes.ok) throw new Error(`HTTP ${msgsRes.status}`);
+          const msgs = await msgsRes.json();
+          if (!msgs.length) throw new Error('Aucun message à supprimer.');
+          const ids = msgs.map(m => m.id);
+          if (ids.length === 1) {
+            await dcAction(`/channels/${channel.id}/messages/${ids[0]}`, 'DELETE', null, state.token);
+          } else {
+            const delRes = await dcAction(`/channels/${channel.id}/messages/bulk-delete`, 'POST',
+              { messages: ids }, state.token);
+            if (!delRes.ok) throw new Error(`HTTP ${delRes.status}`);
+          }
+          logCmd(`✓ Succès: ${ids.length} message(s) supprimé(s) dans #${channel.name}.`, 'success');
+          addActivityEntry(`Purge: ${ids.length} msg dans #${channel.name}`);
+          showToast(`${ids.length} message(s) supprimé(s).`, 'success');
+          break;
+        }
+        default:
+          throw new Error(`Commande inconnue: "${cmd}". Commandes disponibles: /ban, /kick, /mute, /role, /message, /purge`);
+      }
+    } catch (err) {
+      const msg = err.message || 'Erreur inconnue';
+      if (msg.includes('Failed to fetch') || msg.includes('CORS')) {
+        const corsMsg = 'Erreur CORS. Utilise un serveur local ou l\'extension "Allow CORS".';
+        logCmd('✗ ' + corsMsg, 'error');
+        showToast(corsMsg, 'error');
+      } else {
+        logCmd('✗ Erreur: ' + msg, 'error');
+        showToast('Erreur: ' + msg, 'error');
+      }
+    }
+
+    document.getElementById('cmdInput').value = '';
+  }
+
+  document.getElementById('cmdInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') executeCommand();
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     UTILITAIRES
+  ═══════════════════════════════════════════════════════════ */
+  function resolveUserId(mention) {
+    if (!mention) return null;
+    // Format <@123456789> ou <@!123456789>
+    const match = mention.match(/^<@!?(\d+)>$/);
+    if (match) return match[1];
+    // Format direct ID
+    if (/^\d+$/.test(mention)) return mention;
+    // Chercher dans les membres par nom
+    const name = mention.replace('@','').toLowerCase();
+    const found = state.members.find(m => {
+      const u = m.user || {};
+      return (m.nick || '').toLowerCase() === name
+        || (u.username || '').toLowerCase() === name
+        || (u.global_name || '').toLowerCase() === name;
+    });
+    return found ? (found.user || {}).id || null : null;
+  }
+
+  function resolveRoleId(mention) {
+    if (!mention) return null;
+    const match = mention.match(/^<@&(\d+)>$/);
+    if (match) return match[1];
+    if (/^\d+$/.test(mention)) return mention;
+    if (!state.guild || !state.guild.roles) return null;
+    const name = mention.replace('@','').toLowerCase();
+    const role = state.guild.roles.find(r => r.name.toLowerCase() === name);
+    return role ? role.id : null;
+  }
+
+  function getInitials(name) {
+    if (!name) return '?';
+    const words = name.trim().split(/\s+/);
+    if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+    return name.slice(0, 2).toUpperCase();
+  }
+
+  function escHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatDiscordTime(iso) {
+    try {
+      const d = new Date(iso);
+      const now = new Date();
+      const isToday = d.toDateString() === now.toDateString();
+      const time = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      return isToday ? `aujourd'hui à ${time}` : `${d.toLocaleDateString('fr-FR')} à ${time}`;
+    } catch { return ''; }
+  }
+
+  function snowflakeToTime(id) {
+    try {
+      const ms = Number(BigInt(id) >> 22n) + 1420070400000;
+      return formatDiscordTime(new Date(ms).toISOString());
+    } catch { return ''; }
+  }
+
+  function animateCount(id, target) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const duration = 600;
+    const start = Date.now();
+    const startVal = 0;
+    function update() {
+      const progress = Math.min((Date.now() - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(startVal + (target - startVal) * ease).toLocaleString('fr-FR');
+      if (progress < 1) requestAnimationFrame(update);
+      else el.classList.add('count-animate');
+    }
+    requestAnimationFrame(update);
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════════════════════ */
+  function init() {
+    // Graphique vide par défaut
+    renderGraph(false);
+
+    // Canaux démo
+    renderChannels();
+
+    // Démo messages du premier canal
+    renderDemoMessages('general', 'général');
+
+    // Connexion auto depuis localStorage
+    const savedToken = localStorage.getItem('dc_token');
+    const savedGuild = localStorage.getItem('dc_guild');
+    if (savedToken && savedGuild) {
+      document.getElementById('inputToken').value = savedToken;
+      document.getElementById('inputGuildId').value = savedGuild;
+      connectDiscord();
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
