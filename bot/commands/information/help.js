@@ -163,57 +163,57 @@ function buildPages(categories, client) {
   //   Footer : Page 1/N
   //   Timestamp
 
-  // ── Catégories ANSI (fond sombre + couleurs catégories) ──────────────
+  // ── Catégories : Nom  (count) ─────────────────────────────────────────
   const MAX_VISIBLE = 10;
   const visibleCats = categories.slice(0, MAX_VISIBLE);
   const hiddenCount = categories.length - visibleCats.length;
-  const catAnsi = [
-    ...visibleCats.map(([cat]) => {
-      const c = CATEGORIES[cat] ?? { label: cat, ansi: A.CYAN };
-      return `${c.ansi ?? A.CYAN}${c.label}${A.RESET}`;
+  const catLines = [
+    ...visibleCats.map(([cat, cmds]) => {
+      const c = CATEGORIES[cat] ?? { label: cat };
+      return `${c.label}  (${cmds.length})`;
     }),
-    ...(hiddenCount > 0 ? [`${A.GRAY}+${hiddenCount} catégories${A.RESET}`] : []),
+    ...(hiddenCount > 0 ? [`+${hiddenCount} catégories`] : []),
   ].join('\n');
 
-  // ── Syntaxes ANSI ─────────────────────────────────────────────────────
-  const syntaxAnsi = [
-    `${A.CYAN}➤ ${A.GRAY}|${A.BOLD}${A.WHITE} Soulbot${A.RESET}`,
-    `${A.GRAY}- ${A.WHITE}+help ${A.YELLOW}<commande>${A.RESET}`,
-    `${A.YELLOW}<>${A.WHITE} · Obligatoire${A.RESET}`,
-    `${A.YELLOW}[]${A.WHITE} · Optionnel${A.RESET}`,
-    `${A.YELLOW}()${A.WHITE} · Spécification${A.RESET}`,
-    `${A.YELLOW}/${A.WHITE}  · Sépare syntaxes${A.RESET}`,
+  // ── Syntaxes : style ╭➤￤ + ┊ ─────────────────────────────────────────
+  const botName = client.user.username;
+  const syntaxLines = [
+    `╭➤￤${botName}`,
+    `┊ - ;help <commande>`,
+    `┊ <>・Obligatoire`,
+    `┊ []・Optionnel`,
+    `┊ ()・Spécification`,
+    `┊ /  ・Sépare syntaxes`,
   ].join('\n');
 
-  // ── Stats ANSI (bloc pleine largeur sous les colonnes) ────────────────
-  const statsAnsi = [
-    `${A.WHITE}Nombre de commandes: ${A.YELLOW}${client.commands.size}${A.RESET}`,
-    `${A.WHITE}Commandes custom: ${A.YELLOW}0${A.RESET}`,
+  // ── Stats (pleine largeur) ────────────────────────────────────────────
+  const statsLines = [
+    `Nombre de commandes: ${client.commands.size}`,
+    `Commandes custom: 0`,
   ].join('\n');
 
   const overview = E.base()
     .setTimestamp(null)
     .setAuthor({ name: client.user.username, iconURL: client.user.displayAvatarURL({ size: 64 }) })
     .setTitle('Information')
-    .setDescription(`\`\`\`ansi\n${A.GRAY}══════════════════════════${A.RESET}\n${A.BOLD}${A.YELLOW}  ► Version ${version}${A.RESET}\n${A.GRAY}══════════════════════════${A.RESET}\n\`\`\``)
     .addFields(
       {
         name  : 'Catégories',
-        value : `\`\`\`ansi\n${catAnsi}\n\`\`\``,
+        value : `\`\`\`\n${catLines}\n\`\`\``,
         inline: true,
       },
       {
         name  : 'Syntaxes',
-        value : `\`\`\`ansi\n${syntaxAnsi}\n\`\`\``,
+        value : `\`\`\`\n${syntaxLines}\n\`\`\``,
         inline: true,
       },
       {
         name  : '\u200B',
-        value : `\`\`\`ansi\n${statsAnsi}\n\`\`\``,
+        value : `\`\`\`\n${statsLines}\n\`\`\``,
         inline: false,
       },
     )
-    .setFooter({ text: `Page 1/${total} | Version ${version}` });
+    .setFooter({ text: `Page 1/${total} · ;help <commande>` });
 
   pages.push(overview);
 
