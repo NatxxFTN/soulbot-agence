@@ -28,9 +28,14 @@ module.exports = {
     if (!target) return message.reply({ embeds: [E.error('Cible manquante', 'Mentionne un membre à avertir.')] });
     if (target.user.bot) return message.reply({ embeds: [E.error('Action impossible', 'On ne peut pas avertir un bot.')] });
 
-    const reason = args.slice(1).join(' ') || 'Aucune raison fournie';
+    const reason = (args.slice(1).join(' ') || 'Aucune raison fournie').slice(0, 512);
 
-    STMT_WARN.run(message.guild.id, target.id, target.user.tag, message.author.id, message.author.tag, reason);
+    try {
+      STMT_WARN.run(message.guild.id, target.id, target.user.tag, message.author.id, message.author.tag, reason);
+    } catch (err) {
+      return message.reply({ embeds: [E.error('Erreur DB', 'Impossible d\'enregistrer l\'avertissement.')] });
+    }
+
     const { count } = STMT_COUNT.get(message.guild.id, target.id);
     STMT_MOD_LOG.run(message.guild.id, 'WARN', target.id, target.user.tag, message.author.id, message.author.tag, reason);
 

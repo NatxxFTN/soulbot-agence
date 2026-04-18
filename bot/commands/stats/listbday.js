@@ -11,10 +11,10 @@ const E = require('../../utils/embeds');
  * Optionnel : filtrer par numéro de mois (1-12).
  */
 module.exports = {
-  name        : 'list',
-  aliases     : [],
+  name        : 'listbday',
+  aliases     : ['bdays', 'anniversaires'],
   description : 'Liste les anniversaires enregistrés.',
-  usage       : 'list bday [mois 1-12]',
+  usage       : 'listbday [mois 1-12]',
   cooldown    : 5,
 
   async execute(message, args, client) {

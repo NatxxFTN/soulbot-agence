@@ -123,6 +123,12 @@ module.exports = {
         await handler(interaction, params, client, client.db);
       } catch (err) {
         logger.errorStack(`InteractionCreate:Select:${action}`, err);
+        const payload = { content: '✗ Erreur lors de la sélection.', flags: MessageFlags.Ephemeral };
+        if (interaction.replied || interaction.deferred) {
+          await interaction.followUp(payload).catch(() => {});
+        } else {
+          await interaction.reply(payload).catch(() => {});
+        }
       }
     }
   },

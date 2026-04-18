@@ -35,7 +35,7 @@ module.exports = {
       return message.reply({ embeds: [E.error('Durée excessive', 'La durée maximale est **28 jours**.')] });
     }
 
-    const reason       = args.slice(reasonStart).join(' ') || 'Aucune raison fournie';
+    const reason       = (args.slice(reasonStart).join(' ') || 'Aucune raison fournie').slice(0, 512);
     const durationLabel = `${Math.round(duration / 60000)} min`;
 
     await target.timeout(duration, reason);

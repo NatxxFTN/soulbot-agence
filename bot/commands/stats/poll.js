@@ -78,6 +78,9 @@ module.exports = {
 
     const options = rawOptions.filter(Boolean);
 
+    if (question && question.length > 200) {
+      return message.reply({ embeds: [E.error('Question trop longue', 'Maximum **200 caractères**.')] });
+    }
     if (!question || options.length < 2) {
       return message.reply({ embeds: [E.usage(';', 'poll "Question" option1 option2 [--duration 24h]', 'Il faut au moins **2 options**. Entoure la question de guillemets.')] });
     }

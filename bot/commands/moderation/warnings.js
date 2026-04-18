@@ -17,7 +17,13 @@ module.exports = {
 
   async execute(message) {
     const target = message.mentions.members.first() ?? message.member;
-    const rows   = STMT_GET.all(message.guild.id, target.id);
+
+    let rows;
+    try {
+      rows = STMT_GET.all(message.guild.id, target.id);
+    } catch (err) {
+      return message.reply({ embeds: [E.error('Erreur DB', 'Impossible de récupérer les avertissements.')] });
+    }
 
     const description = rows.length === 0
       ? '*Aucun avertissement enregistré.*'

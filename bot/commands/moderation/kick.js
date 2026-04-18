@@ -22,8 +22,14 @@ module.exports = {
     if (!target) return message.reply({ embeds: [E.error('Cible manquante', 'Mentionne un membre à expulser.')] });
     if (!target.kickable) return message.reply({ embeds: [E.error('Action impossible', 'Je ne peux pas expulser ce membre (hiérarchie des rôles).')] });
 
-    const reason = args.slice(1).join(' ') || 'Aucune raison fournie';
-    await target.kick(reason);
+    const reason = (args.slice(1).join(' ') || 'Aucune raison fournie').slice(0, 512);
+
+    try {
+      await target.kick(reason);
+    } catch (err) {
+      if (err.code === 50013) return message.reply({ embeds: [E.error('Permission insuffisante', 'Hiérarchie de rôles : je ne peux pas expulser ce membre.')] });
+      return message.reply({ embeds: [E.error('Erreur API', `Impossible d'expulser : ${err.message}`)] });
+    }
 
     STMT.run(message.guild.id, 'KICK', target.id, target.user.tag, message.author.id, message.author.tag, reason);
 

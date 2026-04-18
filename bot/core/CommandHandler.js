@@ -111,7 +111,7 @@ async function dispatch(message, client, db, logger) {
 
   // Garde ownerOnly — validation Snowflake stricte
   if (cmd.ownerOnly) {
-    const owners = (process.env.BOT_OWNERS ?? '').split(',').map(s => s.trim()).filter(Boolean);
+    const owners = (process.env.BOT_OWNERS ?? '').split(',').map(s => s.trim()).filter(s => /^\d{17,19}$/.test(s));
     if (!owners.includes(author.id)) {
       return channel.send({ content: '✗ Commande réservée au propriétaire du bot.' });
     }

@@ -23,7 +23,11 @@ module.exports = {
       return message.reply({ embeds: [E.error('Valeur invalide', 'Entre un nombre entre **1** et **100**.')] });
     }
 
-    await message.channel.bulkDelete(amount + 1, true).catch(() => {});
+    try {
+      await message.channel.bulkDelete(amount + 1, true);
+    } catch (err) {
+      return message.reply({ embeds: [E.error('Erreur', 'Impossible de supprimer les messages (messages trop anciens ou permission manquante).')] });
+    }
 
     STMT.run(message.guild.id, 'CLEAR', message.author.id, message.author.tag, `${amount} messages dans #${message.channel.name}`);
 

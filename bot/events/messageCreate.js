@@ -57,6 +57,17 @@ module.exports = {
     const cmd          = client.commands.get(resolvedName);
     if (!cmd) return;
 
+    // ── Guard ownerOnly ───────────────────────────────────────────────────────
+    if (cmd.ownerOnly) {
+      const owners = (process.env.BOT_OWNERS ?? '')
+        .split(',')
+        .map(s => s.trim())
+        .filter(s => /^\d{17,19}$/.test(s));
+      if (!owners.includes(message.author.id)) {
+        return message.reply({ embeds: [E.error('Accès refusé', 'Commande réservée au propriétaire du bot.')] });
+      }
+    }
+
     // ── Cooldown ──────────────────────────────────────────────────────────────
     const cooldownMs = (cmd.cooldown ?? 3) * 1000;
     const cdKey      = `${cmd.name}-${message.author.id}`;
