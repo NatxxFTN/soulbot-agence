@@ -9,9 +9,9 @@ const LEVELS = {
 };
 
 // Niveau requis par catégorie de commande.
+// owner absent : le flag ownerOnly:true suffit — pas besoin de mapper la catégorie.
 // Les catégories absentes → USER (10) par défaut.
 const CATEGORY_LEVELS = {
-  owner        : LEVELS.OWNER,
   moderation   : LEVELS.MOD,
   configuration: LEVELS.ADMIN,
   protection   : LEVELS.ADMIN,
