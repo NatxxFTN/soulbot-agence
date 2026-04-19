@@ -33,7 +33,8 @@ try {
         } catch { /* déjà mort */ }
       }
       // Attendre 800ms que Discord libère les connexions WebSocket
-      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 800);
+      const end = Date.now() + 800;
+      while (Date.now() < end) { /* busy-wait cross-platform */ }
     } else {
       console.log('✅ Aucun processus node fantôme');
     }

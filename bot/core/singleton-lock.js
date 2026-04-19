@@ -19,7 +19,14 @@ function acquireLock() {
 
     if (oldPid && oldPid !== process.pid) {
       let alive = false;
-      try { process.kill(oldPid, 0); alive = true; } catch { /* processus mort */ }
+      try {
+        process.kill(oldPid, 0);
+        alive = true;
+      } catch (e) {
+        // EPERM sur Windows = processus existe mais appartient à un autre user → traiter comme vivant
+        if (e.code === 'EPERM') alive = true;
+        // ESRCH = processus mort → lock obsolète
+      }
 
       if (alive) {
         console.error(`\n❌ CONFLIT SINGLETON : une instance du bot est déjà active (PID ${oldPid}).`);

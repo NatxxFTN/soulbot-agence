@@ -3,6 +3,15 @@
 const E  = require('../../utils/embeds');
 const { db } = require('../../database');
 
+// Crée la table si whitelist.js n'a pas encore été chargé (ordre alpha)
+db.exec(`
+  CREATE TABLE IF NOT EXISTS bot_whitelist (
+    user_id    TEXT    PRIMARY KEY,
+    added_by   TEXT    NOT NULL DEFAULT 'system',
+    created_at INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+`);
+
 const STMT_REMOVE = db.prepare('DELETE FROM bot_whitelist WHERE user_id = ?');
 const STMT_CHECK  = db.prepare('SELECT 1 FROM bot_whitelist WHERE user_id = ?');
 
