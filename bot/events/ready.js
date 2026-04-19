@@ -51,6 +51,55 @@ module.exports = {
       startLiveUpdate(client, row.guild_id, 10 * 60 * 1000);
     }
 
+    // ── Handlers ticket (bouton panel + select menu type) ────────────────────
+    const { createTicket, getConfig } = require('../core/ticket-helper');
+
+    client.buttonHandlers.set('ticket_open', async (interaction) => {
+      try {
+        const { channel, number } = await createTicket(interaction.guild, interaction.user);
+        await interaction.reply({ content: `✓ Ticket créé : ${channel}`, ephemeral: true });
+        await channel.send({
+          content: interaction.user.toString(),
+          embeds : [
+            E.base()
+              .setTitle(`🎫 Ticket #${String(number).padStart(4, '0')}`)
+              .setDescription('Un membre du staff va te répondre sous peu.\nUtilise `;close` pour fermer ce ticket.'),
+          ],
+        });
+      } catch (err) {
+        const payload = { content: `✗ ${err.message}`, ephemeral: true };
+        if (interaction.replied || interaction.deferred) {
+          await interaction.followUp(payload).catch(() => {});
+        } else {
+          await interaction.reply(payload).catch(() => {});
+        }
+      }
+    });
+
+    client.selectHandlers.set('ticket_type', async (interaction) => {
+      const type = interaction.values[0];
+      const labels = { support: 'Support général', bug: 'Bug / problème', partnership: 'Partenariat', other: 'Autre' };
+      try {
+        const { channel, number } = await createTicket(interaction.guild, interaction.user, type);
+        await interaction.reply({ content: `✓ Ticket créé : ${channel}`, ephemeral: true });
+        await channel.send({
+          content: interaction.user.toString(),
+          embeds : [
+            E.base()
+              .setTitle(`🎫 Ticket #${String(number).padStart(4, '0')} — ${labels[type] ?? type}`)
+              .setDescription('Un membre du staff va te répondre sous peu.\nUtilise `;close` pour fermer ce ticket.'),
+          ],
+        });
+      } catch (err) {
+        const payload = { content: `✗ ${err.message}`, ephemeral: true };
+        if (interaction.replied || interaction.deferred) {
+          await interaction.followUp(payload).catch(() => {});
+        } else {
+          await interaction.reply(payload).catch(() => {});
+        }
+      }
+    });
+
     console.log('[Bot] Prêt !');
   },
 };

@@ -166,12 +166,51 @@ db.exec(`
     created_at    INTEGER NOT NULL DEFAULT (unixepoch())
   );
 
+  /* ---- Configuration ticket par serveur ---- */
+  CREATE TABLE IF NOT EXISTS ticket_config (
+    guild_id         TEXT PRIMARY KEY,
+    category_id      TEXT,
+    log_channel_id   TEXT,
+    staff_role_id    TEXT,
+    panel_channel_id TEXT,
+    panel_message_id TEXT,
+    ticket_counter   INTEGER NOT NULL DEFAULT 0
+  );
+
+  /* ---- Tickets ---- */
+  CREATE TABLE IF NOT EXISTS tickets (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id      TEXT    NOT NULL,
+    user_id       TEXT    NOT NULL,
+    channel_id    TEXT    NOT NULL UNIQUE,
+    ticket_number INTEGER NOT NULL,
+    status        TEXT    NOT NULL DEFAULT 'open',
+    claimed_by    TEXT,
+    created_at    INTEGER NOT NULL DEFAULT (unixepoch()),
+    closed_at     INTEGER,
+    closed_by     TEXT,
+    deleted_at    INTEGER
+  );
+
+  /* ---- Participants ajoutés dans un ticket ---- */
+  CREATE TABLE IF NOT EXISTS ticket_participants (
+    ticket_id INTEGER NOT NULL,
+    user_id   TEXT    NOT NULL,
+    added_by  TEXT    NOT NULL,
+    added_at  INTEGER NOT NULL DEFAULT (unixepoch()),
+    PRIMARY KEY (ticket_id, user_id),
+    FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
+  );
+
   /* ─── Index de performance ─── */
   CREATE INDEX IF NOT EXISTS idx_user_stats_guild    ON user_stats (guild_id, messages DESC);
   CREATE INDEX IF NOT EXISTS idx_user_stats_voice    ON user_stats (guild_id, voice_seconds DESC);
   CREATE INDEX IF NOT EXISTS idx_chan_stats_guild    ON user_channel_stats (guild_id, channel_id);
   CREATE INDEX IF NOT EXISTS idx_bdays_month         ON birthdays (month, day);
   CREATE INDEX IF NOT EXISTS idx_star_entries_guild  ON starboard_entries (guild_id, star_count DESC);
+  CREATE INDEX IF NOT EXISTS idx_tickets_guild       ON tickets (guild_id);
+  CREATE INDEX IF NOT EXISTS idx_tickets_status      ON tickets (guild_id, status);
+  CREATE INDEX IF NOT EXISTS idx_tickets_channel     ON tickets (channel_id);
 `);
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
