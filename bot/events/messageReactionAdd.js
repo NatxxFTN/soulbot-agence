@@ -18,6 +18,13 @@ module.exports = {
     const message = reaction.message;
     if (!message.guild) return;
 
+    // ── Giveaway — tracking 🎉 ───────────────────────────────────────────────
+    if (reaction.emoji.name === '🎉') {
+      const { getGiveawayByMessage, addParticipant } = require('../core/giveaway-helper');
+      const gw = getGiveawayByMessage(message.id);
+      if (gw && !gw.ended) addParticipant(gw.id, user.id);
+    }
+
     const guildId  = message.guild.id;
     ensureGuild(guildId);
 

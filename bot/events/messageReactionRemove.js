@@ -17,6 +17,13 @@ module.exports = {
     const message = reaction.message;
     if (!message.guild) return;
 
+    // ── Giveaway — retrait 🎉 ────────────────────────────────────────────────
+    if (reaction.emoji.name === '🎉') {
+      const { getGiveawayByMessage, removeParticipant } = require('../core/giveaway-helper');
+      const gw = getGiveawayByMessage(message.id);
+      if (gw && !gw.ended) removeParticipant(gw.id, user.id);
+    }
+
     const guildId  = message.guild.id;
     const settings = getGuildSettings(guildId);
     if (!settings?.star_enabled || !settings?.star_channel_id) return;

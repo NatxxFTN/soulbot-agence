@@ -51,6 +51,35 @@ module.exports = {
       startLiveUpdate(client, row.guild_id, 10 * 60 * 1000);
     }
 
+    // ── Scheduler giveaway (tick 30s) ────────────────────────────────────────
+    const { getActiveGiveaways, drawWinners, markEnded } = require('../core/giveaway-helper');
+    const { EmbedBuilder } = require('discord.js');
+
+    setInterval(async () => {
+      const toEnd = getActiveGiveaways();
+      for (const gw of toEnd) {
+        try {
+          const winners = drawWinners(gw.id, gw.winners_count);
+          markEnded(gw.id, winners);
+          const ch = await client.channels.fetch(gw.channel_id).catch(() => null);
+          if (!ch) continue;
+          const mentions = winners.length ? winners.map(w => `<@${w}>`).join(', ') : '*aucun participant*';
+          await ch.send({
+            content: winners.length ? winners.map(w => `<@${w}>`).join(' ') : '',
+            embeds: [
+              new EmbedBuilder()
+                .setColor(0xF39C12)
+                .setTitle('🎉 Giveaway terminé !')
+                .setDescription(`**Gain :** ${gw.prize}\n**Gagnant(s) :** ${mentions}`)
+                .setTimestamp(),
+            ],
+          }).catch(() => {});
+        } catch (err) {
+          console.error(`[Giveaway] Erreur tick #${gw.id}:`, err.message);
+        }
+      }
+    }, 30_000);
+
     // ── Handlers ticket (bouton panel + select menu type) ────────────────────
     const { createTicket, getConfig } = require('../core/ticket-helper');
 
