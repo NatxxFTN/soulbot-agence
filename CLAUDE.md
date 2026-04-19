@@ -209,6 +209,30 @@ T8               → Consolide et rend le rapport final.
 - ❌ Pas de substitution aux 4 Assistants (Assistants = qualité code, Testeurs = runtime)
 - ❌ Pas de rapport silencieux — chaque test doit être verbalisé
 
+### 🚨 PROTOCOLE RUNTIME STRICT (obligatoire depuis 2026-04-19)
+
+**Règle fondamentale :** La Squad Testeurs NE PEUT PAS valider 🟢 GO PROD sans :
+1. ✅ Bot redémarré — logs startup vérifiés ("Bot connecté")
+2. ✅ Test fonctionnel RÉEL demandé à Nathan dans Discord
+3. ✅ Confirmation explicite de Nathan ("ça marche")
+
+La review de code = étape PRÉ-TEST seulement. Pas une validation finale.
+
+**Workflow obligatoire :**
+```
+1. Squad Engineering livre le code
+2. ENG1/ENG6 redémarre le bot + vérifie les logs
+3. Lead Testeur demande à Nathan : "Teste [feature] et dis-moi ce qui se passe."
+4. Nathan teste et répond précisément
+5. ✅ "ça marche" → 🟢 GO PROD
+   ❌ "ça marche pas" → retour Squad Engineering, itération immédiate
+```
+
+**Phrases INTERDITES dans les rapports :**
+- ❌ "Simulation OK" — ❌ "Devrait fonctionner" — ❌ "Testé mentalement" — ❌ "Logique cohérente"
+
+**Seule phrase valide :** `"Nathan a testé et confirmé : [description exacte]"`
+
 ---
 
 ## 7. Squad Commerce & Growth (6 agents — monétisation & acquisition)
@@ -864,7 +888,34 @@ Condition bloquante : squad principale non saturée → complexité inutile.
 
 ---
 
-## 19. Activation automatique (à chaque ouverture de session)
+## 19. Règle compteur de commandes (obligatoire chaque batch)
+
+À CHAQUE batch de production, la Squad Engineering DOIT :
+
+1. **Vérifier l'augmentation du compteur** après redémarrage du bot :
+   - Avant Batch N : noter le total affiché dans les logs
+   - Après Batch N : total doit avoir augmenté d'exactement N commandes
+
+2. **Si l'écart est différent**, investiguer AVANT de commit :
+   - Doublon de `name` → la 2e commande écrase la 1ère dans le Map (silencieux)
+   - `SyntaxError` dans un fichier → non chargé, loggé en `⚠️ Erreurs`
+   - Fichier dans le mauvais dossier → pas scanné
+   - `module.exports.name` manquant → ignoré avec warning
+
+3. **Vérifier dans les logs de démarrage** :
+   - Le tableau par catégorie (📁 owner : X / 39 ✅)
+   - Aucune ligne `⚠️ Erreur de chargement`
+   - Total cohérent avec l'attendu
+
+4. **Vérifier dans Discord** :
+   - `;help` affiche le nouveau total dans le bloc "Nombre de commandes"
+   - La commande nouvellement ajoutée répond correctement
+
+**Règle absolue :** pas de commit tant que le compteur ne reflète pas exactement l'ajout réel.
+
+---
+
+## 20. Activation automatique (à chaque ouverture de session)
 
 À la lecture de ce fichier, exécuter IMMÉDIATEMENT dans l'ordre :
 

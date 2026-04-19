@@ -12,6 +12,27 @@ const { Collection, PermissionsBitField } = require('discord.js');
 
 const COMMANDS_ROOT = path.join(__dirname, '../commands');
 
+// Objectifs par catégorie (roadmap S1→S6)
+const CATEGORY_TARGETS = {
+  owner        : 39,
+  moderation   : 35,
+  information  : 15,
+  utility      : 21,
+  configuration: 20,
+  protection   : 13,
+  fun          : 12,
+  stats        : 15,
+  ticket       : 12,
+  game         : 10,
+  custom       :  5,
+  giveaway     :  5,
+  greeting     :  5,
+  invitation   :  6,
+  level        :  6,
+  role         :  7,
+};
+const GLOBAL_TARGET = Object.values(CATEGORY_TARGETS).reduce((a, b) => a + b, 0);
+
 /**
  * Charge récursivement toutes les commandes depuis bot/commands/**
  * Chaque fichier doit exporter : { name, execute, [aliases], [cooldown],
@@ -27,14 +48,17 @@ function loadCommands(client, logger) {
 
   let loaded  = 0;
   let skipped = 0;
+  const errors      = [];
+  const catCounts   = {};
 
-  const categories = fs.readdirSync(COMMANDS_ROOT);
+  const categoryDirs = fs.readdirSync(COMMANDS_ROOT);
 
-  for (const category of categories) {
+  for (const category of categoryDirs) {
     const catPath = path.join(COMMANDS_ROOT, category);
     if (!fs.statSync(catPath).isDirectory()) continue;
 
     const files = fs.readdirSync(catPath).filter(f => f.endsWith('.js'));
+    catCounts[category] = 0;
 
     for (const file of files) {
       const filePath = path.join(catPath, file);
@@ -47,6 +71,7 @@ function loadCommands(client, logger) {
         if (!cmd?.name || typeof cmd.execute !== 'function') {
           logger.warn('CommandHandler', `${category}/${file} — "name" ou "execute" manquant, ignoré`);
           skipped++;
+          errors.push(`${category}/${file} — name/execute manquant`);
           continue;
         }
 
@@ -60,14 +85,42 @@ function loadCommands(client, logger) {
         }
 
         loaded++;
+        catCounts[category]++;
       } catch (err) {
         logger.errorStack('CommandHandler', err);
         skipped++;
+        errors.push(`${category}/${file} — ${err.message}`);
       }
     }
   }
 
-  logger.info('CommandHandler', `${loaded} commande(s) chargée(s) — ${skipped} ignorée(s)`);
+  // ── Tableau de chargement par catégorie ──────────────────────────────────
+  const SEP = '━'.repeat(44);
+  const lines = [`\n${SEP}`, '🤖 Soulbot — Chargement des commandes', SEP];
+
+  const allCats = [...new Set([...Object.keys(CATEGORY_TARGETS), ...Object.keys(catCounts)])];
+  for (const cat of allCats) {
+    const count  = catCounts[cat] ?? 0;
+    const target = CATEGORY_TARGETS[cat] ?? '?';
+    let icon;
+    if (count === 0)                      icon = '⏳';
+    else if (count >= target)             icon = count > target ? '🎉' : '✅';
+    else                                  icon = '⏳';
+    const label = `📁 ${cat}`.padEnd(20);
+    lines.push(`${label}: ${String(count).padStart(2)} / ${String(target).padStart(2)}  ${icon}`);
+  }
+
+  lines.push(SEP);
+  const pct = GLOBAL_TARGET > 0 ? Math.round((loaded / GLOBAL_TARGET) * 100) : 0;
+  lines.push(`TOTAL : ${loaded} / ${GLOBAL_TARGET} commandes chargées (${pct}%)`);
+
+  if (errors.length) {
+    lines.push('', `⚠️  ${errors.length} erreur(s) de chargement :`);
+    for (const e of errors) lines.push(`  - ${e}`);
+  }
+
+  lines.push(SEP);
+  logger.info('CommandHandler', lines.join('\n'));
 }
 
 /**

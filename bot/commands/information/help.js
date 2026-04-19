@@ -101,9 +101,11 @@ module.exports = {
       return a.localeCompare(b);
     });
 
-    const userId = message.author.id;
-    const pages  = buildPages(categories, client, version);
-    let   page   = 0;
+    const userId  = message.author.id;
+    const pages   = buildPages(categories, client, version);
+    // null = overview, string = clé catégorie — 1 entrée par page
+    const pageMap = [null, ...categories.map(([cat]) => cat)];
+    let   page    = 0;
 
     const sent = await message.channel.send({
       embeds    : [pages[page]],
@@ -118,21 +120,17 @@ module.exports = {
 
     collector.on('collect', async interaction => {
       const action = interaction.customId.split(':')[1];
-      if      (action === 'first') page = 0;
-      else if (action === 'prev')  page = Math.max(0, page - 1);
-      else if (action === 'next')  page = Math.min(pages.length - 1, page + 1);
-      else if (action === 'last')  page = pages.length - 1;
+      const total  = pages.length;
+      if      (action === 'cat_prev')  page = catPrev(page, pageMap);
+      else if (action === 'page_prev') page = Math.max(0, page - 1);
+      else if (action === 'page_next') page = Math.min(total - 1, page + 1);
+      else if (action === 'cat_next')  page = catNext(page, pageMap, total);
 
-      const payload = {
+      await interaction.deferUpdate().catch(() => {});
+      await sent.edit({
         embeds    : [pages[page]],
         components: [buildRow(page, pages.length, userId)],
-      };
-
-      if (interaction.deferred) {
-        await interaction.editReply(payload).catch(() => {});
-      } else {
-        await interaction.update(payload).catch(() => {});
-      }
+      }).catch(e => console.error('[help] edit:', e.message));
     });
 
     collector.on('end', () => sent.edit({ components: [] }).catch(() => {}));
@@ -150,26 +148,52 @@ function buildPages(categories, client, ver) {
   const visible     = categories.slice(0, MAX_VISIBLE);
   const hidden      = categories.length - visible.length;
 
+  const CAT_COLORS = {
+    owner        : '\u001b[33m',  // jaune
+    moderation   : '\u001b[31m',  // rouge
+    information  : '\u001b[36m',  // cyan
+    utility      : '\u001b[32m',  // vert
+    configuration: '\u001b[34m',  // bleu
+    protection   : '\u001b[35m',  // magenta
+    fun          : '\u001b[35m',  // magenta
+    stats        : '\u001b[37m',  // blanc
+    ticket       : '\u001b[36m',  // cyan
+    game         : '\u001b[32m',  // vert
+    custom       : '\u001b[34m',  // bleu
+    giveaway     : '\u001b[33m',  // jaune
+    greeting     : '\u001b[31m',  // rouge
+    invitation   : '\u001b[35m',  // magenta
+    level        : '\u001b[32m',  // vert
+    role         : '\u001b[36m',  // cyan
+  };
+
+  const allCats   = CATEGORY_ORDER.slice(0, MAX_VISIBLE);
+  const hiddenCnt = CATEGORY_ORDER.length - allCats.length;
+
   const catLines = [
-    ...visible.map(([cat]) => {
-      const c = CATEGORIES[cat] ?? { label: cat };
-      return c.label;
+    ...allCats.map(cat => {
+      const c   = CATEGORIES[cat] ?? { label: cat };
+      const col = CAT_COLORS[cat] ?? '\u001b[37m';
+      return `${col}${c.label}\u001b[0m`;
     }),
-    ...(hidden > 0 ? [`+${hidden} catégories`] : []),
+    ...(hiddenCnt > 0 ? [`\u001b[90m+${hiddenCnt} catégories\u001b[0m`] : []),
   ].join('\n');
+
+  const O = '\u001b[33m'; // orange/jaune
+  const R = '\u001b[31m'; // rouge
+  const G = '\u001b[32m'; // vert
+  const C = '\u001b[36m'; // cyan
+  const M = '\u001b[35m'; // magenta
+  const W = '\u001b[1m';  // gras
+  const X = '\u001b[0m';  // reset
 
   const syntaxLines = [
-    `➤ | ${client.user.username}`,
-    ` - ;help <commande>`,
-    `<> · Obligatoire`,
-    `[] · Optionnel`,
-    `() · Spécification`,
-    `/  · Sépare syntaxes`,
-  ].join('\n');
-
-  const statsLines = [
-    `Nombre de commandes: ${client.commands.size}`,
-    `Commandes custom: 0`,
+    `${O}╭➤│${W}${client.user.username}${X}`,
+    `${O}┊${X} - ;help ${R}<commande>${X}`,
+    `${O}┊${X} ${R}<>${X}・Obligatoire`,
+    `${O}┊${X} ${G}[]${X}・Optionnel`,
+    `${O}┊${X} ${C}()${X}・Spécification`,
+    `${O}┊${X} ${M}/ ${X}・Sépare syntaxes`,
   ].join('\n');
 
   // Catégorie suivante pour le footer
@@ -190,12 +214,12 @@ function buildPages(categories, client, ver) {
       },
       {
         name  : 'Catégories',
-        value : `\`\`\`\n${catLines}\n\`\`\``,
+        value : `\`\`\`ansi\n${catLines}\n\`\`\``,
         inline: true,
       },
       {
         name  : 'Syntaxes',
-        value : `\`\`\`\n${syntaxLines}\n\`\`\``,
+        value : `\`\`\`ansi\n${syntaxLines}\n\`\`\``,
         inline: true,
       },
       {
@@ -253,31 +277,57 @@ function buildPages(categories, client, ver) {
   return pages;
 }
 
+// ─── Navigation catégorie ────────────────────────────────────────────────────
+// pageMap[i] = clé catégorie (string) ou null pour l'overview
+// Fonctionne pour N pages par catégorie — futur-proof
+
+function catNext(page, pageMap, total) {
+  if (page >= total - 1) return total - 1;
+  const current = pageMap[page];
+  for (let i = page + 1; i < total; i++) {
+    if (pageMap[i] !== current) return i;
+  }
+  return total - 1;
+}
+
+function catPrev(page, pageMap) {
+  if (page <= 0) return 0;
+  const current = pageMap[page];
+  // Reculer jusqu'à changer de catégorie
+  let i = page - 1;
+  while (i > 0 && pageMap[i] === current) i--;
+  if (pageMap[i] === current) return 0;
+  // Trouver la 1ère page de cette catégorie précédente
+  const prev = pageMap[i];
+  while (i > 0 && pageMap[i - 1] === prev) i--;
+  return i;
+}
+
 function buildRow(page, total, userId) {
   const isFirst = page === 0;
   const isLast  = page === total - 1;
 
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
-      .setCustomId(`help:first:${userId}`)
+      .setCustomId(`help:cat_prev:${userId}`)
       .setEmoji('⏪')
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(isFirst),
 
     new ButtonBuilder()
-      .setCustomId(`help:prev:${userId}`)
+      .setCustomId(`help:page_prev:${userId}`)
       .setEmoji('◀️')
       .setStyle(ButtonStyle.Primary)
       .setDisabled(isFirst),
 
     new ButtonBuilder()
-      .setCustomId(`help:next:${userId}`)
+      .setCustomId(`help:page_next:${userId}`)
       .setEmoji('▶️')
       .setStyle(ButtonStyle.Primary)
       .setDisabled(isLast),
 
     new ButtonBuilder()
-      .setCustomId(`help:last:${userId}`)
+      .setCustomId(`help:cat_next:${userId}`)
       .setEmoji('⏩')
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(isLast),
