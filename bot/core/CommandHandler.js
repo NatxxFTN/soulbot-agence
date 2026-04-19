@@ -9,6 +9,8 @@
 const fs     = require('fs');
 const path   = require('path');
 const { Collection, PermissionsBitField } = require('discord.js');
+const { getUserLevel, isGloballyBlacklisted } = require('./permissions');
+const { LEVELS, levelName, getRequiredLevel }  = require('./permissions-levels');
 
 const COMMANDS_ROOT = path.join(__dirname, '../commands');
 
@@ -162,11 +164,27 @@ async function dispatch(message, client, db, logger) {
     return channel.send({ content: '✗ Cette commande est uniquement disponible sur un serveur.' });
   }
 
-  // Garde ownerOnly — validation Snowflake stricte
-  if (cmd.ownerOnly) {
-    const owners = (process.env.BOT_OWNERS ?? '').split(',').map(s => s.trim()).filter(s => /^\d{17,19}$/.test(s));
-    if (!owners.includes(author.id)) {
-      return channel.send({ content: '✗ Commande réservée au propriétaire du bot.' });
+  // ── Système de permissions hiérarchique ──────────────────────────────────
+  const userLevel = getUserLevel(author.id, guild?.id ?? null);
+
+  // Owner bot (BOT_OWNERS) : bypass total de tous les guards ci-dessous
+  if (userLevel < LEVELS.OWNER) {
+    // Blacklist globale (table bot_blacklist)
+    if (isGloballyBlacklisted(author.id)) {
+      return channel.send({ content: '✗ Tu es blacklisté de ce bot.' });
+    }
+
+    // Blacklist guild (user_permissions niveau -1)
+    if (userLevel === LEVELS.BLACKLIST) {
+      return channel.send({ content: '✗ Tu es blacklisté sur ce serveur.' });
+    }
+
+    // Niveau insuffisant pour cette commande
+    const required = getRequiredLevel(cmd);
+    if (userLevel < required) {
+      return channel.send({
+        content: `✗ Accès refusé — niveau requis : **${levelName(required)}** · ton niveau : **${levelName(userLevel)}**`,
+      });
     }
   }
 
