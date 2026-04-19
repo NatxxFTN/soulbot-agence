@@ -296,7 +296,7 @@ module.exports = {
     });
 
     // ── Handlers reset (triple confirmation) ────────────────────────────────
-    const { activeResets, COOLDOWN_MS: RESET_COOLDOWN } = require('../commands/owner/reset');
+    const { activeResets, COOLDOWN_MS: RESET_COOLDOWN } = require('../commands/owner/nuke');
     const { serializeGuild: serGuild, saveTemplate: saveTpl } = require('../core/template-helper');
     const { db: resetDb } = require('../database');
 
@@ -307,7 +307,7 @@ module.exports = {
       // Nettoyage de session si présente
       const sid = `${interaction.user.id}-${interaction.guild?.id}`;
       activeResets.delete(sid);
-      await interaction.update({ embeds: [E.info('Annulé', 'Reset annulé.')], components: [] });
+      await interaction.update({ embeds: [E.info('Annulé', 'Nuke annulé.')], components: [] });
     });
 
     client.buttonHandlers.set('reset_step2', async (interaction, params) => {
@@ -317,7 +317,7 @@ module.exports = {
       const sessionId = params[0];
       const session   = activeResets.get(sessionId);
       if (!session) {
-        return interaction.update({ embeds: [E.error('Session expirée', 'Relance la commande `;reset`.')], components: [] });
+        return interaction.update({ embeds: [E.error('Session expirée', 'Relance la commande `;nuke`.')], components: [] });
       }
 
       const finalRow = new ActionRowBuilder().addComponents(
@@ -332,7 +332,7 @@ module.exports = {
       );
 
       return interaction.update({
-        embeds: [E.error('💣 RESET SERVEUR — Étape 3/3 (DERNIÈRE CHANCE)',
+        embeds: [E.error('💣 NUKE SERVEUR — Étape 3/3 (DERNIÈRE CHANCE)',
           `⚠️ **TU VAS DÉCLENCHER LE RESET.**\n\n` +
           `Serveur : **${session.guildName}**\n` +
           `Initié par : <@${session.userId}>\n\n` +
@@ -355,7 +355,7 @@ module.exports = {
       const sessionId = params[0];
       const session   = activeResets.get(sessionId);
       if (!session) {
-        return interaction.update({ embeds: [E.error('Session expirée', 'Relance la commande `;reset`.')], components: [] });
+        return interaction.update({ embeds: [E.error('Session expirée', 'Relance la commande `;nuke`.')], components: [] });
       }
       activeResets.delete(sessionId);
 

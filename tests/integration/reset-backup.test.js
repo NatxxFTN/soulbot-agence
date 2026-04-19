@@ -5,10 +5,10 @@ const assert = require('node:assert/strict');
 const fs     = require('fs');
 const path   = require('path');
 
-describe('Reset & Backup — fichiers', () => {
-  it('reset.js existe dans owner/', () => {
-    const p = path.join(__dirname, '../../bot/commands/owner/reset.js');
-    assert.ok(fs.existsSync(p), 'reset.js manquant');
+describe('Nuke & Backup — fichiers', () => {
+  it('nuke.js existe dans owner/', () => {
+    const p = path.join(__dirname, '../../bot/commands/owner/nuke.js');
+    assert.ok(fs.existsSync(p), 'nuke.js manquant');
   });
 
   it('backup.js existe dans owner/', () => {
@@ -17,8 +17,8 @@ describe('Reset & Backup — fichiers', () => {
   });
 });
 
-describe('Reset — sécurité exports', () => {
-  const reset = require('../../bot/commands/owner/reset');
+describe('Nuke — sécurité exports', () => {
+  const reset = require('../../bot/commands/owner/nuke');
 
   it('ownerOnly est true', () => {
     assert.strictEqual(reset.ownerOnly, true);
@@ -40,9 +40,13 @@ describe('Reset — sécurité exports', () => {
     assert.strictEqual(reset.activeResets.size, 0);
   });
 
-  it('aliases contient nuke et wipe', () => {
+  it('name est nuke', () => {
+    assert.strictEqual(reset.name, 'nuke');
+  });
+
+  it('aliases contient reset et wipe', () => {
     assert.ok(Array.isArray(reset.aliases));
-    assert.ok(reset.aliases.includes('nuke'));
+    assert.ok(reset.aliases.includes('reset'));
     assert.ok(reset.aliases.includes('wipe'));
   });
 });

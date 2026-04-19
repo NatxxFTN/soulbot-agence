@@ -10,10 +10,10 @@ const COOLDOWN_MS  = 60 * 60 * 1000; // 1 heure
 const activeResets = new Map();
 
 module.exports = {
-  name       : 'reset',
-  aliases    : ['nuke', 'wipe'],
+  name       : 'nuke',
+  aliases    : ['reset', 'wipe'],
   description: '💣 Supprime TOUT sur le serveur (salons, rôles, emojis). Auto-backup obligatoire avant.',
-  usage      : ';reset',
+  usage      : ';nuke',
   ownerOnly  : true,
   guildOnly  : true,
 
@@ -55,7 +55,7 @@ module.exports = {
     });
 
     await channel.send({
-      embeds: [E.error('💣 RESET SERVEUR — Étape 1/3',
+      embeds: [E.error('💣 NUKE SERVEUR — Étape 1/3',
         `**⚠️ Cette commande va TOUT SUPPRIMER sur ce serveur.**\n\n` +
         `**Cible :** ${guild.name}\n` +
         `**Membres :** ${guild.memberCount}\n` +
@@ -72,13 +72,13 @@ module.exports = {
 
     if (!collected) {
       activeResets.delete(sessionId);
-      return channel.send({ embeds: [E.info('Expiré', 'Reset annulé (timeout 60s).')] });
+      return channel.send({ embeds: [E.info('Expiré', 'Nuke annulé (timeout 60s).')] });
     }
 
     const typed = collected.first().content.trim();
     if (typed !== guild.name) {
       activeResets.delete(sessionId);
-      return channel.send({ embeds: [E.info('Annulé', `Le nom ne correspond pas (\`${typed}\` ≠ \`${guild.name}\`).`)] });
+      return channel.send({ embeds: [E.info('Annulé', `Le nom ne correspond pas (\`${typed}\` ≠ \`${guild.name}\`) — nuke annulé.`)] });
     }
 
     // Étape 2/3 — Premier bouton
@@ -94,7 +94,7 @@ module.exports = {
     );
 
     return channel.send({
-      embeds: [E.warning('💣 RESET SERVEUR — Étape 2/3',
+      embeds: [E.warning('💣 NUKE SERVEUR — Étape 2/3',
         `Nom confirmé ✓ : **${guild.name}**\n\n` +
         `**SERA SUPPRIMÉ (irréversible) :**\n` +
         `• Tous les salons texte, vocaux et catégories\n` +
