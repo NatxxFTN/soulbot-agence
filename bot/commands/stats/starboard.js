@@ -17,6 +17,8 @@ module.exports = {
   usage       : 'starboard [top <n>]',
   cooldown    : 5,
 
+  guildOnly  : true,
+
   async execute(message, args, client) {
     const guildId  = message.guild.id;
     const settings = getGuildSettings(guildId);

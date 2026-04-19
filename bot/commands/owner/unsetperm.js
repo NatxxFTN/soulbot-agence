@@ -9,7 +9,7 @@ const STMT_CHECK        = db.prepare('SELECT 1 FROM perm_groups WHERE guild_id =
 
 module.exports = {
   name       : 'unsetperm',
-  aliases    : [],
+  aliases    : ['usp'],
   description: 'Retire un rôle d\'un groupe de permissions custom (ou supprime le groupe).',
   usage      : ';unsetperm <permission> <@role/id/everyone|all>',
   cooldown   : 3,

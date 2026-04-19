@@ -14,6 +14,7 @@ module.exports = {
   description : 'Réinitialise les statistiques du serveur.',
   usage       : 'reset all stats',
   cooldown    : 10,
+  guildOnly  : true,
   permissions : ['Administrator'],
 
   async execute(message, args, client) {

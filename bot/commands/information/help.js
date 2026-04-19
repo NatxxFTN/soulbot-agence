@@ -45,6 +45,8 @@ module.exports = {
   usage      : ';help [commande]',
   cooldown   : 5,
 
+  guildOnly  : true,
+
   async execute(message, args, client) {
 
     // ── Mode détail : ;help <commande> ────────────────────────────────────

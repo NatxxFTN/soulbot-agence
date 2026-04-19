@@ -9,6 +9,8 @@ module.exports = {
   usage     : ';avatar [@utilisateur]',
   cooldown  : 5,
 
+  guildOnly  : true,
+
   async execute(message, args) {
     const target = message.mentions.users.first() ?? message.author;
     const url    = target.displayAvatarURL({ size: 4096, extension: 'png' });

@@ -23,7 +23,7 @@ const STMT_SET = db.prepare(`
 
 module.exports = {
   name       : 'autobackup',
-  aliases    : [],
+  aliases    : ['abackup'],
   description: 'Configure les sauvegardes automatiques de la base de données.',
   usage      : ';autobackup <on|off> [intervalle_h] [nb_copies]',
   cooldown   : 5,

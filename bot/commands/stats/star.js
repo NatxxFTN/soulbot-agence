@@ -21,6 +21,7 @@ module.exports = {
   description : 'Configure le système Starboard.',
   usage       : 'star <on|off|channel|threshold|emoji|roles|allow|deny|remove>',
   cooldown    : 3,
+  guildOnly  : true,
   permissions : ['ManageGuild'],
 
   async execute(message, args, client) {

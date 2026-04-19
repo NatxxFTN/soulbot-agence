@@ -8,7 +8,7 @@ module.exports = {
   description : 'Affiche la latence du bot et de l\'API Discord.',
   usage       : ';ping',
   cooldown    : 5,
-  guildOnly   : false,
+  guildOnly   : true,
   ownerOnly   : false,
   permissions : [],
 

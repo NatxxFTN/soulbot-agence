@@ -19,6 +19,8 @@ module.exports = {
   usage       : 'poll "Question" option1 option2 [...] [--duration 1h]  |  poll end <id>  |  poll results <id>',
   cooldown    : 5,
 
+  guildOnly  : true,
+
   async execute(message, args, client) {
     const guildId = message.guild.id;
     const sub     = args[0]?.toLowerCase();

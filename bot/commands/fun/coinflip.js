@@ -9,6 +9,8 @@ module.exports = {
   usage     : ';coinflip',
   cooldown  : 2,
 
+  guildOnly  : true,
+
   async execute(message) {
     const result = Math.random() < 0.5 ? 'Pile' : 'Face';
     const embed  = E.info('Pile ou Face', `Résultat : **${result}**`);

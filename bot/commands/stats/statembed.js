@@ -21,6 +21,7 @@ module.exports = {
   description : 'Embed de statistiques en direct dans un salon.',
   usage       : 'statembed [set #salon | refresh | remove]',
   cooldown    : 5,
+  guildOnly  : true,
   permissions : ['ManageGuild'],
 
   async execute(message, args, client) {

@@ -18,7 +18,7 @@ const STMT_CHECK  = db.prepare('SELECT 1 FROM bot_managers WHERE user_id = ?');
 
 module.exports = {
   name       : 'manager',
-  aliases    : [],
+  aliases    : ['mgr'],
   description: 'Ajoute ou retire un manager du bot (accès étendu aux commandes owner).',
   usage      : ';manager <add|remove|list> [@user]',
   cooldown   : 3,

@@ -17,6 +17,8 @@ module.exports = {
   usage       : 'listbday [mois 1-12]',
   cooldown    : 5,
 
+  guildOnly  : true,
+
   async execute(message, args, client) {
     const guildId = message.guild.id;
     const sub     = (args[0] ?? '').toLowerCase();

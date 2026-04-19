@@ -15,7 +15,7 @@ function formatUptime(ms) {
 
 module.exports = {
   name       : 'status',
-  aliases    : ['botstatus', 'botinfo'],
+  aliases    : ['botstatus'],
   description: 'Affiche les statistiques techniques du bot.',
   usage      : ';status',
   cooldown   : 5,

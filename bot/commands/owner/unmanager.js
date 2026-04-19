@@ -8,7 +8,7 @@ const STMT_CHECK  = db.prepare('SELECT 1 FROM bot_managers WHERE user_id = ?');
 
 module.exports = {
   name       : 'unmanager',
-  aliases    : [],
+  aliases    : ['unmgr'],
   description: 'Retire le statut de manager du bot à un utilisateur.',
   usage      : ';unmanager <@membre/id>',
   cooldown   : 3,

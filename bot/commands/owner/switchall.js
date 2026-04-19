@@ -8,7 +8,7 @@ const STMT_UPDATE = db.prepare('UPDATE cmd_perm_required SET perm_name = ? WHERE
 
 module.exports = {
   name       : 'switchall',
-  aliases    : [],
+  aliases    : ['swall'],
   description: 'Déplace toutes les commandes d\'un groupe de permissions vers un autre.',
   usage      : ';switchall <perm_source> <perm_destination>',
   cooldown   : 5,

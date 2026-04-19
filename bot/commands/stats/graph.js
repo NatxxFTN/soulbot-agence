@@ -16,6 +16,8 @@ module.exports = {
   usage       : 'graph [messages|voc] [7d|30d|all]',
   cooldown    : 10,
 
+  guildOnly  : true,
+
   async execute(message, args, client) {
     const guildId = message.guild.id;
 

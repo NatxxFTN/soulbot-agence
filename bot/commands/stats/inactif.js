@@ -15,6 +15,7 @@ module.exports = {
   description : 'Liste les membres inactifs depuis N jours.',
   usage       : 'inactif [jours] [--roles @role1 @role2]',
   cooldown    : 10,
+  guildOnly  : true,
   permissions : ['ManageGuild'],
 
   async execute(message, args, client) {

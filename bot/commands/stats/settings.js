@@ -19,6 +19,7 @@ module.exports = {
   description : 'Paramètres globaux du bot.',
   usage       : 'settings global [prefix|stats] [valeur]',
   cooldown    : 3,
+  guildOnly  : true,
   permissions : ['ManageGuild'],
 
   async execute(message, args, client) {

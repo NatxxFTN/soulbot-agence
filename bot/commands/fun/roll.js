@@ -9,6 +9,8 @@ module.exports = {
   usage     : ';roll [faces]',
   cooldown  : 2,
 
+  guildOnly  : true,
+
   async execute(message, args) {
     const faces = parseInt(args[0], 10) || 6;
 

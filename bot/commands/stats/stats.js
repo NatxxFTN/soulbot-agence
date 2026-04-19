@@ -12,6 +12,8 @@ module.exports = {
   usage       : 'stats [best|channel|server|user] [@user|#channel] [messages|voc]',
   cooldown    : 5,
 
+  guildOnly  : true,
+
   async execute(message, args, client) {
     const sub     = (args[0] ?? 'server').toLowerCase();
     const guildId = message.guild.id;

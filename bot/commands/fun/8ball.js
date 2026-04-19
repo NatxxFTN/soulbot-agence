@@ -24,6 +24,8 @@ module.exports = {
   usage     : ';8ball <question>',
   cooldown  : 3,
 
+  guildOnly  : true,
+
   async execute(message, args) {
     const question = args.join(' ').trim();
     if (!question) {

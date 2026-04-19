@@ -18,7 +18,7 @@ const STMT_ALL    = db.prepare('SELECT DISTINCT perm_name FROM perm_groups WHERE
 
 module.exports = {
   name       : 'setperm',
-  aliases    : [],
+  aliases    : ['sp'],
   description: 'Associe un rôle (ou @everyone) à un groupe de permissions custom.',
   usage      : ';setperm <permission> <@role/id/everyone>',
   cooldown   : 3,

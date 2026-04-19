@@ -12,6 +12,8 @@ module.exports = {
   usage       : 'compteur',
   cooldown    : 5,
 
+  guildOnly  : true,
+
   async execute(message, args, client) {
     const guildId = message.guild.id;
 

@@ -27,6 +27,7 @@ module.exports = {
   description : 'Gestion des rôles automatiques (ancient, badge, bday, boost, voc).',
   usage       : 'role <ancient|badge|bday|boost|voc> [sous-commande] [arguments]',
   cooldown    : 3,
+  guildOnly  : true,
   permissions : ['ManageRoles'],
 
   async execute(message, args, client) {
