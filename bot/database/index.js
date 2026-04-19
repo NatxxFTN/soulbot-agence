@@ -166,6 +166,18 @@ db.exec(`
     created_at    INTEGER NOT NULL DEFAULT (unixepoch())
   );
 
+  /* ---- Greeting (bienvenue / départ) ---- */
+  CREATE TABLE IF NOT EXISTS greeting_config (
+    guild_id         TEXT    PRIMARY KEY,
+    join_channel_id  TEXT,
+    join_message     TEXT    NOT NULL DEFAULT 'Bienvenue {user} sur **{server}** ! 🎉',
+    join_enabled     INTEGER NOT NULL DEFAULT 0,
+    leave_channel_id TEXT,
+    leave_message    TEXT    NOT NULL DEFAULT '{username} a quitté **{server}**. 👋',
+    leave_enabled    INTEGER NOT NULL DEFAULT 0,
+    updated_at       INTEGER
+  );
+
   /* ---- Giveaways ---- */
   CREATE TABLE IF NOT EXISTS giveaways (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,

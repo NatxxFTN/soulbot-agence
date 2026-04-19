@@ -5,7 +5,7 @@ const { db } = require('../database');
 module.exports = {
   name : 'guildMemberRemove',
 
-  execute(member, client) {
+  async execute(member, client) {
     // Clôturer une éventuelle session vocale ouverte
     const guildId = member.guild.id;
     const userId  = member.id;
@@ -23,6 +23,14 @@ module.exports = {
       `).run(guildId, userId, duration, now);
 
       db.prepare('DELETE FROM voice_sessions WHERE guild_id = ? AND user_id = ?').run(guildId, userId);
+    }
+
+    // ── Message de départ ────────────────────────────────────────────────────
+    const { getConfig, formatMessage } = require('../core/greeting-helper');
+    const cfg = getConfig(guildId);
+    if (cfg?.leave_enabled && cfg.leave_channel_id) {
+      const ch = member.guild.channels.cache.get(cfg.leave_channel_id);
+      if (ch) await ch.send(formatMessage(cfg.leave_message, member)).catch(() => {});
     }
   },
 };

@@ -28,7 +28,12 @@ module.exports = {
     // ── Rôles anciens au moment de l'arrivée (0 jours → aucun) ───────────────
     // Les rôles anciens sont assignés via le check périodique
 
-    // ── Message de bienvenue (minimal ici, extensible via module gestion) ─────
-    // TODO: sera étendu dans le module gestion
+    // ── Message de bienvenue ─────────────────────────────────────────────────
+    const { getConfig, formatMessage } = require('../core/greeting-helper');
+    const cfg = getConfig(guildId);
+    if (cfg?.join_enabled && cfg.join_channel_id) {
+      const ch = member.guild.channels.cache.get(cfg.join_channel_id);
+      if (ch) await ch.send(formatMessage(cfg.join_message, member)).catch(() => {});
+    }
   },
 };
