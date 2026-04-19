@@ -1,0 +1,58 @@
+{
+  "_comment": "Fichier de référence — structure d'un template Soulbot. Les vrais templates ne commencent pas par '_'.",
+  "name": "Nom du serveur source",
+  "icon": "https://cdn.discordapp.com/icons/.../...",
+  "saved_at": 1713456789000,
+  "roles": [
+    {
+      "name": "Admin",
+      "color": "#E74C3C",
+      "hoist": true,
+      "mentionable": false,
+      "position": 5,
+      "permissions": ["SendMessages", "ViewChannel", "ReadMessageHistory"]
+    }
+  ],
+  "categories": [
+    {
+      "name": "INFORMATIONS",
+      "position": 0,
+      "channels": [
+        {
+          "name": "règles",
+          "type": 0,
+          "topic": "Règlement du serveur",
+          "nsfw": false,
+          "rateLimitPerUser": 0,
+          "bitrate": null,
+          "userLimit": null
+        },
+        {
+          "name": "annonces",
+          "type": 0,
+          "topic": null,
+          "nsfw": false,
+          "rateLimitPerUser": 0,
+          "bitrate": null,
+          "userLimit": null
+        }
+      ]
+    },
+    {
+      "name": "VOCAL",
+      "position": 1,
+      "channels": [
+        {
+          "name": "Général",
+          "type": 2,
+          "topic": null,
+          "nsfw": false,
+          "rateLimitPerUser": 0,
+          "bitrate": 64000,
+          "userLimit": 0
+        }
+      ]
+    }
+  ],
+  "emojis": []
+}

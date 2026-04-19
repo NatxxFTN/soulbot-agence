@@ -129,6 +129,96 @@ module.exports = {
       }
     });
 
+    // ── Handlers template (boutons confirmation) ─────────────────────────────
+    const { loadTemplate, applyTemplate, logAction: logTplAction } = require('../core/template-helper');
+
+    const isOwner = (userId) => {
+      const ids = (process.env.OWNER_IDS || '').split(',').map(s => s.trim()).filter(Boolean);
+      return ids.includes(userId);
+    };
+
+    client.buttonHandlers.set('tpl_cancel', async (interaction) => {
+      if (!isOwner(interaction.user.id)) {
+        return interaction.reply({ content: '✗ Accès refusé.', ephemeral: true });
+      }
+      await interaction.update({ embeds: [E.info('Annulé', 'Opération annulée.')], components: [] });
+    });
+
+    client.buttonHandlers.set('tpl_confirm', async (interaction, params) => {
+      if (!isOwner(interaction.user.id)) {
+        return interaction.reply({ content: '✗ Accès refusé.', ephemeral: true });
+      }
+
+      const [name, mode, emjflag] = params;
+      const template = loadTemplate(name);
+      if (!template) {
+        return interaction.update({ content: '✗ Template introuvable.', components: [] });
+      }
+
+      await interaction.update({
+        embeds: [E.info('Chargement en cours...', 'Patience, cela peut prendre 1 à 2 minutes.')],
+        components: [],
+      });
+
+      const startTime = Date.now();
+      let lastUpdate  = Date.now();
+
+      try {
+        for await (const progress of applyTemplate(interaction.guild, template, {
+          mode,
+          includeEmojis: emjflag === 'emj',
+        })) {
+          if (progress.status !== 'done' && Date.now() - lastUpdate > 2000) {
+            lastUpdate = Date.now();
+            await interaction.editReply({
+              embeds: [E.info('En cours...', progress.message || progress.status)],
+            }).catch(() => {});
+          }
+
+          if (progress.status === 'done') {
+            logTplAction({
+              action      : 'load',
+              templateName: name,
+              userId      : interaction.user.id,
+              guildId     : interaction.guild.id,
+              guildName   : interaction.guild.name,
+              mode,
+              stats       : progress.stats,
+              success     : true,
+              durationMs  : Date.now() - startTime,
+            });
+
+            return interaction.editReply({
+              embeds: [
+                E.success('Template appliqué !')
+                  .addFields(
+                    { name: 'Rôles',       value: String(progress.stats.rolesCreated),      inline: true },
+                    { name: 'Catégories',  value: String(progress.stats.categoriesCreated), inline: true },
+                    { name: 'Salons',      value: String(progress.stats.channelsCreated),   inline: true },
+                    { name: 'Emojis',      value: String(progress.stats.emojisCreated),     inline: true },
+                    { name: 'Erreurs',     value: String(progress.stats.errors.length),     inline: true },
+                    { name: 'Durée',       value: `${((Date.now() - startTime) / 1000).toFixed(1)}s`, inline: true },
+                  ),
+              ],
+            });
+          }
+        }
+      } catch (err) {
+        logTplAction({
+          action      : 'load',
+          templateName: name,
+          userId      : interaction.user.id,
+          guildId     : interaction.guild.id,
+          mode,
+          success     : false,
+          error       : err.message,
+        });
+        await interaction.editReply({
+          embeds: [E.error('Erreur lors du chargement', err.message)],
+        }).catch(() => {});
+      }
+    });
+
     console.log('[Bot] Prêt !');
   },
 };

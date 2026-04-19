@@ -241,6 +241,25 @@ db.exec(`
     FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
   );
 
+  /* ---- Logs des opérations template ---- */
+  CREATE TABLE IF NOT EXISTS template_logs (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    action        TEXT    NOT NULL,
+    template_name TEXT    NOT NULL,
+    user_id       TEXT    NOT NULL,
+    guild_id      TEXT    NOT NULL,
+    guild_name    TEXT,
+    mode          TEXT,
+    stats         TEXT,
+    success       INTEGER NOT NULL,
+    error         TEXT,
+    duration_ms   INTEGER,
+    timestamp     INTEGER NOT NULL
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_tpl_logs_user     ON template_logs(user_id);
+  CREATE INDEX IF NOT EXISTS idx_tpl_logs_template ON template_logs(template_name);
+
   /* ─── Index de performance ─── */
   CREATE INDEX IF NOT EXISTS idx_user_stats_guild    ON user_stats (guild_id, messages DESC);
   CREATE INDEX IF NOT EXISTS idx_user_stats_voice    ON user_stats (guild_id, voice_seconds DESC);
