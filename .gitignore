@@ -52,3 +52,6 @@ docs/bug-reports/*
 # Runtime files in .agents_tech
 .agents_tech/*.log
 .agents_tech/*.pid
+
+# Singleton lock (runtime-only, ne jamais commiter)
+.bot.lock

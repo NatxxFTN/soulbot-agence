@@ -1,7 +1,9 @@
 'use strict';
 
-const fs   = require('fs');
-const path = require('path');
+const { describe, it, before } = require('node:test');
+const assert                   = require('node:assert/strict');
+const fs                       = require('fs');
+const path                     = require('path');
 
 const COMMANDS_ROOT = path.join(__dirname, '../../bot/commands');
 
@@ -20,22 +22,20 @@ function scanCommandFiles(dir) {
 
 describe('Commandes — Cohérence compteur', () => {
   let commandFiles;
-  let loadedCommands;
   let loadErrors;
+  let loadedNames;
 
-  beforeAll(() => {
+  before(() => {
     commandFiles = scanCommandFiles(COMMANDS_ROOT);
-
-    // Charge manuellement chaque fichier pour détecter les erreurs
-    loadedCommands = new Map();
-    loadErrors     = [];
+    loadErrors   = [];
+    loadedNames  = new Map(); // name → filePath
 
     for (const filePath of commandFiles) {
       try {
         delete require.cache[require.resolve(filePath)];
         const cmd = require(filePath);
         if (cmd?.name && typeof cmd.execute === 'function') {
-          loadedCommands.set(cmd.name.toLowerCase(), cmd);
+          loadedNames.set(cmd.name.toLowerCase(), filePath);
         }
       } catch (err) {
         loadErrors.push({ file: filePath, error: err.message });
@@ -43,14 +43,16 @@ describe('Commandes — Cohérence compteur', () => {
     }
   });
 
-  test('Aucun fichier de commande ne provoque une erreur au chargement', () => {
+  it('Aucun fichier de commande ne provoque une erreur au chargement', () => {
     if (loadErrors.length) {
-      const detail = loadErrors.map(e => `  - ${path.relative(COMMANDS_ROOT, e.file)}: ${e.error}`).join('\n');
-      throw new Error(`${loadErrors.length} fichier(s) en erreur :\n${detail}`);
+      const detail = loadErrors
+        .map(e => `  - ${path.relative(COMMANDS_ROOT, e.file)}: ${e.error}`)
+        .join('\n');
+      assert.fail(`${loadErrors.length} fichier(s) en erreur :\n${detail}`);
     }
   });
 
-  test('Aucun doublon de nom de commande (pas d\'écrasement silencieux)', () => {
+  it('Aucun doublon de nom de commande', () => {
     const seen  = new Map();
     const dupes = [];
 
@@ -64,17 +66,15 @@ describe('Commandes — Cohérence compteur', () => {
         } else {
           seen.set(n, filePath);
         }
-      } catch {
-        // erreur déjà signalée dans le test précédent
-      }
+      } catch { /* déjà signalé */ }
     }
 
     if (dupes.length) {
-      throw new Error(`Doublons détectés :\n${dupes.map(d => `  - ${d}`).join('\n')}`);
+      assert.fail(`Doublons détectés :\n${dupes.map(d => `  - ${d}`).join('\n')}`);
     }
   });
 
-  test('Chaque commande a un champ "name" et une fonction "execute"', () => {
+  it('Chaque fichier .js a un champ "name" et une fonction "execute"', () => {
     const invalid = [];
     for (const filePath of commandFiles) {
       try {
@@ -82,21 +82,18 @@ describe('Commandes — Cohérence compteur', () => {
         if (!cmd?.name || typeof cmd.execute !== 'function') {
           invalid.push(path.relative(COMMANDS_ROOT, filePath));
         }
-      } catch {
-        // déjà signalé
-      }
+      } catch { /* déjà signalé */ }
     }
     if (invalid.length) {
-      throw new Error(`Fichiers sans name/execute :\n${invalid.map(f => `  - ${f}`).join('\n')}`);
+      assert.fail(`Fichiers sans name/execute :\n${invalid.map(f => `  - ${f}`).join('\n')}`);
     }
   });
 
-  test('Le nombre de commandes chargées correspond aux fichiers valides', () => {
-    // commandFiles peut inclure des fichiers sans name/execute → ils ne comptent pas
-    const validFiles = commandFiles.filter(f => {
+  it('Le nombre de commandes valides correspond aux fichiers chargés', () => {
+    const validCount = commandFiles.filter(f => {
       try { const c = require(f); return c?.name && typeof c.execute === 'function'; }
       catch { return false; }
-    });
-    expect(loadedCommands.size).toBe(validFiles.length);
+    }).length;
+    assert.strictEqual(loadedNames.size, validCount);
   });
 });

@@ -2,6 +2,10 @@
 
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 
+// ─── Singleton — un seul bot actif autorisé ───────────────────────────────────
+const { acquireLock } = require('./core/singleton-lock');
+acquireLock();
+
 const { Client, GatewayIntentBits, Partials, Collection } = require('discord.js');
 const { loadCommands }  = require('./core/CommandHandler');
 const { loadEvents }    = require('./handlers/EventHandler');
@@ -50,23 +54,53 @@ client.login(process.env.DISCORD_TOKEN).catch(err => {
   process.exit(1);
 });
 
-// ─── Erreurs non catchées ─────────────────────────────────────────────────────
+// ─── Graceful shutdown ────────────────────────────────────────────────────────
 
-// POURQUOI ne PAS exit sur unhandledRejection : le client Discord.js gère le retry
-// de certaines promesses en interne. Crasher ici tuerait le bot pour une erreur
-// temporaire (réseau, rate limit). On log et on continue.
+let isShuttingDown = false;
+
+async function gracefulShutdown(signal) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
+  logger.info('Bot', `Signal ${signal} reçu — arrêt propre...`);
+
+  try {
+    client.removeAllListeners();
+
+    if (client.isReady()) {
+      await client.destroy();
+      logger.info('Bot', 'Connexion Discord fermée');
+    }
+
+    if (db) {
+      try { db.close(); logger.info('Bot', 'Database fermée'); } catch { /* ignoré */ }
+    }
+
+    logger.info('Bot', 'Arrêt propre terminé');
+    process.exit(0);
+  } catch (err) {
+    logger.error('Bot', `Erreur pendant shutdown: ${err.message}`);
+    process.exit(1);
+  }
+}
+
+// Signaux d'arrêt (nodemon envoie SIGTERM par défaut)
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT',  () => gracefulShutdown('SIGINT'));
+process.on('SIGHUP',  () => gracefulShutdown('SIGHUP'));
+
+// POURQUOI ne PAS exit sur unhandledRejection : Discord.js gère le retry
+// en interne. Crasher ici tuerait le bot pour une erreur temporaire réseau.
 process.on('unhandledRejection', (reason) => {
   logger.errorStack('Process', reason instanceof Error ? reason : new Error(String(reason)));
 });
 
-// POURQUOI exit(1) sur uncaughtException : contrairement aux rejections,
-// une exception non catchée indique un état d'exécution potentiellement corrompu.
-// Il est plus sûr de laisser le process manager (PM2, Docker) relancer proprement
-// que de continuer dans un état inconnu. Référence : AUDITOR_CRITICAL_POINTS §1.2
+// POURQUOI exit sur uncaughtException : état d'exécution potentiellement
+// corrompu. Le graceful shutdown ferme proprement avant exit.
 process.on('uncaughtException', (err) => {
-  logger.error('Process', `Uncaught Exception — arrêt immédiat: ${err.message}`);
+  logger.error('Process', `Uncaught Exception: ${err.message}`);
   if (err.stack) process.stderr.write(err.stack + '\n');
-  process.exit(1);
+  gracefulShutdown('uncaughtException');
 });
 
 module.exports = client;

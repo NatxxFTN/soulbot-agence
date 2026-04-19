@@ -1,0 +1,17 @@
+{
+  "watch": ["bot"],
+  "ext": "js,json",
+  "ignore": [
+    "node_modules/",
+    "bot/database/",
+    ".bot.lock",
+    "logs/",
+    "data/"
+  ],
+  "delay": "1500",
+  "signal": "SIGTERM",
+  "verbose": false,
+  "events": {
+    "restart": "echo '♻️  Redémarrage bot...'"
+  }
+}
