@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs   = require('fs');
 const path = require('path');
 
-const { saveTemplate, loadTemplate, listTemplates } = require('../../bot/core/template-helper');
+const { saveTemplate, loadTemplate, listTemplates, deleteTemplate, sanitizeName } = require('../../bot/core/template-helper');
 
 const TEMPLATES_DIR = path.join(__dirname, '../../data/templates');
 const TEST_NAME     = 'soulbot-test-template';
@@ -64,6 +64,25 @@ describe('Template — stockage JSON', () => {
     const { filePath } = saveTemplate(evilName, SAMPLE);
     assert.ok(filePath.startsWith(TEMPLATES_DIR), 'le chemin doit rester dans TEMPLATES_DIR');
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  });
+
+  it('deleteTemplate supprime le fichier et retourne true', () => {
+    saveTemplate(TEST_NAME, SAMPLE);
+    assert.ok(fs.existsSync(TEST_PATH));
+    const result = deleteTemplate(TEST_NAME);
+    assert.strictEqual(result, true);
+    assert.ok(!fs.existsSync(TEST_PATH));
+  });
+
+  it('deleteTemplate retourne false si fichier inexistant', () => {
+    const result = deleteTemplate('__inexistant_xyz__');
+    assert.strictEqual(result, false);
+  });
+
+  it('sanitizeName nettoie les caractères spéciaux', () => {
+    assert.ok(!sanitizeName('../../etc/passwd').includes('/'));
+    assert.ok(!sanitizeName('../../etc/passwd').includes('..'));
+    assert.ok(sanitizeName('Mon Serveur!').match(/^[a-z0-9-_]+$/));
   });
 
   it('loadTemplate retourne null sur un fichier corrompu', () => {

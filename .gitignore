@@ -55,3 +55,7 @@ docs/bug-reports/*
 
 # Singleton lock (runtime-only, ne jamais commiter)
 .bot.lock
+
+# Templates de serveur (contenu privé — ignoré sauf exemple)
+data/templates/*.json
+!data/templates/_example.json

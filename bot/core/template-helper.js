@@ -258,4 +258,13 @@ function sleep(ms) {
   return new Promise(r => setTimeout(r, ms));
 }
 
-module.exports = { serializeGuild, saveTemplate, listTemplates, loadTemplate, applyTemplate, logAction };
+function deleteTemplate(name) {
+  const safe = sanitizeName(name);
+  const filePath = path.join(TEMPLATES_DIR, `${safe}.json`);
+  if (!filePath.startsWith(TEMPLATES_DIR)) return false;
+  if (!fs.existsSync(filePath)) return false;
+  fs.unlinkSync(filePath);
+  return true;
+}
+
+module.exports = { serializeGuild, saveTemplate, listTemplates, loadTemplate, deleteTemplate, applyTemplate, logAction, sanitizeName };

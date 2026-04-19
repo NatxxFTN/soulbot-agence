@@ -4,23 +4,25 @@ const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const E = require('../../utils/embeds');
 const {
   serializeGuild, saveTemplate, listTemplates,
-  loadTemplate, logAction,
+  loadTemplate, deleteTemplate, logAction, sanitizeName,
 } = require('../../core/template-helper');
 
 module.exports = {
   name       : 'template',
   aliases    : ['tpl'],
-  description: 'Sauvegarde, liste ou applique un template de structure de serveur.',
-  usage      : ';template save <nom> | list | load <nom> [--reset] [--emojis]',
+  description: 'Sauvegarde, liste, applique ou supprime un template de structure de serveur.',
+  usage      : ';template save <nom> | list | info <nom> | load <nom> [--reset] [--emojis] | delete <nom>',
   cooldown   : 10,
   ownerOnly  : true,
   guildOnly  : true,
 
   async execute(message, args) {
     const sub = (args[0] || '').toLowerCase();
-    if (sub === 'save')  return handleSave(message, args);
-    if (sub === 'list')  return handleList(message);
-    if (sub === 'load')  return handleLoad(message, args);
+    if (sub === 'save')               return handleSave(message, args);
+    if (sub === 'list')               return handleList(message);
+    if (sub === 'load')               return handleLoad(message, args);
+    if (sub === 'info')               return handleInfo(message, args);
+    if (sub === 'delete' || sub === 'del') return handleDelete(message, args);
 
     return message.reply({
       embeds: [
@@ -28,7 +30,9 @@ module.exports = {
           '**Sous-commandes :**',
           '`;template save <nom>` — Sauvegarde ce serveur',
           '`;template list` — Liste les templates disponibles',
+          '`;template info <nom>` — Détails d\'un template',
           '`;template load <nom>` — Applique un template sur ce serveur',
+          '`;template delete <nom>` — Supprime un template',
           '',
           '**Flags (load) :**',
           '`--reset` — Supprime tout avant de recréer ⚠️',
@@ -156,4 +160,70 @@ async function handleLoad(message, args) {
     embeds: [E.warning('Confirmation requise', lines.join('\n'))],
     components: [row],
   });
+}
+
+// ─── Info ─────────────────────────────────────────────────────────────────────
+
+async function handleInfo(message, args) {
+  const name = args[1];
+  if (!name) {
+    return message.reply({ embeds: [E.error('Nom manquant', 'Usage : `;template info <nom>`')] });
+  }
+
+  const template = loadTemplate(name);
+  if (!template) {
+    return message.reply({ embeds: [E.error('Introuvable', `Le template \`${name}\` n'existe pas.`)] });
+  }
+
+  const totalCh  = template.categories?.reduce((s, c) => s + (c.channels?.length || 0), 0) || 0;
+  const date     = template.saved_at ? new Date(template.saved_at).toLocaleString('fr-FR') : 'Inconnue';
+  const preview  = (template.categories || [])
+    .slice(0, 5)
+    .map(c => `• ${c.name} (${c.channels?.length || 0} salons)`)
+    .join('\n');
+
+  return message.reply({
+    embeds: [
+      E.info(`Template : ${sanitizeName(name)}`, [
+        `**Serveur source :** ${template.name || '—'}`,
+        `**Sauvegardé le :** ${date}`,
+        '',
+        `**Rôles :** ${template.roles?.length || 0}`,
+        `**Catégories :** ${template.categories?.length || 0}`,
+        `**Salons :** ${totalCh}`,
+        `**Emojis :** ${template.emojis?.length || 0}`,
+        '',
+        '**Aperçu catégories :**',
+        preview || '—',
+        ...(template.categories?.length > 5 ? [`*… et ${template.categories.length - 5} de plus*`] : []),
+        '',
+        `Pour appliquer : \`;template load ${sanitizeName(name)}\``,
+      ].join('\n')),
+    ],
+  });
+}
+
+// ─── Delete ───────────────────────────────────────────────────────────────────
+
+async function handleDelete(message, args) {
+  const name = args[1];
+  if (!name) {
+    return message.reply({ embeds: [E.error('Nom manquant', 'Usage : `;template delete <nom>`')] });
+  }
+
+  const deleted = deleteTemplate(name);
+  if (!deleted) {
+    return message.reply({ embeds: [E.error('Introuvable', `Le template \`${name}\` n'existe pas.`)] });
+  }
+
+  logAction({
+    action      : 'delete',
+    templateName: sanitizeName(name),
+    userId      : message.author.id,
+    guildId     : message.guild.id,
+    guildName   : message.guild.name,
+    success     : true,
+  });
+
+  return message.reply({ embeds: [E.success('Template supprimé', `\`${sanitizeName(name)}\` a été supprimé.`)] });
 }
