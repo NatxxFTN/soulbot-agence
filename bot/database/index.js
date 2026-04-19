@@ -269,6 +269,30 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_tickets_guild       ON tickets (guild_id);
   CREATE INDEX IF NOT EXISTS idx_tickets_status      ON tickets (guild_id, status);
   CREATE INDEX IF NOT EXISTS idx_tickets_channel     ON tickets (channel_id);
+
+  /* ---- Logs de reset serveur ---- */
+  CREATE TABLE IF NOT EXISTS reset_logs (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id          TEXT    NOT NULL,
+    guild_name        TEXT    NOT NULL,
+    user_id           TEXT    NOT NULL,
+    auto_backup_name  TEXT    NOT NULL,
+    channels_deleted  INTEGER NOT NULL DEFAULT 0,
+    roles_deleted     INTEGER NOT NULL DEFAULT 0,
+    emojis_deleted    INTEGER NOT NULL DEFAULT 0,
+    duration_ms       INTEGER,
+    success           INTEGER NOT NULL,
+    error             TEXT,
+    timestamp         INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+  CREATE INDEX IF NOT EXISTS idx_reset_logs_guild ON reset_logs(guild_id);
+  CREATE INDEX IF NOT EXISTS idx_reset_logs_user  ON reset_logs(user_id);
+
+  /* ---- Cooldown reset par serveur ---- */
+  CREATE TABLE IF NOT EXISTS reset_cooldowns (
+    guild_id      TEXT    PRIMARY KEY,
+    last_reset_at INTEGER NOT NULL
+  );
 `);
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
