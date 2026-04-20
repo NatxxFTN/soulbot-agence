@@ -42,15 +42,11 @@ function renderPanel(guildId, mode = 'join') {
 
   const container = new ContainerBuilder().setAccentColor(COLORS.accent);
 
-  // ── Titre ─────────────────────────────────────────────────────────────────
+  // ── Titre + dropdown mode ─────────────────────────────────────────────────
   container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent('# 🍊 Configuration Greeting'),
-  );
-  container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent('Paramétrez les messages d\'arrivée et de départ de votre serveur.'),
+    new TextDisplayBuilder().setContent(`# 🍊 Configuration Greeting — ${modeEmoji} ${modeLabel}`),
   );
 
-  // ── Dropdown mode ─────────────────────────────────────────────────────────
   container.addActionRowComponents(
     new ActionRowBuilder().addComponents(
       new StringSelectMenuBuilder()
@@ -63,10 +59,7 @@ function renderPanel(guildId, mode = 'join') {
     ),
   );
 
-  // ── Label mode + toggle ───────────────────────────────────────────────────
-  container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent(`**${modeLabel}**`),
-  );
+  // ── Toggle ────────────────────────────────────────────────────────────────
   container.addActionRowComponents(
     new ActionRowBuilder().addComponents(
       new ButtonBuilder()

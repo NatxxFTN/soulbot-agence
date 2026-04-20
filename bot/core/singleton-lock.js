@@ -1,34 +1,37 @@
 'use strict';
 
-/**
- * Garantit qu'une seule instance du bot tourne à la fois.
- * Crée .bot.lock à la racine avec le PID courant.
- * Refuse de démarrer si un processus actif détecté.
- * Nettoie le lock proprement à chaque shutdown (exit/signal).
- */
-
 const fs   = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 const LOCK_FILE = path.join(__dirname, '../../.bot.lock');
 
+function isPidAlive(pid) {
+  if (process.platform === 'win32') {
+    // Sur Windows, process.kill(pid, 0) retourne EPERM même pour les PID morts
+    // appartenant à un ancien process → faux positif. On utilise tasklist à la place.
+    try {
+      const out = execSync(
+        `tasklist /FI "PID eq ${pid}" /FO CSV /NH`,
+        { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 2000 }
+      );
+      return out.includes(`"${pid}"`);
+    } catch {
+      return false;
+    }
+  }
+  // Unix : signal 0 = sonde sans kill
+  try { process.kill(pid, 0); return true; }
+  catch (e) { return e.code === 'EPERM'; }
+}
+
 function acquireLock() {
   if (fs.existsSync(LOCK_FILE)) {
-    let oldPid;
-    try { oldPid = parseInt(fs.readFileSync(LOCK_FILE, 'utf-8').trim(), 10); } catch { oldPid = 0; }
+    let oldPid = 0;
+    try { oldPid = parseInt(fs.readFileSync(LOCK_FILE, 'utf-8').trim(), 10); } catch { /* ignoré */ }
 
     if (oldPid && oldPid !== process.pid) {
-      let alive = false;
-      try {
-        process.kill(oldPid, 0);
-        alive = true;
-      } catch (e) {
-        // EPERM sur Windows = processus existe mais appartient à un autre user → traiter comme vivant
-        if (e.code === 'EPERM') alive = true;
-        // ESRCH = processus mort → lock obsolète
-      }
-
-      if (alive) {
+      if (isPidAlive(oldPid)) {
         console.error(`\n❌ CONFLIT SINGLETON : une instance du bot est déjà active (PID ${oldPid}).`);
         console.error('   Pour la tuer :');
         console.error(`     Windows : taskkill /F /PID ${oldPid}`);
@@ -36,17 +39,14 @@ function acquireLock() {
         console.error('   Ou utilise : npm run dev:bot (kill automatique)\n');
         process.exit(1);
       }
-
-      // Lock obsolète (processus mort) → on nettoie silencieusement
+      // Process mort → lock obsolète, on nettoie
       try { fs.unlinkSync(LOCK_FILE); } catch { /* ignoré */ }
       console.log(`   🧹 Lock obsolète supprimé (ancien PID ${oldPid})`);
     }
   }
 
-  // Écrire le lock avec le PID courant
   fs.writeFileSync(LOCK_FILE, String(process.pid), 'utf-8');
 
-  // Nettoyage automatique à la fermeture (dans tous les cas)
   const releaseLock = () => { try { fs.unlinkSync(LOCK_FILE); } catch { /* ignoré */ } };
   process.on('exit',    releaseLock);
   process.on('SIGINT',  releaseLock);
