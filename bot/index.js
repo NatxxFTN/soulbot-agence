@@ -8,6 +8,7 @@ acquireLock();
 
 const { Client, GatewayIntentBits, Partials, Collection } = require('discord.js');
 const { loadCommands }  = require('./core/CommandHandler');
+const { register: registerUIHandlers } = require('./ui/handlers/greeting-handler');
 const { loadEvents }    = require('./handlers/EventHandler');
 const { db }            = require('./database');
 const logger            = require('./utils/logger');
@@ -47,6 +48,7 @@ client.selectHandlers = new Collection();
 
 // ─── Chargement ──────────────────────────────────────────────────────────────
 loadCommands(client, logger);
+registerUIHandlers(client);
 loadEvents(client);
 
 // ─── Events dashboard logging ────────────────────────────────────────────────
