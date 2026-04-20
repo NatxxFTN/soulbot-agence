@@ -386,6 +386,70 @@ db.exec(`
     UNIQUE(guild_id, role_id)
   );
   CREATE INDEX IF NOT EXISTS idx_antispam_wl_guild ON antispam_whitelist(guild_id);
+
+  /* ---- Nuke Premium — configuration par serveur ---- */
+  CREATE TABLE IF NOT EXISTS nuke_config (
+    guild_id         TEXT    PRIMARY KEY,
+    targets_channels INTEGER NOT NULL DEFAULT 1,
+    targets_roles    INTEGER NOT NULL DEFAULT 1,
+    targets_emojis   INTEGER NOT NULL DEFAULT 1,
+    updated_at       INTEGER,
+    updated_by       TEXT
+  );
+
+  /* ---- Lockdown — état par serveur ---- */
+  CREATE TABLE IF NOT EXISTS lockdown_config (
+    guild_id      TEXT    PRIMARY KEY,
+    active        INTEGER NOT NULL DEFAULT 0,
+    locked_by     TEXT,
+    locked_at     INTEGER,
+    reason        TEXT,
+    locked_count  INTEGER NOT NULL DEFAULT 0
+  );
+
+  /* ---- Lockdown — canaux verrouillés ---- */
+  CREATE TABLE IF NOT EXISTS lockdown_channels (
+    guild_id    TEXT    NOT NULL,
+    channel_id  TEXT    NOT NULL,
+    locked_at   INTEGER NOT NULL DEFAULT (unixepoch()),
+    PRIMARY KEY (guild_id, channel_id)
+  );
+
+  /* ---- Raidmode — configuration ---- */
+  CREATE TABLE IF NOT EXISTS raidmode_config (
+    guild_id        TEXT    PRIMARY KEY,
+    active          INTEGER NOT NULL DEFAULT 0,
+    join_threshold  INTEGER NOT NULL DEFAULT 5,
+    join_window_sec INTEGER NOT NULL DEFAULT 10,
+    action          TEXT    NOT NULL DEFAULT 'kick',
+    enabled_by      TEXT,
+    enabled_at      INTEGER,
+    auto_disable    INTEGER NOT NULL DEFAULT 1
+  );
+
+  /* ---- Raidmode — détections récentes ---- */
+  CREATE TABLE IF NOT EXISTS raidmode_detections (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id   TEXT    NOT NULL,
+    user_id    TEXT    NOT NULL,
+    user_tag   TEXT,
+    action     TEXT    NOT NULL,
+    joined_at  INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+  CREATE INDEX IF NOT EXISTS idx_raidmode_det_guild ON raidmode_detections(guild_id, joined_at DESC);
+
+  /* ---- Massban — logs ---- */
+  CREATE TABLE IF NOT EXISTS massban_logs (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id     TEXT    NOT NULL,
+    banned_by    TEXT    NOT NULL,
+    banned_ids   TEXT    NOT NULL,
+    reason       TEXT,
+    success      INTEGER NOT NULL DEFAULT 0,
+    failed       INTEGER NOT NULL DEFAULT 0,
+    timestamp    INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+  CREATE INDEX IF NOT EXISTS idx_massban_guild ON massban_logs(guild_id, timestamp DESC);
 `);
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

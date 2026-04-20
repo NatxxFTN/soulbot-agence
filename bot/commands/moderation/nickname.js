@@ -10,7 +10,7 @@ const STMT_LOG = db.prepare(
 
 module.exports = {
   name       : 'nickname',
-  aliases    : ['nick'],
+  aliases    : ['nick', 'rename'],
   description: 'Modifier ou réinitialiser le pseudo d\'un membre.',
   usage      : ';nickname @membre [nouveau pseudo] — sans pseudo = réinitialise',
   cooldown   : 3,

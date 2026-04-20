@@ -11,7 +11,11 @@ const { loadCommands }  = require('./core/CommandHandler');
 const { register: registerUIHandlers }       = require('./ui/handlers/greeting-handler');
 const { register: registerTicketHandlers }   = require('./ui/handlers/ticket-handler');
 const { register: registerAntileakHandlers } = require('./ui/handlers/antileak-handler');
-const { register: registerAntispamHandlers } = require('./ui/handlers/antispam-handler');
+const { register: registerAntispamHandlers }  = require('./ui/handlers/antispam-handler');
+const { register: registerNukeHandlers }      = require('./ui/handlers/nuke-handler');
+const { register: registerLockdownHandlers }  = require('./ui/handlers/lockdown-handler');
+const { register: registerRaidmodeHandlers }  = require('./ui/handlers/raidmode-handler');
+const { register: registerMassbanHandlers }   = require('./ui/handlers/massban-handler');
 const { loadEvents }    = require('./handlers/EventHandler');
 const { db }            = require('./database');
 const logger            = require('./utils/logger');
@@ -55,6 +59,10 @@ registerUIHandlers(client);
 registerTicketHandlers(client);
 registerAntileakHandlers(client);
 registerAntispamHandlers(client);
+registerNukeHandlers(client);
+registerLockdownHandlers(client);
+registerRaidmodeHandlers(client);
+registerMassbanHandlers(client);
 loadEvents(client);
 
 // ─── Events dashboard logging ────────────────────────────────────────────────
