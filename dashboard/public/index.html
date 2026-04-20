@@ -1,370 +1,360 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Discord Manager — Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/css/style.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soulbot — Dashboard</title>
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=instrument-serif@400,400i&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
-<div id="login-screen" class="login-screen">
-  <div class="login-bg">
-    <div class="login-blob b1"></div>
-    <div class="login-blob b2"></div>
-    <div class="login-blob b3"></div>
+  <!-- Background orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
   </div>
-  <div class="login-card">
-    <div class="login-logo">
-      <div class="logo-icon">⚡</div>
-      <span class="logo-text">Discord<strong>Manager</strong></span>
-    </div>
-    <h2>Connexion au Dashboard</h2>
-    <p class="login-sub">Accès sécurisé à votre panneau de contrôle</p>
-    <div class="form-group">
-      <label>Mot de passe</label>
-      <input type="password" id="password-input" placeholder="••••••••••" autocomplete="current-password"/>
-    </div>
-    <button class="btn-primary full" id="login-btn">Se connecter</button>
-    <p class="login-hint">💡 Mot de passe par défaut: <code>admin123</code></p>
-    <button class="btn-ghost full" id="demo-btn">🎮 Charger des données de démo</button>
+
+  <!-- Layout -->
+  <div class="layout">
+
+    <!-- ── SIDEBAR ─────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+
+        <!-- Brand -->
+        <div class="sidebar-brand">
+          <div class="brand-logo">🍊</div>
+          <span class="brand-name">Soulbot</span>
+          <button class="sidebar-toggle" id="sidebarToggle" aria-label="Réduire sidebar">
+            <i data-lucide="chevrons-left" width="16" height="16"></i>
+          </button>
+        </div>
+
+        <!-- Search -->
+        <div class="sidebar-search">
+          <i data-lucide="search" width="14" height="14" class="search-icon"></i>
+          <input type="text" placeholder="Rechercher…" class="search-input" id="searchInput">
+        </div>
+
+        <!-- Nav -->
+        <nav class="sidebar-nav">
+          <span class="nav-label">Navigation</span>
+          <a href="#overview" class="nav-item active" data-section="overview">
+            <i data-lucide="layout-dashboard" width="16" height="16"></i>
+            <span>Vue d'ensemble</span>
+          </a>
+          <a href="/logs" class="nav-item">
+            <i data-lucide="scroll-text" width="16" height="16"></i>
+            <span>Logs temps réel</span>
+            <span class="nav-badge live-dot" id="liveDot"></span>
+          </a>
+          <a href="#guilds" class="nav-item" data-section="guilds">
+            <i data-lucide="server" width="16" height="16"></i>
+            <span>Serveurs</span>
+            <span class="nav-badge" id="guildCountBadge">—</span>
+          </a>
+          <a href="#commands" class="nav-item" data-section="commands">
+            <i data-lucide="terminal" width="16" height="16"></i>
+            <span>Commandes</span>
+          </a>
+
+          <span class="nav-label" style="margin-top:16px">Modération</span>
+          <a href="#mod-logs" class="nav-item" data-section="mod-logs">
+            <i data-lucide="shield" width="16" height="16"></i>
+            <span>Mod logs</span>
+          </a>
+          <a href="#warnings" class="nav-item" data-section="warnings">
+            <i data-lucide="alert-triangle" width="16" height="16"></i>
+            <span>Avertissements</span>
+          </a>
+        </nav>
+
+        <!-- Spacer -->
+        <div style="flex:1"></div>
+
+        <!-- User card -->
+        <div class="sidebar-user" id="userCard">
+          <div class="user-avatar" id="userAvatarEl">?</div>
+          <div class="user-info">
+            <span class="user-name" id="userNameEl">Chargement…</span>
+            <span class="user-role">Owner</span>
+          </div>
+          <a href="/logout" class="user-logout" title="Déconnexion">
+            <i data-lucide="log-out" width="14" height="14"></i>
+          </a>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ── MAIN ───────────────────────────────────────────────── -->
+    <main class="main" id="main">
+
+      <!-- Header -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+            <i data-lucide="menu" width="20" height="20"></i>
+          </button>
+          <div class="topbar-title">
+            <h1 class="page-title" id="pageTitle">Vue d'ensemble</h1>
+            <span class="page-breadcrumb">Dashboard → <span id="breadcrumbSub">Aperçu</span></span>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="status-pill" id="statusPill">
+            <span class="status-dot"></span>
+            <span id="statusText">En ligne</span>
+          </div>
+          <button class="icon-btn" id="refreshBtn" title="Actualiser">
+            <i data-lucide="refresh-cw" width="16" height="16"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content area -->
+      <div class="content" id="content">
+
+        <!-- ── SECTION: Overview ─────────────────────────────── -->
+        <section class="section active" id="section-overview">
+
+          <!-- Welcome -->
+          <div class="welcome-block">
+            <p class="welcome-eyebrow">Tableau de bord</p>
+            <h2 class="welcome-title">Bon retour, <em id="welcomeName">Nathan</em>.</h2>
+            <p class="welcome-sub">Voici un résumé de l'activité de Soulbot en temps réel.</p>
+          </div>
+
+          <!-- Stats grid -->
+          <div class="stats-grid">
+            <div class="stat-card" id="sc-guilds">
+              <div class="stat-icon">
+                <i data-lucide="server" width="18" height="18"></i>
+              </div>
+              <div class="stat-body">
+                <span class="stat-value" id="stat-guilds">—</span>
+                <span class="stat-label">Serveurs actifs</span>
+              </div>
+              <div class="stat-trend up" id="trend-guilds"></div>
+            </div>
+            <div class="stat-card" id="sc-commands">
+              <div class="stat-icon accent">
+                <i data-lucide="zap" width="18" height="18"></i>
+              </div>
+              <div class="stat-body">
+                <span class="stat-value" id="stat-commands">—</span>
+                <span class="stat-label">Commandes exécutées</span>
+              </div>
+            </div>
+            <div class="stat-card" id="sc-24h">
+              <div class="stat-icon">
+                <i data-lucide="activity" width="18" height="18"></i>
+              </div>
+              <div class="stat-body">
+                <span class="stat-value" id="stat-24h">—</span>
+                <span class="stat-label">Événements 24h</span>
+              </div>
+            </div>
+            <div class="stat-card" id="sc-errors">
+              <div class="stat-icon danger">
+                <i data-lucide="alert-circle" width="18" height="18"></i>
+              </div>
+              <div class="stat-body">
+                <span class="stat-value" id="stat-errors">—</span>
+                <span class="stat-label">Erreurs totales</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart + top commands -->
+          <div class="row-split">
+
+            <!-- Activity chart -->
+            <div class="panel panel-chart">
+              <div class="panel-header">
+                <span class="panel-title">Activité — 7 derniers jours</span>
+                <div class="panel-actions">
+                  <button class="chip active" data-chart="7d">7j</button>
+                  <button class="chip" data-chart="24h">24h</button>
+                </div>
+              </div>
+              <div class="chart-wrap">
+                <canvas id="activityChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Top commands -->
+            <div class="panel panel-top-cmds">
+              <div class="panel-header">
+                <span class="panel-title">Top commandes</span>
+              </div>
+              <ul class="cmd-list" id="topCmdList">
+                <li class="cmd-list-empty">Chargement…</li>
+              </ul>
+            </div>
+
+          </div>
+
+          <!-- Recent activity row -->
+          <div class="row-split">
+
+            <!-- Recent commands table -->
+            <div class="panel panel-recent">
+              <div class="panel-header">
+                <span class="panel-title">Commandes récentes</span>
+                <a href="/logs" class="panel-link">Voir tout →</a>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table" id="recentCmdTable">
+                  <thead>
+                    <tr>
+                      <th>Commande</th>
+                      <th>Serveur</th>
+                      <th>Heure</th>
+                      <th>Statut</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recentCmdBody">
+                    <tr><td colspan="4" class="table-empty">Chargement…</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Live log stream -->
+            <div class="panel panel-live">
+              <div class="panel-header">
+                <span class="panel-title">Flux live</span>
+                <span class="live-badge" id="liveBadge">● LIVE</span>
+              </div>
+              <div class="log-filter-chips">
+                <button class="chip active" data-level="">Tout</button>
+                <button class="chip" data-level="command">cmd</button>
+                <button class="chip" data-level="info">info</button>
+                <button class="chip" data-level="warn">warn</button>
+                <button class="chip" data-level="error">error</button>
+              </div>
+              <div class="live-stream" id="liveStream">
+                <div class="stream-empty">En attente de logs…</div>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ── SECTION: Guilds ───────────────────────────────── -->
+        <section class="section" id="section-guilds">
+          <div class="section-header">
+            <h2 class="section-title">Serveurs connectés</h2>
+            <span class="section-count" id="guildsTotal">—</span>
+          </div>
+          <div class="guilds-grid" id="guildsGrid">
+            <div class="guilds-empty">Chargement…</div>
+          </div>
+        </section>
+
+        <!-- ── SECTION: Commands ─────────────────────────────── -->
+        <section class="section" id="section-commands">
+          <div class="section-header">
+            <h2 class="section-title">Historique des commandes</h2>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="search-inline">
+                <i data-lucide="search" width="14" height="14"></i>
+                <input type="text" placeholder="Filtrer par commande ou serveur…" id="cmdFilterInput">
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table" id="cmdHistTable">
+                <thead>
+                  <tr>
+                    <th>Commande</th>
+                    <th>Serveur</th>
+                    <th>Utilisateur</th>
+                    <th>Durée</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="cmdHistBody">
+                  <tr><td colspan="6" class="table-empty">Chargement…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── SECTION: Mod Logs ─────────────────────────────── -->
+        <section class="section" id="section-mod-logs">
+          <div class="section-header">
+            <h2 class="section-title">Logs de modération</h2>
+          </div>
+          <div class="panel">
+            <div class="table-wrap">
+              <table class="data-table" id="modLogsTable">
+                <thead>
+                  <tr>
+                    <th>Action</th>
+                    <th>Cible</th>
+                    <th>Modérateur</th>
+                    <th>Serveur</th>
+                    <th>Raison</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="modLogsBody">
+                  <tr><td colspan="6" class="table-empty">Chargement…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── SECTION: Warnings ─────────────────────────────── -->
+        <section class="section" id="section-warnings">
+          <div class="section-header">
+            <h2 class="section-title">Avertissements</h2>
+          </div>
+          <div class="panel">
+            <div class="table-wrap">
+              <table class="data-table" id="warningsTable">
+                <thead>
+                  <tr>
+                    <th>Utilisateur</th>
+                    <th>Serveur</th>
+                    <th>Raison</th>
+                    <th>Modérateur</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="warningsBody">
+                  <tr><td colspan="5" class="table-empty">Chargement…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+      <!-- /content -->
+
+    </main>
+    <!-- /main -->
+
   </div>
-</div>
+  <!-- /layout -->
 
-<!-- MAIN APP -->
-<div id="app" class="app hidden">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="logo">
-        <div class="logo-icon">⚡</div>
-        <span>Discord<strong>Manager</strong></span>
-      </div>
-      <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
-    </div>
-
-    <nav class="nav">
-      <div class="nav-section-label">Dashboard</div>
-      <a href="#" class="nav-item active" data-page="overview">
-        <span class="nav-icon">📊</span><span class="nav-label">Vue d'ensemble</span>
-      </a>
-      <a href="#" class="nav-item" data-page="guilds">
-        <span class="nav-icon">🏠</span><span class="nav-label">Serveurs</span>
-      </a>
-
-      <div class="nav-section-label">Modération</div>
-      <a href="#" class="nav-item" data-page="modlogs">
-        <span class="nav-icon">🛡️</span><span class="nav-label">Logs de modération</span>
-        <span class="nav-badge" id="badge-modlogs">0</span>
-      </a>
-      <a href="#" class="nav-item" data-page="warnings">
-        <span class="nav-icon">⚠️</span><span class="nav-label">Avertissements</span>
-        <span class="nav-badge" id="badge-warnings">0</span>
-      </a>
-
-      <div class="nav-section-label">Commandes</div>
-      <a href="#" class="nav-item" data-page="cmdlogs">
-        <span class="nav-icon">📝</span><span class="nav-label">Logs de commandes</span>
-      </a>
-      <a href="#" class="nav-item" data-page="customcmds">
-        <span class="nav-icon">🔧</span><span class="nav-label">Commandes custom</span>
-      </a>
-
-      <div class="nav-section-label">Paramètres</div>
-      <a href="#" class="nav-item" data-page="settings">
-        <span class="nav-icon">⚙️</span><span class="nav-label">Configuration</span>
-      </a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="bot-status" id="bot-status">
-        <div class="status-dot offline"></div>
-        <span>Bot: <strong>Hors ligne</strong></span>
-      </div>
-      <button class="btn-ghost small" id="logout-btn">Se déconnecter</button>
-    </div>
-  </aside>
-
-  <!-- MAIN CONTENT -->
-  <main class="main">
-    <!-- TOPBAR -->
-    <header class="topbar">
-      <div class="topbar-left">
-        <h1 class="page-title" id="page-title">Vue d'ensemble</h1>
-      </div>
-      <div class="topbar-right">
-        <div class="topbar-server-select">
-          <select id="guild-filter" class="select-input">
-            <option value="">Tous les serveurs</option>
-          </select>
-        </div>
-        <button class="btn-icon" id="refresh-btn" title="Actualiser">↻</button>
-      </div>
-    </header>
-
-    <!-- PAGES -->
-    <div class="pages">
-
-      <!-- OVERVIEW PAGE -->
-      <section class="page active" id="page-overview">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">🏠</div>
-            <div class="stat-content">
-              <div class="stat-value" id="stat-guilds">—</div>
-              <div class="stat-label">Serveurs</div>
-            </div>
-            <div class="stat-trend up">+0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">🛡️</div>
-            <div class="stat-content">
-              <div class="stat-value" id="stat-modactions">—</div>
-              <div class="stat-label">Actions de mod.</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">⚠️</div>
-            <div class="stat-content">
-              <div class="stat-value" id="stat-warnings">—</div>
-              <div class="stat-label">Avertissements</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">⚡</div>
-            <div class="stat-content">
-              <div class="stat-value" id="stat-commands">—</div>
-              <div class="stat-label">Commandes exec.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="dashboard-grid">
-          <!-- Recent Mod Actions -->
-          <div class="card">
-            <div class="card-header">
-              <h3>Actions récentes</h3>
-              <a href="#" class="card-link" data-page="modlogs">Voir tout →</a>
-            </div>
-            <div class="mod-log-list" id="overview-modlogs">
-              <div class="loading">Chargement...</div>
-            </div>
-          </div>
-
-          <!-- Command Usage Chart -->
-          <div class="card">
-            <div class="card-header">
-              <h3>Commandes les plus utilisées</h3>
-            </div>
-            <div class="chart-container" id="cmd-chart-container">
-              <div id="cmd-chart"></div>
-            </div>
-          </div>
-
-          <!-- Recent Commands -->
-          <div class="card span-2">
-            <div class="card-header">
-              <h3>Commandes récentes</h3>
-              <a href="#" class="card-link" data-page="cmdlogs">Voir tout →</a>
-            </div>
-            <table class="data-table">
-              <thead><tr><th>Utilisateur</th><th>Commande</th><th>Serveur</th><th>Date</th></tr></thead>
-              <tbody id="overview-cmdlogs"><tr><td colspan="4" class="loading-cell">Chargement...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- GUILDS PAGE -->
-      <section class="page" id="page-guilds">
-        <div class="guilds-grid" id="guilds-grid">
-          <div class="loading">Chargement des serveurs...</div>
-        </div>
-      </section>
-
-      <!-- MOD LOGS PAGE -->
-      <section class="page" id="page-modlogs">
-        <div class="page-toolbar">
-          <div class="filters">
-            <select class="select-input" id="modlog-action-filter">
-              <option value="">Toutes les actions</option>
-              <option value="BAN">🔨 Ban</option>
-              <option value="KICK">👟 Kick</option>
-              <option value="MUTE">🔇 Mute</option>
-              <option value="WARN">⚠️ Warn</option>
-              <option value="CLEAR">🗑️ Clear</option>
-            </select>
-          </div>
-          <div class="pagination-info" id="modlog-info">0 résultats</div>
-        </div>
-        <div class="card no-pad">
-          <table class="data-table">
-            <thead><tr><th>Action</th><th>Utilisateur</th><th>Modérateur</th><th>Raison</th><th>Serveur</th><th>Date</th></tr></thead>
-            <tbody id="modlog-table"><tr><td colspan="6" class="loading-cell">Chargement...</td></tr></tbody>
-          </table>
-          <div class="table-footer">
-            <button class="btn-ghost" id="modlog-prev">← Précédent</button>
-            <span id="modlog-page">Page 1</span>
-            <button class="btn-ghost" id="modlog-next">Suivant →</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- WARNINGS PAGE -->
-      <section class="page" id="page-warnings">
-        <div class="page-toolbar">
-          <div class="filters">
-            <input type="text" class="text-input" id="warn-user-filter" placeholder="Filtrer par user ID..."/>
-          </div>
-          <button class="btn-primary" id="warn-search-btn">Rechercher</button>
-        </div>
-        <div class="card no-pad">
-          <table class="data-table">
-            <thead><tr><th>Utilisateur</th><th>Modérateur</th><th>Raison</th><th>Serveur</th><th>Date</th><th>Action</th></tr></thead>
-            <tbody id="warn-table"><tr><td colspan="6" class="loading-cell">Chargement...</td></tr></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- COMMAND LOGS PAGE -->
-      <section class="page" id="page-cmdlogs">
-        <div class="card no-pad">
-          <table class="data-table">
-            <thead><tr><th>Utilisateur</th><th>Commande</th><th>Arguments</th><th>Salon</th><th>Serveur</th><th>Date</th></tr></thead>
-            <tbody id="cmdlog-table"><tr><td colspan="6" class="loading-cell">Chargement...</td></tr></tbody>
-          </table>
-          <div class="table-footer">
-            <button class="btn-ghost" id="cmdlog-prev">← Précédent</button>
-            <span id="cmdlog-page">Page 1</span>
-            <button class="btn-ghost" id="cmdlog-next">Suivant →</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- CUSTOM COMMANDS PAGE -->
-      <section class="page" id="page-customcmds">
-        <div class="page-toolbar">
-          <div></div>
-          <button class="btn-primary" id="add-cmd-btn">+ Ajouter une commande</button>
-        </div>
-
-        <!-- Add form (hidden by default) -->
-        <div class="card" id="add-cmd-form" style="display:none">
-          <h3>Nouvelle commande custom</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Serveur</label>
-              <select class="select-input" id="cmd-guild-select"></select>
-            </div>
-            <div class="form-group">
-              <label>Déclencheur (trigger)</label>
-              <input type="text" class="text-input" id="cmd-trigger" placeholder="ex: !règles"/>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Réponse <small>(variables: {user}, {server})</small></label>
-            <textarea class="text-input textarea" id="cmd-response" placeholder="La réponse du bot..."></textarea>
-          </div>
-          <div class="form-actions">
-            <button class="btn-ghost" id="cancel-cmd-btn">Annuler</button>
-            <button class="btn-primary" id="save-cmd-btn">Sauvegarder</button>
-          </div>
-        </div>
-
-        <div class="card no-pad">
-          <table class="data-table">
-            <thead><tr><th>Déclencheur</th><th>Réponse</th><th>Serveur</th><th>Créé le</th><th>Action</th></tr></thead>
-            <tbody id="customcmd-table"><tr><td colspan="5" class="loading-cell">Chargement...</td></tr></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- SETTINGS PAGE -->
-      <section class="page" id="page-settings">
-        <div class="settings-header">
-          <div class="form-group">
-            <label>Sélectionner un serveur</label>
-            <select class="select-input" id="settings-guild-select">
-              <option value="">Choisir un serveur...</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="settings-form" style="display:none">
-          <div class="settings-grid">
-            <!-- General -->
-            <div class="card">
-              <div class="card-header"><h3>⚙️ Général</h3></div>
-              <div class="form-group">
-                <label>Préfixe du bot</label>
-                <input type="text" class="text-input" id="s-prefix" maxlength="5" placeholder="!"/>
-              </div>
-              <div class="form-group">
-                <label>Salon de bienvenue (ID)</label>
-                <input type="text" class="text-input" id="s-welcome-channel" placeholder="ID du salon"/>
-              </div>
-              <div class="form-group">
-                <label>Message de bienvenue</label>
-                <textarea class="text-input textarea" id="s-welcome-msg" placeholder="Welcome {user} to {server}!"></textarea>
-                <small class="hint">Variables: {user}, {username}, {server}, {membercount}</small>
-              </div>
-            </div>
-
-            <!-- Moderation -->
-            <div class="card">
-              <div class="card-header"><h3>🛡️ Modération</h3></div>
-              <div class="form-group">
-                <label>Salon de logs (ID)</label>
-                <input type="text" class="text-input" id="s-log-channel" placeholder="ID du salon"/>
-              </div>
-              <div class="form-group">
-                <label>Rôle automatique (ID)</label>
-                <input type="text" class="text-input" id="s-auto-role" placeholder="ID du rôle"/>
-              </div>
-
-              <div class="toggle-group">
-                <div class="toggle-item">
-                  <div>
-                    <div class="toggle-label">Anti-spam</div>
-                    <div class="toggle-desc">Détection et suppression des spams</div>
-                  </div>
-                  <label class="toggle"><input type="checkbox" id="s-anti-spam"/><span class="toggle-slider"></span></label>
-                </div>
-                <div class="toggle-item">
-                  <div>
-                    <div class="toggle-label">Anti-liens</div>
-                    <div class="toggle-desc">Bloquer les liens externes</div>
-                  </div>
-                  <label class="toggle"><input type="checkbox" id="s-anti-links"/><span class="toggle-slider"></span></label>
-                </div>
-                <div class="toggle-item">
-                  <div>
-                    <div class="toggle-label">Anti-majuscules</div>
-                    <div class="toggle-desc">Bloquer les messages en caps excessif</div>
-                  </div>
-                  <label class="toggle"><input type="checkbox" id="s-anti-caps"/><span class="toggle-slider"></span></label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="settings-actions">
-            <button class="btn-primary large" id="save-settings-btn">💾 Sauvegarder la configuration</button>
-          </div>
-
-          <div id="settings-toast" class="toast hidden"></div>
-        </div>
-      </section>
-
-    </div><!-- /pages -->
-  </main>
-</div>
-
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
 </body>
 </html>

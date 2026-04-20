@@ -17,6 +17,11 @@ const io     = new Server(server, { cors: { origin: '*' } });
 const PORT     = process.env.DASHBOARD_PORT || process.env.PORT || 3000;
 const PASSWORD = process.env.DASHBOARD_PASSWORD || 'admin123';
 
+const DISCORD_CLIENT_ID     = process.env.DISCORD_CLIENT_ID;
+const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
+const DASHBOARD_URL         = process.env.DASHBOARD_URL || `http://localhost:${PORT}`;
+const REDIRECT_URI          = `${DASHBOARD_URL}/auth/callback`;
+
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -60,17 +65,22 @@ app.post('/api/logout', (req, res) => {
 
 app.get('/api/auth/check', (req, res) => {
   res.json({
-    authenticated: !!req.session.authenticated,
-    userId: req.session.userId || null,
-    userName: req.session.userName || null,
+    authenticated : !!req.session.authenticated,
+    userId        : req.session.userId   || null,
+    userName      : req.session.userName || null,
+    oauthEnabled  : !!(DISCORD_CLIENT_ID && DISCORD_CLIENT_SECRET),
+  });
+});
+
+app.get('/api/me', requireAuth, (req, res) => {
+  res.json({
+    id      : req.session.userId   || null,
+    username: req.session.userName || 'Nathan',
+    avatar  : req.session.avatar   || null,
   });
 });
 
 // ── Discord OAuth2 (activé seulement si CLIENT_ID configuré) ─────────────────
-const DISCORD_CLIENT_ID     = process.env.DISCORD_CLIENT_ID;
-const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
-const DASHBOARD_URL         = process.env.DASHBOARD_URL || `http://localhost:${PORT}`;
-const REDIRECT_URI          = `${DASHBOARD_URL}/auth/callback`;
 
 if (DISCORD_CLIENT_ID && DISCORD_CLIENT_SECRET) {
   app.get('/auth/discord', (req, res) => {
@@ -164,7 +174,16 @@ app.get('/api/stats', requireAuth, (req, res) => {
 });
 
 app.get('/api/guilds', requireAuth, (req, res) => {
-  res.json(tryAll('SELECT * FROM guild_settings ORDER BY guild_id'));
+  // Prioritise bot_logs (active guilds with event counts) ; fallback to guild_settings
+  const fromLogs = tryAll(`
+    SELECT guild_id, guild_name, COUNT(*) as events_count
+    FROM bot_logs
+    WHERE guild_id IS NOT NULL
+    GROUP BY guild_id
+    ORDER BY events_count DESC
+  `);
+  if (fromLogs.length) return res.json(fromLogs);
+  res.json(tryAll('SELECT guild_id, NULL as guild_name, 0 as events_count FROM guild_settings ORDER BY guild_id'));
 });
 
 app.patch('/api/guilds/:id', requireAuth, (req, res) => {

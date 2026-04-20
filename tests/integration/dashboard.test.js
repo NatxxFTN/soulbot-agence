@@ -69,3 +69,54 @@ describe('Dashboard Phase 1 — fondations', () => {
     assert.ok(src.includes("require('../bot/database')"), 'Import DB manquant');
   });
 });
+
+describe('Dashboard Phase 2 — frontend premium', () => {
+  it('dashboard/public/styles.css existe', () => {
+    assert.ok(fs.existsSync(path.join(__dirname, '../../dashboard/public/styles.css')));
+  });
+
+  it('dashboard/public/app.js existe', () => {
+    assert.ok(fs.existsSync(path.join(__dirname, '../../dashboard/public/app.js')));
+  });
+
+  it('dashboard/public/login.html existe', () => {
+    assert.ok(fs.existsSync(path.join(__dirname, '../../dashboard/public/login.html')));
+  });
+
+  it('styles.css contient --accent: #F39C12', () => {
+    const src = fs.readFileSync(
+      path.join(__dirname, '../../dashboard/public/styles.css'), 'utf8'
+    );
+    assert.ok(src.includes('--accent: #F39C12'), '--accent manquant ou couleur incorrecte');
+  });
+
+  it('index.html charge General Sans et Instrument Serif', () => {
+    const src = fs.readFileSync(
+      path.join(__dirname, '../../dashboard/public/index.html'), 'utf8'
+    );
+    assert.ok(src.includes('General+Sans') || src.includes('general-sans'), 'General Sans manquant');
+    assert.ok(src.includes('Instrument+Serif') || src.includes('instrument-serif'), 'Instrument Serif manquant');
+  });
+
+  it('index.html charge Chart.js et socket.io', () => {
+    const src = fs.readFileSync(
+      path.join(__dirname, '../../dashboard/public/index.html'), 'utf8'
+    );
+    assert.ok(src.includes('chart.js') || src.includes('Chart'), 'Chart.js manquant');
+    assert.ok(src.includes('socket.io'), 'socket.io manquant');
+  });
+
+  it('server.js expose /api/me', () => {
+    const src = fs.readFileSync(
+      path.join(__dirname, '../../dashboard/server.js'), 'utf8'
+    );
+    assert.ok(src.includes('/api/me'), 'Route /api/me manquante');
+  });
+
+  it('server.js retourne oauthEnabled dans /api/auth/check', () => {
+    const src = fs.readFileSync(
+      path.join(__dirname, '../../dashboard/server.js'), 'utf8'
+    );
+    assert.ok(src.includes('oauthEnabled'), 'oauthEnabled manquant dans /api/auth/check');
+  });
+});
