@@ -67,7 +67,7 @@ describe('Système emojis custom — ;setupemojis', () => {
 
 });
 
-describe('Greeting Panel v2 — clone Crowbot', () => {
+describe('Greeting Panel v3 — clone Crowbot', () => {
 
   it('renderPanel mode join retourne 1 embed + 5 rows', () => {
     const { renderPanel } = require('../../bot/ui/panels/greeting-panel');
@@ -81,6 +81,23 @@ describe('Greeting Panel v2 — clone Crowbot', () => {
     const panel = renderPanel('fake-guild-id', 'leave');
     assert.equal(panel.embeds.length,     1);
     assert.equal(panel.components.length, 5);
+  });
+
+  it('renderPanel — tous les champs sont inline: false', () => {
+    const { renderPanel } = require('../../bot/ui/panels/greeting-panel');
+    const panel = renderPanel('fake-guild-id', 'join');
+    const fields = panel.embeds[0].data.fields;
+    assert.ok(fields.length >= 6, `Attendu ≥6 champs, trouvé ${fields.length}`);
+    for (const field of fields) {
+      assert.ok(!field.inline, `Champ "${field.name}" ne doit pas être inline`);
+    }
+  });
+
+  it('renderPanel row5 contient 4 boutons (dm_reset + dm_embed_modal + dm_embed_reset + variables)', () => {
+    const { renderPanel } = require('../../bot/ui/panels/greeting-panel');
+    const panel = renderPanel('fake-guild-id', 'join');
+    const row5components = panel.components[4].components;
+    assert.equal(row5components.length, 4, 'Row 5 doit avoir 4 boutons');
   });
 
   it('greeting-handler exporte handleGreetingInteraction + register', () => {
