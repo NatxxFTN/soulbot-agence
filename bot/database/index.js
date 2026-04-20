@@ -327,6 +327,65 @@ db.exec(`
     unique_users      INTEGER DEFAULT 0,
     unique_guilds     INTEGER DEFAULT 0
   );
+
+  /* ---- Anti-Leak configuration ---- */
+  CREATE TABLE IF NOT EXISTS antileak_config (
+    guild_id               TEXT    PRIMARY KEY,
+    enabled                INTEGER NOT NULL DEFAULT 0,
+    detect_discord_token   INTEGER NOT NULL DEFAULT 1,
+    detect_ip              INTEGER NOT NULL DEFAULT 1,
+    detect_email           INTEGER NOT NULL DEFAULT 1,
+    detect_phone           INTEGER NOT NULL DEFAULT 0,
+    sanction_discord_token TEXT    NOT NULL DEFAULT 'delete',
+    sanction_ip            TEXT    NOT NULL DEFAULT 'delete',
+    sanction_email         TEXT    NOT NULL DEFAULT 'delete',
+    sanction_phone         TEXT    NOT NULL DEFAULT 'delete',
+    logs_channel_id        TEXT,
+    updated_at             INTEGER,
+    updated_by             TEXT
+  );
+  CREATE INDEX IF NOT EXISTS idx_antileak_guild ON antileak_config(guild_id);
+
+  CREATE TABLE IF NOT EXISTS antileak_whitelist (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id  TEXT    NOT NULL,
+    role_id   TEXT    NOT NULL,
+    added_at  INTEGER NOT NULL DEFAULT (unixepoch()),
+    added_by  TEXT,
+    UNIQUE(guild_id, role_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_antileak_wl_guild ON antileak_whitelist(guild_id);
+
+  /* ---- Anti-Spam configuration ---- */
+  CREATE TABLE IF NOT EXISTS antispam_config (
+    guild_id                TEXT    PRIMARY KEY,
+    enabled                 INTEGER NOT NULL DEFAULT 0,
+    flood_threshold         INTEGER NOT NULL DEFAULT 5,
+    flood_window_seconds    INTEGER NOT NULL DEFAULT 5,
+    flood_sanction          TEXT    NOT NULL DEFAULT 'timeout',
+    mentions_threshold      INTEGER NOT NULL DEFAULT 5,
+    mentions_sanction       TEXT    NOT NULL DEFAULT 'timeout',
+    repeat_threshold        INTEGER NOT NULL DEFAULT 3,
+    repeat_sanction         TEXT    NOT NULL DEFAULT 'delete',
+    caps_enabled            INTEGER NOT NULL DEFAULT 0,
+    caps_threshold          INTEGER NOT NULL DEFAULT 70,
+    caps_min_length         INTEGER NOT NULL DEFAULT 10,
+    caps_sanction           TEXT    NOT NULL DEFAULT 'delete',
+    logs_channel_id         TEXT,
+    updated_at              INTEGER,
+    updated_by              TEXT
+  );
+  CREATE INDEX IF NOT EXISTS idx_antispam_guild ON antispam_config(guild_id);
+
+  CREATE TABLE IF NOT EXISTS antispam_whitelist (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id  TEXT    NOT NULL,
+    role_id   TEXT    NOT NULL,
+    added_at  INTEGER NOT NULL DEFAULT (unixepoch()),
+    added_by  TEXT,
+    UNIQUE(guild_id, role_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_antispam_wl_guild ON antispam_whitelist(guild_id);
 `);
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

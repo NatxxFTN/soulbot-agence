@@ -1,0 +1,9 @@
+@echo off
+echo [safe-restart] Killing bot/index.js processes...
+node scripts/kill-bot.js
+
+echo [safe-restart] Removing lock file...
+del /F /Q .bot.lock 2>nul
+
+echo [safe-restart] Starting bot...
+call npm run dev

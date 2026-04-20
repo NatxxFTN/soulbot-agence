@@ -13,7 +13,9 @@
     "predev:bot": "node scripts/kill-bot.js",
     "dev:bot": "nodemon --config nodemon.json bot/index.js",
     "dev:all": "concurrently -n bot,dashboard -c cyan,yellow \"npm run dev:bot\" \"npm run dashboard\"",
-    "test": "node --test tests/"
+    "test": "node --test tests/",
+    "restart": "node scripts/kill-bot.js && rm -f .bot.lock && npm run dev",
+    "restart:win": "scripts\\safe-restart.bat"
   },
   "dependencies": {
     "better-sqlite3": "^12.8.0",

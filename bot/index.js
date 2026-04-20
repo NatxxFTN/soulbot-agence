@@ -8,7 +8,10 @@ acquireLock();
 
 const { Client, GatewayIntentBits, Partials, Collection } = require('discord.js');
 const { loadCommands }  = require('./core/CommandHandler');
-const { register: registerUIHandlers } = require('./ui/handlers/greeting-handler');
+const { register: registerUIHandlers }       = require('./ui/handlers/greeting-handler');
+const { register: registerTicketHandlers }   = require('./ui/handlers/ticket-handler');
+const { register: registerAntileakHandlers } = require('./ui/handlers/antileak-handler');
+const { register: registerAntispamHandlers } = require('./ui/handlers/antispam-handler');
 const { loadEvents }    = require('./handlers/EventHandler');
 const { db }            = require('./database');
 const logger            = require('./utils/logger');
@@ -49,6 +52,9 @@ client.selectHandlers = new Collection();
 // ─── Chargement ──────────────────────────────────────────────────────────────
 loadCommands(client, logger);
 registerUIHandlers(client);
+registerTicketHandlers(client);
+registerAntileakHandlers(client);
+registerAntispamHandlers(client);
 loadEvents(client);
 
 // ─── Events dashboard logging ────────────────────────────────────────────────
