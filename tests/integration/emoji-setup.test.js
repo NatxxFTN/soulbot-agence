@@ -67,37 +67,30 @@ describe('Système emojis custom — ;setupemojis', () => {
 
 });
 
-describe('Greeting Panel v3 — clone Crowbot', () => {
+describe('Greeting Panel v4 — Components V2 clone Mya', () => {
 
-  it('renderPanel mode join retourne 1 embed + 5 rows', () => {
+  it('renderPanel retourne flag IsComponentsV2 (32768)', () => {
     const { renderPanel } = require('../../bot/ui/panels/greeting-panel');
     const panel = renderPanel('fake-guild-id', 'join');
-    assert.equal(panel.embeds.length,     1, 'Doit avoir 1 embed');
-    assert.equal(panel.components.length, 5, 'Doit avoir 5 rows');
+    assert.equal(panel.flags, 32768, 'Flag IsComponentsV2 manquant');
   });
 
-  it('renderPanel mode leave retourne 1 embed + 5 rows', () => {
+  it('renderPanel ne retourne pas d\'embeds (incompatible V2)', () => {
+    const { renderPanel } = require('../../bot/ui/panels/greeting-panel');
+    const panel = renderPanel('fake-guild-id', 'join');
+    assert.ok(!panel.embeds, 'embeds ne doit pas être présent avec Components V2');
+  });
+
+  it('renderPanel mode join retourne 1 container', () => {
+    const { renderPanel } = require('../../bot/ui/panels/greeting-panel');
+    const panel = renderPanel('fake-guild-id', 'join');
+    assert.equal(panel.components.length, 1, 'Doit avoir 1 container');
+  });
+
+  it('renderPanel mode leave retourne 1 container', () => {
     const { renderPanel } = require('../../bot/ui/panels/greeting-panel');
     const panel = renderPanel('fake-guild-id', 'leave');
-    assert.equal(panel.embeds.length,     1);
-    assert.equal(panel.components.length, 5);
-  });
-
-  it('renderPanel — tous les champs sont inline: false', () => {
-    const { renderPanel } = require('../../bot/ui/panels/greeting-panel');
-    const panel = renderPanel('fake-guild-id', 'join');
-    const fields = panel.embeds[0].data.fields;
-    assert.ok(fields.length >= 6, `Attendu ≥6 champs, trouvé ${fields.length}`);
-    for (const field of fields) {
-      assert.ok(!field.inline, `Champ "${field.name}" ne doit pas être inline`);
-    }
-  });
-
-  it('renderPanel row5 contient 4 boutons (dm_reset + dm_embed_modal + dm_embed_reset + variables)', () => {
-    const { renderPanel } = require('../../bot/ui/panels/greeting-panel');
-    const panel = renderPanel('fake-guild-id', 'join');
-    const row5components = panel.components[4].components;
-    assert.equal(row5components.length, 4, 'Row 5 doit avoir 4 boutons');
+    assert.equal(panel.components.length, 1);
   });
 
   it('greeting-handler exporte handleGreetingInteraction + register', () => {

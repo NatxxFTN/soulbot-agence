@@ -7,20 +7,21 @@ const {
   StringSelectMenuBuilder,
   ChannelSelectMenuBuilder,
   ChannelType,
-  EmbedBuilder,
+  ContainerBuilder,
+  SectionBuilder,
+  TextDisplayBuilder,
+  SeparatorBuilder,
+  SeparatorSpacingSize,
+  MessageFlags,
 } = require('discord.js');
-const { COLORS, EMOJIS, LABELS } = require('../theme');
+const { COLORS, LABELS } = require('../theme');
 const { getConfig } = require('../../core/greeting-helper');
 
-function e(key, fallback) {
-  return typeof EMOJIS[key] === 'function' ? EMOJIS[key]() : (EMOJIS[key] || fallback);
-}
+const STATUS = (val) => val ? '**Défini**' : '*Non défini*';
 
 /**
- * Panel Greeting v3 — clone visuel Crowbot.
- * Tout sur UN seul écran. 5 rows max (limite Discord).
- * Chaque paramètre sur sa propre ligne (inline: false).
- * Boutons groupés par paramètre.
+ * Panel Greeting v4 — clone visuel strict Mya/Crowbot.
+ * Discord Components V2 — dépasse la limite 5 ActionRows.
  *
  * @param {string} guildId
  * @param {'join'|'leave'} mode
@@ -31,137 +32,201 @@ function renderPanel(guildId, mode = 'join') {
 
   const channelId = isJoin ? cfg.join_channel_id : cfg.leave_channel_id;
   const message   = isJoin ? cfg.join_message    : cfg.leave_message;
-  const embed     = isJoin ? cfg.join_embed       : cfg.leave_embed;
+  const embedCfg  = isJoin ? cfg.join_embed       : cfg.leave_embed;
   const dm        = isJoin ? cfg.join_dm          : cfg.leave_dm;
   const dmEmbed   = isJoin ? cfg.join_dm_embed    : cfg.leave_dm_embed;
   const isEnabled = isJoin ? !!cfg.join_enabled   : !!cfg.leave_enabled;
 
-  const eCheck = e('check', '✅');
-  const eCross = e('cross', '❌');
+  const modeLabel = isJoin ? 'Arrivée' : 'Départ';
+  const modeEmoji = isJoin ? '🔔' : '👋';
 
-  // ── Embed ──────────────────────────────────────────────────────────────────
-  const mainEmbed = new EmbedBuilder()
-    .setColor(COLORS.accent)
-    .setTitle(`${EMOJIS.bot || '🍊'} Configuration Greeting`)
-    .setDescription('Paramétrez les messages d\'arrivée et de départ de votre serveur.')
-    .addFields(
-      {
-        name : `${isJoin ? (EMOJIS.join || '🔔') : (EMOJIS.leave || '👋')} ${isJoin ? 'Arrivée' : 'Départ'}`,
-        value: isEnabled
-          ? `${EMOJIS.on || '🟢'} **${LABELS.statusOn}**`
-          : `${EMOJIS.off || '🔴'} ${LABELS.statusOff}`,
-        inline: false,
-      },
-      {
-        name : `${EMOJIS.channel || '#'} Salon`,
-        value: channelId ? `<#${channelId}>` : `*${LABELS.notDefined}*`,
-        inline: false,
-      },
-      {
-        name : `${EMOJIS.message || '💬'} Message`,
-        value: message ? `${eCheck} **${LABELS.defined}**` : `${eCross} *${LABELS.notDefined}*`,
-        inline: false,
-      },
-      {
-        name : `${EMOJIS.embed || '🖼️'} Embed`,
-        value: embed ? `${eCheck} **${LABELS.defined}**` : `${eCross} *${LABELS.notDefined}*`,
-        inline: false,
-      },
-      {
-        name : `${EMOJIS.dm || '📨'} DM`,
-        value: dm ? `${eCheck} **${LABELS.defined}**` : `${eCross} *${LABELS.notDefined}*`,
-        inline: false,
-      },
-      {
-        name : `${EMOJIS.dmEmbed || '💌'} DM Embed`,
-        value: dmEmbed ? `${eCheck} **${LABELS.defined}**` : `${eCross} *${LABELS.notDefined}*`,
-        inline: false,
-      },
-    )
-    .setFooter({ text: `Soulbot · ${isJoin ? 'Arrivée' : 'Départ'}` });
+  const container = new ContainerBuilder().setAccentColor(COLORS.accent);
 
-  // ── Row 1 : Dropdown Arrivée / Départ ─────────────────────────────────────
-  const row1 = new ActionRowBuilder().addComponents(
-    new StringSelectMenuBuilder()
-      .setCustomId('greeting:mode:select')
-      .setPlaceholder('Choisir la section à configurer')
-      .addOptions(
-        { label: 'Arrivée', value: 'join',  description: 'Messages quand un membre rejoint', emoji: '🔔', default: isJoin  },
-        { label: 'Départ',  value: 'leave', description: 'Messages quand un membre quitte',  emoji: '👋', default: !isJoin },
+  // ── Titre ─────────────────────────────────────────────────────────────────
+  container.addTextDisplayComponents(
+    new TextDisplayBuilder().setContent('# 🍊 Configuration Greeting'),
+  );
+  container.addTextDisplayComponents(
+    new TextDisplayBuilder().setContent('Paramétrez les messages d\'arrivée et de départ de votre serveur.'),
+  );
+
+  // ── Dropdown mode ─────────────────────────────────────────────────────────
+  container.addActionRowComponents(
+    new ActionRowBuilder().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId('greeting:mode:select')
+        .setPlaceholder(`${modeEmoji} ${modeLabel}`)
+        .addOptions(
+          { label: 'Arrivée', value: 'join',  emoji: '🔔', default: isJoin  },
+          { label: 'Départ',  value: 'leave', emoji: '👋', default: !isJoin },
+        ),
+    ),
+  );
+
+  // ── Label mode + toggle ───────────────────────────────────────────────────
+  container.addTextDisplayComponents(
+    new TextDisplayBuilder().setContent(`**${modeLabel}**`),
+  );
+  container.addActionRowComponents(
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`greeting:${mode}:toggle`)
+        .setLabel(isEnabled ? 'Désactiver' : 'Activer')
+        .setStyle(isEnabled ? ButtonStyle.Danger : ButtonStyle.Success),
+    ),
+  );
+
+  container.addSeparatorComponents(
+    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
+  );
+
+  // ── Salon ─────────────────────────────────────────────────────────────────
+  const salonDisplay = channelId ? `<#${channelId}>` : '🔒 Aucun accès';
+  container.addSectionComponents(
+    new SectionBuilder()
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(`# Salon : ${salonDisplay}`),
+      )
+      .setButtonAccessory(
+        new ButtonBuilder()
+          .setCustomId(`greeting:${mode}:channel_reset`)
+          .setLabel('Réinitialiser')
+          .setStyle(ButtonStyle.Danger),
       ),
   );
-
-  // ── Row 2 : Sélecteur salon ────────────────────────────────────────────────
-  const row2 = new ActionRowBuilder().addComponents(
-    new ChannelSelectMenuBuilder()
-      .setCustomId(`greeting:${mode}:channel`)
-      .setPlaceholder('Sélectionner un salon')
-      .setChannelTypes([ChannelType.GuildText, ChannelType.GuildAnnouncement])
-      .setMinValues(1).setMaxValues(1),
+  container.addActionRowComponents(
+    new ActionRowBuilder().addComponents(
+      new ChannelSelectMenuBuilder()
+        .setCustomId(`greeting:${mode}:channel`)
+        .setPlaceholder('Sélectionner un salon')
+        .setChannelTypes([ChannelType.GuildText, ChannelType.GuildAnnouncement])
+        .setMinValues(1).setMaxValues(1),
+    ),
   );
 
-  // ── Row 3 : Activer/Désactiver · Message [Configurer] [Reset] ─────────────
-  const row3 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`greeting:${mode}:toggle`)
-      .setLabel(isEnabled ? LABELS.deactivate : LABELS.activate)
-      .setStyle(isEnabled ? ButtonStyle.Danger : ButtonStyle.Success),
-    new ButtonBuilder()
-      .setCustomId(`greeting:${mode}:message_modal`)
-      .setLabel('Message')
-      .setEmoji('💬')
-      .setStyle(ButtonStyle.Primary),
-    new ButtonBuilder()
-      .setCustomId(`greeting:${mode}:message_reset`)
-      .setEmoji('🔄')
-      .setLabel('Reset msg')
-      .setStyle(ButtonStyle.Secondary),
+  container.addSeparatorComponents(
+    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
   );
 
-  // ── Row 4 : Embed [Configurer] [Reset] · DM [Configurer] ──────────────────
-  const row4 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`greeting:${mode}:embed_modal`)
-      .setLabel('Embed')
-      .setEmoji('🖼️')
-      .setStyle(ButtonStyle.Primary),
-    new ButtonBuilder()
-      .setCustomId(`greeting:${mode}:embed_reset`)
-      .setEmoji('🔄')
-      .setLabel('Reset embed')
-      .setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder()
-      .setCustomId(`greeting:${mode}:dm_modal`)
-      .setLabel('DM')
-      .setEmoji('📨')
-      .setStyle(ButtonStyle.Primary),
+  // ── Message ───────────────────────────────────────────────────────────────
+  container.addSectionComponents(
+    new SectionBuilder()
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(`💬 Message : ${STATUS(!!message)}`),
+      )
+      .setButtonAccessory(
+        new ButtonBuilder()
+          .setCustomId(`greeting:${mode}:message_reset`)
+          .setLabel('Réinitialiser')
+          .setStyle(ButtonStyle.Danger),
+      ),
+  );
+  container.addActionRowComponents(
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`greeting:${mode}:message_modal`)
+        .setLabel('Configurer le message')
+        .setStyle(ButtonStyle.Primary),
+    ),
   );
 
-  // ── Row 5 : DM [Reset] · DM Embed [Configurer] [Reset] · Variables ────────
-  const row5 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`greeting:${mode}:dm_reset`)
-      .setEmoji('🔄')
-      .setLabel('Reset DM')
-      .setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder()
-      .setCustomId(`greeting:${mode}:dm_embed_modal`)
-      .setLabel('DM Embed')
-      .setEmoji('💌')
-      .setStyle(ButtonStyle.Primary),
-    new ButtonBuilder()
-      .setCustomId(`greeting:${mode}:dm_embed_reset`)
-      .setEmoji('🔄')
-      .setLabel('Reset DM emb')
-      .setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder()
-      .setCustomId(`greeting:${mode}:variables`)
-      .setLabel('Variables')
-      .setEmoji('🔍')
-      .setStyle(ButtonStyle.Secondary),
+  container.addSeparatorComponents(
+    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
   );
 
-  return { embeds: [mainEmbed], components: [row1, row2, row3, row4, row5] };
+  // ── Embed ─────────────────────────────────────────────────────────────────
+  container.addSectionComponents(
+    new SectionBuilder()
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(`🖼️ Embed : ${STATUS(!!embedCfg)}`),
+      )
+      .setButtonAccessory(
+        new ButtonBuilder()
+          .setCustomId(`greeting:${mode}:embed_reset`)
+          .setLabel('Réinitialiser')
+          .setStyle(ButtonStyle.Danger),
+      ),
+  );
+  container.addActionRowComponents(
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`greeting:${mode}:embed_modal`)
+        .setLabel('Configurer l\'embed')
+        .setStyle(ButtonStyle.Primary),
+    ),
+  );
+
+  container.addSeparatorComponents(
+    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
+  );
+
+  // ── DM ────────────────────────────────────────────────────────────────────
+  container.addSectionComponents(
+    new SectionBuilder()
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(`📨 DM : ${STATUS(!!dm)}`),
+      )
+      .setButtonAccessory(
+        new ButtonBuilder()
+          .setCustomId(`greeting:${mode}:dm_reset`)
+          .setLabel('Réinitialiser')
+          .setStyle(ButtonStyle.Danger),
+      ),
+  );
+  container.addActionRowComponents(
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`greeting:${mode}:dm_modal`)
+        .setLabel('Configurer le DM')
+        .setStyle(ButtonStyle.Secondary),
+    ),
+  );
+
+  container.addSeparatorComponents(
+    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
+  );
+
+  // ── DM Embed ──────────────────────────────────────────────────────────────
+  container.addSectionComponents(
+    new SectionBuilder()
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(`💌 DM Embed : ${STATUS(!!dmEmbed)}`),
+      )
+      .setButtonAccessory(
+        new ButtonBuilder()
+          .setCustomId(`greeting:${mode}:dm_embed_reset`)
+          .setLabel('Réinitialiser')
+          .setStyle(ButtonStyle.Danger),
+      ),
+  );
+  container.addActionRowComponents(
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`greeting:${mode}:dm_embed_modal`)
+        .setLabel('Configurer l\'embed DM')
+        .setStyle(ButtonStyle.Secondary),
+    ),
+  );
+
+  container.addSeparatorComponents(
+    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Large),
+  );
+
+  // ── Variables ─────────────────────────────────────────────────────────────
+  container.addActionRowComponents(
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`greeting:${mode}:variables`)
+        .setLabel('Variables')
+        .setEmoji('🔍')
+        .setStyle(ButtonStyle.Secondary),
+    ),
+  );
+
+  return {
+    components: [container],
+    flags     : MessageFlags.IsComponentsV2,
+  };
 }
 
 module.exports = { renderPanel };

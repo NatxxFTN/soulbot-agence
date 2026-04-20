@@ -151,10 +151,11 @@ async function handleGreetingInteraction(interaction) {
 
     // ── Resets individuels ───────────────────────────────────────────────────
     const resetMap = {
-      message_reset : mode === 'join' ? 'join_message'  : 'leave_message',
-      embed_reset   : mode === 'join' ? 'join_embed'    : 'leave_embed',
-      dm_reset      : mode === 'join' ? 'join_dm'       : 'leave_dm',
-      dm_embed_reset: mode === 'join' ? 'join_dm_embed' : 'leave_dm_embed',
+      channel_reset : mode === 'join' ? 'join_channel_id' : 'leave_channel_id',
+      message_reset : mode === 'join' ? 'join_message'    : 'leave_message',
+      embed_reset   : mode === 'join' ? 'join_embed'      : 'leave_embed',
+      dm_reset      : mode === 'join' ? 'join_dm'         : 'leave_dm',
+      dm_embed_reset: mode === 'join' ? 'join_dm_embed'   : 'leave_dm_embed',
     };
     if (resetMap[action] !== undefined) {
       updateConfig(guildId, { [resetMap[action]]: null });
