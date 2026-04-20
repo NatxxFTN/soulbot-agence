@@ -1,54 +1,55 @@
 'use strict';
 
 /**
- * Tue toutes les instances node du bot avant démarrage.
- * Empêche l'accumulation de processus fantômes qui causent les doublons de réponse.
- * Exécuté automatiquement via npm hooks prestart / predev:bot.
+ * Tue uniquement les instances node qui font tourner bot/index.js.
+ * Ne touche PAS aux autres processus node (Claude Code, dashboard, etc.)
  */
 
 const { execSync } = require('child_process');
-const os           = require('os');
-
+const os = require('os');
 const currentPid = process.pid;
-const isWindows  = os.platform() === 'win32';
 
 try {
-  if (isWindows) {
-    const output = execSync(
-      'tasklist /FI "IMAGENAME eq node.exe" /FO CSV /NH',
-      { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] }
+  if (os.platform() === 'win32') {
+    // wmic permet de filtrer par CommandLine — on cible bot/index.js uniquement
+    const out = execSync(
+      'wmic process where "name=\'node.exe\'" get ProcessId,CommandLine',
+      { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 5000 }
     );
 
-    const pids = output
-      .split('\n')
-      .map(line => { const m = line.match(/"node\.exe","(\d+)"/); return m ? parseInt(m[1]) : null; })
-      .filter(pid => pid && pid !== currentPid);
+    const botPids = [];
+    for (const line of out.split('\n')) {
+      if (!line.includes('bot/index.js') && !line.includes('bot\\index.js')) continue;
+      const m = line.match(/(\d{4,6})\s*$/);
+      if (m) {
+        const pid = parseInt(m[1].trim(), 10);
+        if (pid && pid !== currentPid) botPids.push(pid);
+      }
+    }
 
-    if (pids.length > 0) {
-      console.log(`🔪 Kill ${pids.length} instance(s) node fantôme(s)...`);
-      for (const pid of pids) {
+    if (botPids.length > 0) {
+      console.log(`🔪 Kill ${botPids.length} instance(s) bot...`);
+      for (const pid of botPids) {
         try {
           execSync(`taskkill /F /PID ${pid}`, { stdio: 'pipe' });
           console.log(`   ✅ PID ${pid} terminé`);
         } catch { /* déjà mort */ }
       }
-      // Attendre 800ms que Discord libère les connexions WebSocket
-      const end = Date.now() + 800;
-      while (Date.now() < end) { /* busy-wait cross-platform */ }
+      // Attendre que Discord libère la connexion WebSocket
+      const end = Date.now() + 1000;
+      while (Date.now() < end) {}
     } else {
-      console.log('✅ Aucun processus node fantôme');
+      console.log('✅ Aucune instance bot active');
     }
   } else {
-    // Linux / Mac
     try {
-      execSync(`pkill -f "node.*bot/index\\.js" 2>/dev/null || true`, { shell: true });
+      execSync('pkill -f "node.*bot/index\\.js" 2>/dev/null || true', { shell: true });
+      execSync('sleep 1', { shell: true });
       console.log('🔪 Instances bot tuées (Unix)');
-      execSync('sleep 0.8', { shell: true });
     } catch {
       console.log('✅ Aucune instance bot à tuer');
     }
   }
 } catch (err) {
-  // Non-bloquant : si le kill échoue, on démarre quand même
   console.log('⚠️  Kill script non-bloquant:', err.message);
 }
