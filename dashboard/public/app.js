@@ -403,7 +403,12 @@ socket.on('connect',    () => {
 socket.on('disconnect', () => {
   if (liveBadge) { liveBadge.textContent = '● OFFLINE'; liveBadge.className = 'live-badge off'; }
 });
-socket.on('log:new', log => { appendStreamRow(log); });
+socket.on('logs:initial', logs => { logs.forEach(log => appendStreamRow(log)); });
+socket.on('log:new', log => {
+  appendStreamRow(log);
+  // Rafraîchir les stats toutes les 5 commandes pour ne pas surcharger
+  if (log.level === 'command') { streamCount++; if (streamCount % 5 === 0) loadStats(); }
+});
 
 function appendStreamRow(log) {
   if (liveFilter && log.level !== liveFilter) return;

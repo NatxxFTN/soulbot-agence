@@ -3,6 +3,7 @@
 const { PermissionFlagsBits } = require('discord.js');
 const { db, ensureGuild, getGuildSettings } = require('../database');
 const E = require('../utils/embeds');
+const botLogger = require('../core/logger');
 
 // Statements précompilés UNE SEULE FOIS au chargement du module.
 // POURQUOI hors du handler : better-sqlite3 compile le statement à chaque appel
@@ -98,10 +99,33 @@ module.exports = {
     }
 
     // ── Exécution ─────────────────────────────────────────────────────────────
+    const startTime = Date.now();
     try {
       await cmd.execute(message, args, client);
+      botLogger.command({
+        eventType  : 'command_executed',
+        guildId    : message.guild.id,
+        guildName  : message.guild.name,
+        userId     : message.author.id,
+        userName   : message.author.tag,
+        channelId  : message.channel.id,
+        commandName: cmd.name,
+        message    : `;${cmd.name} par ${message.author.tag}`,
+        durationMs : Date.now() - startTime,
+        success    : true,
+      });
     } catch (err) {
       console.error(`[Commands] Erreur dans ${cmd.name}:`, err);
+      botLogger.error({
+        eventType  : 'command_error',
+        guildId    : message.guild.id,
+        guildName  : message.guild.name,
+        userId     : message.author.id,
+        userName   : message.author.tag,
+        commandName: cmd.name,
+        message    : `Erreur ${cmd.name}: ${err.message}`,
+        success    : false,
+      });
       message.reply({
         embeds: [E.error('Erreur interne', 'Une erreur est survenue. Vérifie les logs du bot.')]
       }).catch(() => {});

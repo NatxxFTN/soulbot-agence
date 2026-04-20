@@ -257,6 +257,14 @@ io.on('connection', socket => {
   console.log(`[Dashboard] Client connecté : ${socket.id}`);
   socket.on('disconnect', () => console.log(`[Dashboard] Client déconnecté : ${socket.id}`));
   socket.on('subscribe-guild', guildId => socket.join(guildId));
+
+  // Pousser les 50 derniers logs au nouveau client
+  try {
+    const recent = db.prepare(
+      'SELECT * FROM bot_logs ORDER BY id DESC LIMIT 50'
+    ).all().reverse();
+    socket.emit('logs:initial', recent);
+  } catch { /* DB pas encore prête */ }
 });
 
 // ── Fallback SPA ──────────────────────────────────────────────────────────────
