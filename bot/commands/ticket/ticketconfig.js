@@ -5,10 +5,10 @@ const E = require('../../utils/embeds');
 const { renderTicketPanel } = require('../../ui/panels/ticket-panel');
 
 module.exports = {
-  name       : 'ticket',
-  aliases    : ['tconfig'],
+  name       : 'ticketconfig',
+  aliases    : ['ticketsetup', 'ticketcfg'],
   description: 'Ouvre le panel de configuration des tickets.',
-  usage      : ';ticket',
+  usage      : ';ticketconfig',
   cooldown   : 3,
   guildOnly  : true,
   ownerOnly  : false,
@@ -18,7 +18,6 @@ module.exports = {
     if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
       return message.reply({ embeds: [E.error('Accès refusé', 'Tu dois être administrateur.')] });
     }
-
     return message.channel.send(renderTicketPanel(message.guild.id));
   },
 };

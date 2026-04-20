@@ -381,4 +381,20 @@ for (const col of GREETING_EXTRA_COLS) {
   try { db.exec(`ALTER TABLE greeting_config ADD COLUMN ${col} TEXT`); } catch { /* déjà présent */ }
 }
 
+// ── Migration ticket_config — nouvelles colonnes (ajout sûr) ─────────────────
+const TICKET_EXTRA_COLS = {
+  open_message        : 'TEXT',
+  open_embed          : 'TEXT',
+  close_message       : 'TEXT',
+  close_embed         : 'TEXT',
+  enabled             : 'INTEGER DEFAULT 0',
+  transcript_enabled  : 'INTEGER DEFAULT 1',
+  max_per_user        : 'INTEGER DEFAULT 1',
+  cooldown_seconds    : 'INTEGER DEFAULT 0',
+  updated_by          : 'TEXT',
+};
+for (const [col, type] of Object.entries(TICKET_EXTRA_COLS)) {
+  try { db.exec(`ALTER TABLE ticket_config ADD COLUMN ${col} ${type}`); } catch { /* déjà présent */ }
+}
+
 module.exports = { db, ensureGuild, getGuildSettings, setGuildSetting };

@@ -95,8 +95,54 @@ async function logAction(guild, config, content) {
   if (ch) await ch.send(content).catch(() => {});
 }
 
+// ── Helpers UI panel (ticket config V2) ──────────────────────────────────────
+
+const TICKET_CFG_FIELDS = new Set([
+  'enabled', 'category_id', 'log_channel_id', 'staff_role_id',
+  'open_message', 'open_embed', 'close_message', 'close_embed',
+  'transcript_enabled', 'max_per_user', 'cooldown_seconds',
+  'panel_channel_id', 'panel_message_id',
+]);
+
+const TICKET_CFG_DEFAULTS = {
+  enabled            : 0,
+  category_id        : null,
+  log_channel_id     : null,
+  staff_role_id      : null,
+  open_message       : null,
+  open_embed         : null,
+  close_message      : null,
+  close_embed        : null,
+  transcript_enabled : 1,
+  max_per_user       : 1,
+  cooldown_seconds   : 0,
+};
+
+function getTicketConfig(guildId) {
+  return STMT_GET_CONFIG.get(guildId);
+}
+
+function updateTicketConfig(guildId, updates, updatedBy = null) {
+  const existing = STMT_GET_CONFIG.get(guildId);
+  if (!existing) {
+    db.prepare('INSERT OR IGNORE INTO ticket_config (guild_id) VALUES (?)').run(guildId);
+  }
+  const keys = Object.keys(updates);
+  if (keys.length === 0) return;
+  const setClause = [...keys.map(k => `${k} = ?`), 'updated_by = ?'].join(', ');
+  const values    = [...keys.map(k => updates[k]), updatedBy, guildId];
+  db.prepare(`UPDATE ticket_config SET ${setClause} WHERE guild_id = ?`).run(...values);
+}
+
+function resetTicketField(guildId, field, updatedBy = null) {
+  if (!TICKET_CFG_FIELDS.has(field)) throw new Error(`Champ ticket inconnu : ${field}`);
+  const val = field in TICKET_CFG_DEFAULTS ? TICKET_CFG_DEFAULTS[field] : null;
+  updateTicketConfig(guildId, { [field]: val }, updatedBy);
+}
+
 module.exports = {
   getConfig, setConfig,
+  getTicketConfig, updateTicketConfig, resetTicketField,
   createTicket, getTicketByChannel,
   getOpenTickets, getClosedTickets,
   closeTicket, reopenTicket, markDeleted,
