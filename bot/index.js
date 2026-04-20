@@ -11,6 +11,7 @@ const { loadCommands }  = require('./core/CommandHandler');
 const { loadEvents }    = require('./handlers/EventHandler');
 const { db }            = require('./database');
 const logger            = require('./utils/logger');
+const botLogger         = require('./core/logger');
 
 // ─── Client ──────────────────────────────────────────────────────────────────
 const client = new Client({
@@ -47,6 +48,33 @@ client.selectHandlers = new Collection();
 // ─── Chargement ──────────────────────────────────────────────────────────────
 loadCommands(client, logger);
 loadEvents(client);
+
+// ─── Events dashboard logging ────────────────────────────────────────────────
+client.on('guildCreate', guild => {
+  botLogger.event({
+    eventType : 'guild_join',
+    guildId   : guild.id,
+    guildName : guild.name,
+    message   : `Bot ajouté au serveur ${guild.name} (${guild.memberCount} membres)`,
+  });
+});
+
+client.on('guildDelete', guild => {
+  botLogger.event({
+    eventType : 'guild_leave',
+    guildId   : guild.id,
+    guildName : guild.name,
+    message   : `Bot retiré du serveur ${guild.name}`,
+  });
+});
+
+client.on('error', err => {
+  botLogger.error({
+    eventType : 'client_error',
+    message   : err.message,
+    metadata  : { stack: err.stack },
+  });
+});
 
 // ─── Login ───────────────────────────────────────────────────────────────────
 client.login(process.env.DISCORD_TOKEN).catch(err => {

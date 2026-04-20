@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soulbot — Logs temps réel</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    h1 { color: #F39C12; font-size: 1.4rem; }
+    h1 span { color: #888; font-weight: 400; font-size: 0.9rem; margin-left: 8px; }
+    .back-link {
+      color: #F39C12;
+      text-decoration: none;
+      font-size: 0.85rem;
+      border: 1px solid #F39C12;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+    .back-link:hover { background: #F39C1220; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #141414;
+      border: 1px solid #222;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .stat-value { font-size: 2rem; font-weight: 700; color: #F39C12; }
+    .stat-label { font-size: 0.75rem; color: #666; margin-top: 4px; }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .toolbar label { font-size: 0.8rem; color: #888; }
+    select, button {
+      background: #1a1a1a;
+      color: #e0e0e0;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    button:hover { border-color: #F39C12; color: #F39C12; }
+    #live-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      background: #1a3a1a;
+      color: #2ecc71;
+      border: 1px solid #2ecc7140;
+    }
+    #live-badge.off { background: #3a1a1a; color: #e74c3c; border-color: #e74c3c40; }
+
+    .logs-wrap {
+      background: #0d0d0d;
+      border: 1px solid #1e1e1e;
+      border-radius: 8px;
+      height: calc(100vh - 280px);
+      min-height: 300px;
+      overflow-y: auto;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 12px;
+    }
+    .log-row {
+      display: grid;
+      grid-template-columns: 80px 72px 100px 1fr;
+      gap: 8px;
+      align-items: start;
+      padding: 6px 12px;
+      border-bottom: 1px solid #141414;
+      transition: background .1s;
+    }
+    .log-row:hover { background: #141414; }
+    .log-row.level-error   { border-left: 3px solid #e74c3c; }
+    .log-row.level-command { border-left: 3px solid #F39C12; }
+    .log-row.level-warn    { border-left: 3px solid #e67e22; }
+    .log-row.level-info    { border-left: 3px solid #3498db; }
+    .log-row.level-debug   { border-left: 3px solid #555; }
+
+    .log-time    { color: #555; white-space: nowrap; }
+    .log-level   {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      font-size: 10px;
+      font-weight: 600;
+      text-align: center;
+    }
+    .badge-command { background: #F39C1230; color: #F39C12; }
+    .badge-error   { background: #e74c3c30; color: #e74c3c; }
+    .badge-warn    { background: #e67e2230; color: #e67e22; }
+    .badge-info    { background: #3498db30; color: #3498db; }
+    .badge-debug   { background: #55555530; color: #888; }
+
+    .log-cat   { color: #666; }
+    .log-msg   { color: #ccc; word-break: break-all; }
+    .log-cmd   { color: #F39C12; margin-right: 6px; }
+    .log-guild { color: #888; font-size: 10px; }
+
+    #empty-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      color: #444;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>⚡ Soulbot Logs <span id="log-count">— 0 entrées</span></h1>
+    <a href="/" class="back-link">← Dashboard</a>
+  </header>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-value" id="s-commands">-</div>
+      <div class="stat-label">Commandes exécutées</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="s-errors">-</div>
+      <div class="stat-label">Erreurs totales</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="s-24h">-</div>
+      <div class="stat-label">Événements 24h</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="s-guilds">-</div>
+      <div class="stat-label">Serveurs actifs</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <span id="live-badge">● LIVE</span>
+    <label>Filtre :
+      <select id="filter-level">
+        <option value="">Tous les niveaux</option>
+        <option value="command">command</option>
+        <option value="info">info</option>
+        <option value="warn">warn</option>
+        <option value="error">error</option>
+        <option value="debug">debug</option>
+      </select>
+    </label>
+    <button id="btn-clear">Vider</button>
+    <button id="btn-pause">⏸ Pause</button>
+  </div>
+
+  <div class="logs-wrap" id="logs-wrap">
+    <div id="empty-state">En attente de logs... Lance une commande Discord.</div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket    = io();
+    const logsWrap  = document.getElementById('logs-wrap');
+    const emptyEl   = document.getElementById('empty-state');
+    const countEl   = document.getElementById('log-count');
+    const filterEl  = document.getElementById('filter-level');
+    const liveBadge = document.getElementById('live-badge');
+
+    let paused    = false;
+    let logCount  = 0;
+    let filterVal = '';
+
+    filterEl.addEventListener('change', e => { filterVal = e.target.value; });
+
+    document.getElementById('btn-clear').addEventListener('click', () => {
+      logsWrap.innerHTML = '';
+      logCount = 0;
+      updateCount();
+    });
+
+    document.getElementById('btn-pause').addEventListener('click', function() {
+      paused = !paused;
+      this.textContent   = paused ? '▶ Reprendre' : '⏸ Pause';
+      liveBadge.textContent = paused ? '● PAUSE' : '● LIVE';
+      liveBadge.className   = paused ? 'off' : '';
+    });
+
+    function updateCount() {
+      countEl.textContent = `— ${logCount} entrée${logCount !== 1 ? 's' : ''}`;
+    }
+
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = s || '';
+      return d.innerHTML;
+    }
+
+    function formatTime(ts) {
+      return new Date(ts).toLocaleTimeString('fr-FR', { hour12: false });
+    }
+
+    function renderLog(log) {
+      if (filterVal && log.level !== filterVal) return;
+      if (emptyEl.parentNode) emptyEl.remove();
+
+      const row = document.createElement('div');
+      row.className = `log-row level-${log.level}`;
+
+      const cmdPart   = log.command_name ? `<span class="log-cmd">;${esc(log.command_name)}</span>` : '';
+      const guildPart = log.guild_name   ? `<span class="log-guild">[${esc(log.guild_name)}]</span> ` : '';
+
+      row.innerHTML = `
+        <span class="log-time">${formatTime(log.timestamp)}</span>
+        <span class="log-level badge-${log.level}">${esc(log.level)}</span>
+        <span class="log-cat">${esc(log.category)}</span>
+        <span class="log-msg">${guildPart}${cmdPart}${esc(log.message)}</span>
+      `;
+      logsWrap.insertBefore(row, logsWrap.firstChild);
+      if (logsWrap.children.length > 300) logsWrap.removeChild(logsWrap.lastChild);
+      logCount++;
+      updateCount();
+    }
+
+    socket.on('log:new', log => { if (!paused) renderLog(log); });
+
+    socket.on('connect',    () => { liveBadge.textContent = '● LIVE'; liveBadge.className = ''; });
+    socket.on('disconnect', () => { liveBadge.textContent = '● OFFLINE'; liveBadge.className = 'off'; });
+
+    async function loadInitial() {
+      try {
+        const [statsRes, logsRes] = await Promise.all([
+          fetch('/api/logs/stats').then(r => r.json()),
+          fetch('/api/logs/recent?limit=50').then(r => r.json()),
+        ]);
+        document.getElementById('s-commands').textContent = statsRes.totalCommands ?? '-';
+        document.getElementById('s-errors').textContent   = statsRes.totalErrors   ?? '-';
+        document.getElementById('s-24h').textContent      = statsRes.last24h       ?? '-';
+        document.getElementById('s-guilds').textContent   = statsRes.uniqueGuilds  ?? '-';
+
+        if (Array.isArray(logsRes) && logsRes.length) {
+          logsRes.slice().reverse().forEach(renderLog);
+        }
+      } catch (e) { console.error('[logs] init error:', e); }
+    }
+
+    loadInitial();
+    setInterval(() => {
+      fetch('/api/logs/stats').then(r => r.json()).then(s => {
+        document.getElementById('s-commands').textContent = s.totalCommands ?? '-';
+        document.getElementById('s-errors').textContent   = s.totalErrors   ?? '-';
+        document.getElementById('s-24h').textContent      = s.last24h       ?? '-';
+        document.getElementById('s-guilds').textContent   = s.uniqueGuilds  ?? '-';
+      }).catch(() => {});
+    }, 30000);
+  </script>
+</body>
+</html>

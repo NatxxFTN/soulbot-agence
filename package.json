@@ -12,6 +12,7 @@
     "dev": "node index.js",
     "predev:bot": "node scripts/kill-bot.js",
     "dev:bot": "nodemon --config nodemon.json bot/index.js",
+    "dev:all": "concurrently -n bot,dashboard -c cyan,yellow \"npm run dev:bot\" \"npm run dashboard\"",
     "test": "node --test tests/"
   },
   "dependencies": {
@@ -26,6 +27,7 @@
     "socket.io": "^4.6.1"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "nodemon": "^3.1.14"
   }
 }

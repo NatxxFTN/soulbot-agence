@@ -11,6 +11,7 @@ const path   = require('path');
 const { Collection, PermissionsBitField } = require('discord.js');
 const { getUserLevel, isGloballyBlacklisted } = require('./permissions');
 const { LEVELS, levelName, getRequiredLevel }  = require('./permissions-levels');
+const botLogger = require('./logger');
 
 const COMMANDS_ROOT = path.join(__dirname, '../commands');
 
@@ -219,11 +220,39 @@ async function dispatch(message, client, db, logger) {
   }
 
   // Exécution avec catch structuré
+  const startTime = Date.now();
   try {
     await cmd.execute(message, args, client, db);
+
+    botLogger.command({
+      eventType   : 'command_executed',
+      guildId     : guild?.id,
+      guildName   : guild?.name,
+      userId      : author.id,
+      userName    : author.tag,
+      channelId   : channel.id,
+      commandName : cmd.name,
+      message     : `Commande ${cmd.name} exécutée`,
+      durationMs  : Date.now() - startTime,
+      success     : true,
+    });
   } catch (err) {
     logger.errorStack('CommandHandler', err);
     channel.send({ content: '✗ Une erreur interne est survenue.' }).catch(() => {});
+
+    botLogger.error({
+      eventType   : 'command_error',
+      guildId     : guild?.id,
+      guildName   : guild?.name,
+      userId      : author.id,
+      userName    : author.tag,
+      channelId   : channel.id,
+      commandName : cmd.name,
+      message     : `Erreur commande ${cmd.name}: ${err.message}`,
+      metadata    : { stack: err.stack },
+      durationMs  : Date.now() - startTime,
+      success     : false,
+    });
   }
 }
 

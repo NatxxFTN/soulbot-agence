@@ -1,41 +1,52 @@
+'use strict';
+
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
-const express = require('express');
-const session = require('express-session');
-const cors = require('cors');
-const http = require('http');
+
+const express  = require('express');
+const http     = require('http');
 const { Server } = require('socket.io');
-const path = require('path');
-const { getDB } = require('../bot/database');
+const session  = require('express-session');
+const cors     = require('cors');
+const path     = require('path');
+const { db }   = require('../bot/database');
 
-const app = express();
+const app    = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: '*' } });
+const io     = new Server(server, { cors: { origin: '*' } });
 
-const PORT = process.env.PORT || 3000;
+const PORT     = process.env.DASHBOARD_PORT || process.env.PORT || 3000;
 const PASSWORD = process.env.DASHBOARD_PASSWORD || 'admin123';
 
+// ── Middleware ────────────────────────────────────────────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'discord-manager-secret',
+  secret: process.env.SESSION_SECRET || 'soulbot-change-me',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 }
+  cookie: {
+    maxAge: 24 * 3600 * 1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+  },
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Auth middleware
-const requireAuth = (req, res, next) => {
+// ── Auth middleware ───────────────────────────────────────────────────────────
+function requireAuth(req, res, next) {
   if (req.session.authenticated) return next();
-  res.status(401).json({ error: 'Non authentifié' });
-};
+  // API calls get 401
+  if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'Non authentifié' });
+  res.redirect('/login.html');
+}
 
-// ===== AUTH ROUTES =====
+// ── Password auth ─────────────────────────────────────────────────────────────
 app.post('/api/login', (req, res) => {
   const { password } = req.body;
   if (password === PASSWORD) {
     req.session.authenticated = true;
+    req.session.authMethod    = 'password';
     res.json({ success: true });
   } else {
     res.status(401).json({ error: 'Mot de passe incorrect' });
@@ -48,62 +59,118 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.get('/api/auth/check', (req, res) => {
-  res.json({ authenticated: !!req.session.authenticated });
+  res.json({
+    authenticated: !!req.session.authenticated,
+    userId: req.session.userId || null,
+    userName: req.session.userName || null,
+  });
 });
 
-// ===== DASHBOARD API =====
+// ── Discord OAuth2 (activé seulement si CLIENT_ID configuré) ─────────────────
+const DISCORD_CLIENT_ID     = process.env.DISCORD_CLIENT_ID;
+const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
+const DASHBOARD_URL         = process.env.DASHBOARD_URL || `http://localhost:${PORT}`;
+const REDIRECT_URI          = `${DASHBOARD_URL}/auth/callback`;
 
-// Overview stats
+if (DISCORD_CLIENT_ID && DISCORD_CLIENT_SECRET) {
+  app.get('/auth/discord', (req, res) => {
+    const url = `https://discord.com/api/oauth2/authorize?` +
+      `client_id=${DISCORD_CLIENT_ID}` +
+      `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+      `&response_type=code&scope=identify`;
+    res.redirect(url);
+  });
+
+  app.get('/auth/callback', async (req, res) => {
+    const { code } = req.query;
+    if (!code) return res.redirect('/login.html?error=nocode');
+
+    try {
+      const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body   : new URLSearchParams({
+          client_id    : DISCORD_CLIENT_ID,
+          client_secret: DISCORD_CLIENT_SECRET,
+          grant_type   : 'authorization_code',
+          code,
+          redirect_uri : REDIRECT_URI,
+        }),
+      });
+      const tokens = await tokenRes.json();
+      if (!tokens.access_token) return res.redirect('/login.html?error=token');
+
+      const userRes = await fetch('https://discord.com/api/users/@me', {
+        headers: { Authorization: `Bearer ${tokens.access_token}` },
+      });
+      const user = await userRes.json();
+
+      const OWNER_IDS = (process.env.BOT_OWNERS || process.env.OWNER_IDS || '').split(',').map(s => s.trim());
+      if (!OWNER_IDS.includes(user.id)) {
+        return res.status(403).send('Accès refusé : Owner bot uniquement.');
+      }
+
+      req.session.authenticated = true;
+      req.session.authMethod    = 'oauth2';
+      req.session.userId        = user.id;
+      req.session.userName      = user.username;
+      req.session.avatar        = user.avatar;
+      res.redirect('/');
+    } catch (err) {
+      console.error('[OAuth2]', err.message);
+      res.redirect('/login.html?error=1');
+    }
+  });
+}
+
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/login.html');
+});
+
+// ── API existantes (guilds, mod-logs, warnings, command-logs) ─────────────────
 app.get('/api/stats', requireAuth, (req, res) => {
-  const db = getDB();
   try {
-    const guilds = db.prepare('SELECT COUNT(*) as count FROM guilds').get();
-    const warns = db.prepare('SELECT COUNT(*) as count FROM warnings').get();
-    const commands = db.prepare('SELECT COUNT(*) as count FROM command_logs').get();
-    const modlogs = db.prepare('SELECT COUNT(*) as count FROM mod_logs').get();
+    // Stats legacy (tables anciennes) + bot_logs
+    const guilds       = tryGet('SELECT COUNT(*) as c FROM guild_settings', 0, 'c');
+    const warns        = tryGet('SELECT COUNT(*) as c FROM warnings', 0, 'c');
+    const modActions   = tryGet('SELECT COUNT(*) as c FROM mod_logs', 0, 'c');
+    const totalCmds    = tryGet("SELECT COUNT(*) as c FROM bot_logs WHERE category='command'", 0, 'c');
+    const totalErrors  = tryGet("SELECT COUNT(*) as c FROM bot_logs WHERE level='error'", 0, 'c');
+    const last24h      = tryGet(
+      'SELECT COUNT(*) as c FROM bot_logs WHERE timestamp > ' + (Date.now() - 86400000), 0, 'c'
+    );
 
-    const recentCommands = db.prepare('SELECT * FROM command_logs ORDER BY created_at DESC LIMIT 10').all();
-    const recentMod = db.prepare('SELECT * FROM mod_logs ORDER BY created_at DESC LIMIT 10').all();
+    const commandStats = tryAll(`
+      SELECT command_name as command, COUNT(*) as count FROM bot_logs
+      WHERE category='command' GROUP BY command_name ORDER BY count DESC LIMIT 8
+    `);
 
-    const commandStats = db.prepare(`
-      SELECT command, COUNT(*) as count FROM command_logs 
-      GROUP BY command ORDER BY count DESC LIMIT 8
-    `).all();
+    const recentCommands = tryAll(
+      'SELECT * FROM bot_logs WHERE category=\'command\' ORDER BY timestamp DESC LIMIT 10'
+    );
+    const recentMod = tryAll(
+      'SELECT * FROM mod_logs ORDER BY created_at DESC LIMIT 10'
+    );
 
     res.json({
-      guilds: guilds.count,
-      warnings: warns.count,
-      commands: commands.count,
-      modActions: modlogs.count,
-      recentCommands,
-      recentMod,
-      commandStats
+      guilds, warnings: warns, commands: totalCmds, modActions,
+      totalErrors, last24h,
+      recentCommands, recentMod, commandStats,
     });
   } catch (err) {
-    res.json({ guilds: 0, warnings: 0, commands: 0, modActions: 0, recentCommands: [], recentMod: [], commandStats: [] });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// Guilds
 app.get('/api/guilds', requireAuth, (req, res) => {
-  const db = getDB();
-  const guilds = db.prepare('SELECT * FROM guilds ORDER BY name').all();
-  res.json(guilds);
-});
-
-app.get('/api/guilds/:id', requireAuth, (req, res) => {
-  const db = getDB();
-  const guild = db.prepare('SELECT * FROM guilds WHERE id = ?').get(req.params.id);
-  if (!guild) return res.status(404).json({ error: 'Serveur introuvable' });
-  res.json(guild);
+  res.json(tryAll('SELECT * FROM guild_settings ORDER BY guild_id'));
 });
 
 app.patch('/api/guilds/:id', requireAuth, (req, res) => {
-  const db = getDB();
-  const { prefix, welcome_channel, welcome_message, log_channel, auto_role, anti_spam, anti_links, anti_caps } = req.body;
+  const { prefix } = req.body;
   try {
-    db.prepare(`UPDATE guilds SET prefix=?, welcome_channel=?, welcome_message=?, log_channel=?, auto_role=?, anti_spam=?, anti_links=?, anti_caps=? WHERE id=?`)
-      .run(prefix, welcome_channel, welcome_message, log_channel, auto_role, anti_spam ? 1 : 0, anti_links ? 1 : 0, anti_caps ? 1 : 0, req.params.id);
+    db.prepare('UPDATE guild_settings SET prefix=? WHERE guild_id=?').run(prefix, req.params.id);
     res.json({ success: true });
     io.emit('guild-updated', req.params.id);
   } catch (err) {
@@ -111,133 +178,92 @@ app.patch('/api/guilds/:id', requireAuth, (req, res) => {
   }
 });
 
-// Moderation logs
 app.get('/api/mod-logs', requireAuth, (req, res) => {
-  const db = getDB();
-  const { guild_id, action, limit = 50, offset = 0 } = req.query;
-  let query = 'SELECT * FROM mod_logs WHERE 1=1';
-  const params = [];
-  if (guild_id) { query += ' AND guild_id = ?'; params.push(guild_id); }
-  if (action) { query += ' AND action = ?'; params.push(action); }
-  query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-  params.push(parseInt(limit), parseInt(offset));
-  const logs = db.prepare(query).all(...params);
-  const total = db.prepare('SELECT COUNT(*) as count FROM mod_logs' + (guild_id ? ' WHERE guild_id = ?' : '')).get(guild_id ? guild_id : undefined);
-  res.json({ logs, total: total.count });
-});
-
-// Warnings
-app.get('/api/warnings', requireAuth, (req, res) => {
-  const db = getDB();
-  const { guild_id, user_id, limit = 50, offset = 0 } = req.query;
-  let query = 'SELECT * FROM warnings WHERE 1=1';
-  const params = [];
-  if (guild_id) { query += ' AND guild_id = ?'; params.push(guild_id); }
-  if (user_id) { query += ' AND user_id = ?'; params.push(user_id); }
-  query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-  params.push(parseInt(limit), parseInt(offset));
-  const warnings = db.prepare(query).all(...params);
-  res.json(warnings);
-});
-
-app.delete('/api/warnings/:id', requireAuth, (req, res) => {
-  const db = getDB();
-  db.prepare('DELETE FROM warnings WHERE id = ?').run(req.params.id);
-  res.json({ success: true });
-});
-
-// Command logs
-app.get('/api/command-logs', requireAuth, (req, res) => {
-  const db = getDB();
   const { guild_id, limit = 50, offset = 0 } = req.query;
-  let query = 'SELECT * FROM command_logs WHERE 1=1';
-  const params = [];
-  if (guild_id) { query += ' AND guild_id = ?'; params.push(guild_id); }
-  query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-  params.push(parseInt(limit), parseInt(offset));
-  const logs = db.prepare(query).all(...params);
-  res.json(logs);
+  const logs = guild_id
+    ? tryAll('SELECT * FROM mod_logs WHERE guild_id=? ORDER BY created_at DESC LIMIT ? OFFSET ?', guild_id, Number(limit), Number(offset))
+    : tryAll('SELECT * FROM mod_logs ORDER BY created_at DESC LIMIT ? OFFSET ?', Number(limit), Number(offset));
+  const total = tryGet(guild_id ? 'SELECT COUNT(*) as c FROM mod_logs WHERE guild_id=?' : 'SELECT COUNT(*) as c FROM mod_logs', guild_id ? guild_id : undefined, 'c');
+  res.json({ logs, total });
 });
 
-// Custom commands
-app.get('/api/custom-commands', requireAuth, (req, res) => {
-  const db = getDB();
-  const { guild_id } = req.query;
-  const cmds = guild_id
-    ? db.prepare('SELECT * FROM custom_commands WHERE guild_id = ?').all(guild_id)
-    : db.prepare('SELECT * FROM custom_commands').all();
-  res.json(cmds);
+app.get('/api/warnings', requireAuth, (req, res) => {
+  const { guild_id, user_id, limit = 50, offset = 0 } = req.query;
+  let q = 'SELECT * FROM warnings WHERE 1=1';
+  const p = [];
+  if (guild_id) { q += ' AND guild_id=?'; p.push(guild_id); }
+  if (user_id)  { q += ' AND user_id=?';  p.push(user_id); }
+  q += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+  p.push(Number(limit), Number(offset));
+  res.json(tryAll(q, ...p));
 });
 
-app.post('/api/custom-commands', requireAuth, (req, res) => {
-  const db = getDB();
-  const { guild_id, trigger, response } = req.body;
-  if (!guild_id || !trigger || !response) return res.status(400).json({ error: 'Champs manquants' });
+// ── API bot_logs (nouvelles) ──────────────────────────────────────────────────
+app.get('/api/logs/recent', requireAuth, (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 100, 500);
+  res.json(tryAll('SELECT * FROM bot_logs ORDER BY timestamp DESC LIMIT ?', limit));
+});
+
+app.get('/api/logs/since/:ts', requireAuth, (req, res) => {
+  const ts = parseInt(req.params.ts) || 0;
+  res.json(tryAll('SELECT * FROM bot_logs WHERE timestamp > ? ORDER BY timestamp ASC', ts));
+});
+
+app.get('/api/logs/stats', requireAuth, (req, res) => {
+  const totalCommands = tryGet("SELECT COUNT(*) as c FROM bot_logs WHERE category='command'", undefined, 'c');
+  const totalErrors   = tryGet("SELECT COUNT(*) as c FROM bot_logs WHERE level='error'", undefined, 'c');
+  const last24h       = tryGet('SELECT COUNT(*) as c FROM bot_logs WHERE timestamp > ?', Date.now() - 86400000, 'c');
+  const uniqueGuilds  = tryGet('SELECT COUNT(DISTINCT guild_id) as c FROM bot_logs WHERE guild_id IS NOT NULL', undefined, 'c');
+  res.json({ totalCommands, totalErrors, last24h, uniqueGuilds });
+});
+
+// ── Socket.io — polling DB → push live logs aux clients browser ───────────────
+let lastLogId = (() => {
+  try { return (db.prepare('SELECT MAX(id) as m FROM bot_logs').get()?.m) || 0; } catch { return 0; }
+})();
+
+setInterval(() => {
+  if (!io.sockets.sockets.size) return;
   try {
-    db.prepare('INSERT OR REPLACE INTO custom_commands (guild_id, trigger, response) VALUES (?, ?, ?)').run(guild_id, trigger.toLowerCase(), response);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    const newLogs = db.prepare(
+      'SELECT * FROM bot_logs WHERE id > ? ORDER BY id ASC LIMIT 50'
+    ).all(lastLogId);
+    if (!newLogs.length) return;
+    lastLogId = newLogs[newLogs.length - 1].id;
+    newLogs.forEach(log => io.emit('log:new', log));
+  } catch { /* DB peut ne pas être prête */ }
+}, 2000);
+
+io.on('connection', socket => {
+  console.log(`[Dashboard] Client connecté : ${socket.id}`);
+  socket.on('disconnect', () => console.log(`[Dashboard] Client déconnecté : ${socket.id}`));
+  socket.on('subscribe-guild', guildId => socket.join(guildId));
 });
 
-app.delete('/api/custom-commands/:id', requireAuth, (req, res) => {
-  const db = getDB();
-  db.prepare('DELETE FROM custom_commands WHERE id = ?').run(req.params.id);
-  res.json({ success: true });
-});
-
-// Demo data seeder
-app.post('/api/seed-demo', requireAuth, (req, res) => {
-  const db = getDB();
-  try {
-    db.prepare("INSERT OR IGNORE INTO guilds (id, name, icon, prefix) VALUES ('123456789', 'Mon Super Serveur', null, '!')").run();
-    db.prepare("INSERT OR IGNORE INTO guilds (id, name, icon, prefix) VALUES ('987654321', 'Gaming Zone', null, '?')").run();
-
-    const actions = ['BAN', 'KICK', 'WARN', 'MUTE', 'CLEAR'];
-    const users = [['111', 'Alpha#0001'], ['222', 'Beta#0002'], ['333', 'Gamma#0003']];
-    const mods = [['444', 'ModA#0001'], ['555', 'ModB#0002']];
-
-    for (let i = 0; i < 20; i++) {
-      const u = users[i % users.length];
-      const m = mods[i % mods.length];
-      db.prepare("INSERT INTO mod_logs (guild_id, action, user_id, user_tag, moderator_id, moderator_tag, reason, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-        .run('123456789', actions[i % actions.length], u[0], u[1], m[0], m[1], 'Demo raison #' + i, Math.floor(Date.now()/1000) - i * 3600);
-    }
-
-    const cmds = ['ban', 'kick', 'help', 'ping', 'warn', 'userinfo', '8ball', 'clear'];
-    for (let i = 0; i < 30; i++) {
-      const u = users[i % users.length];
-      db.prepare("INSERT INTO command_logs (guild_id, user_id, user_tag, command, created_at) VALUES (?, ?, ?, ?, ?)")
-        .run('123456789', u[0], u[1], cmds[i % cmds.length], Math.floor(Date.now()/1000) - i * 1200);
-    }
-
-    for (let i = 0; i < 10; i++) {
-      const u = users[i % users.length];
-      const m = mods[i % mods.length];
-      db.prepare("INSERT INTO warnings (guild_id, user_id, user_tag, moderator_id, moderator_tag, reason, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
-        .run('123456789', u[0], u[1], m[0], m[1], 'Comportement inapproprié #' + i, Math.floor(Date.now()/1000) - i * 7200);
-    }
-
-    res.json({ success: true, message: 'Données de démonstration créées!' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Socket.io for real-time
-io.on('connection', (socket) => {
-  socket.on('subscribe-guild', (guildId) => socket.join(guildId));
-});
-
-// Fallback to index.html
-app.get('*', (req, res) => {
+// ── Fallback SPA ──────────────────────────────────────────────────────────────
+app.get('/', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+app.get('/logs', requireAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'logs.html'));
+});
+
+// ── Helpers DB safe ───────────────────────────────────────────────────────────
+function tryAll(sql, ...params) {
+  try { return db.prepare(sql).all(...params); } catch { return []; }
+}
+function tryGet(sql, param, field) {
+  try {
+    const row = param !== undefined ? db.prepare(sql).get(param) : db.prepare(sql).get();
+    return row?.[field] ?? 0;
+  } catch { return 0; }
+}
+
 server.listen(PORT, () => {
-  console.log(`\x1b[32m[Dashboard] Running at http://localhost:${PORT}\x1b[0m`);
-  if (process.send) process.send(`Dashboard ready at http://localhost:${PORT}`);
+  console.log(`[Dashboard] http://localhost:${PORT}`);
+  if (DISCORD_CLIENT_ID) console.log(`[Dashboard] OAuth2 activé — /auth/discord`);
+  else console.log(`[Dashboard] OAuth2 désactivé — définir DISCORD_CLIENT_ID dans .env`);
 });
 
 module.exports = { io };
