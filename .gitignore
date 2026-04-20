@@ -59,3 +59,6 @@ docs/bug-reports/*
 # Templates de serveur (contenu privé — ignoré sauf exemple)
 data/templates/*.json
 !data/templates/_example.json
+
+# Cache IDs emojis custom (généré par ;setupemojis)
+data/emojis-ids.json

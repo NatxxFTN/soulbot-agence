@@ -375,4 +375,10 @@ function setGuildSetting(guildId, field, value) {
   db.prepare(`UPDATE guild_settings SET ${field} = ? WHERE guild_id = ?`).run(value, guildId);
 }
 
+// ── Migration greeting_config — colonnes embed/dm (ajout sûr) ────────────────
+const GREETING_EXTRA_COLS = ['join_embed', 'join_dm', 'join_dm_embed', 'leave_embed', 'leave_dm', 'leave_dm_embed'];
+for (const col of GREETING_EXTRA_COLS) {
+  try { db.exec(`ALTER TABLE greeting_config ADD COLUMN ${col} TEXT`); } catch { /* déjà présent */ }
+}
+
 module.exports = { db, ensureGuild, getGuildSettings, setGuildSetting };
