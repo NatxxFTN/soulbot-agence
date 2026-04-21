@@ -27,14 +27,14 @@ module.exports = {
     try {
       if (!args.length) {
         const row  = STMT_GET.get('embed_footer');
-        const current = row?.value ?? '+help pour la liste des commandes';
+        const current = row?.value ?? `${process.env.PREFIX || ';'}help pour la liste des commandes`;
         return message.channel.send({
           embeds: [E.base().setTitle('Footer actuel').setDescription(`\`${current}\``)],
         });
       }
 
       if (args[0]?.toLowerCase() === 'reset') {
-        STMT_SET.run('embed_footer', '+help pour la liste des commandes');
+        STMT_SET.run('embed_footer', `${process.env.PREFIX || ';'}help pour la liste des commandes`);
         return message.channel.send({
           embeds: [E.success('Footer réinitialisé', 'Valeur par défaut restaurée.')],
         });

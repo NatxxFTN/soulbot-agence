@@ -149,33 +149,31 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
 
   const components = [dropdown];
 
-  // ── Pagination — customId UNIQUES (first/prev/next/last) ──────────────────
-  if (totalPages > 1) {
-    components.push(
-      new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId('help:nav:home:first')
-          .setEmoji('⏮')
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(page === 1),
-        new ButtonBuilder()
-          .setCustomId(`help:nav:home:prev:${page}`)
-          .setEmoji('◀')
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(page === 1),
-        new ButtonBuilder()
-          .setCustomId(`help:nav:home:next:${page}`)
-          .setEmoji('▶')
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(page === totalPages),
-        new ButtonBuilder()
-          .setCustomId('help:nav:home:last')
-          .setEmoji('⏭')
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(page === totalPages),
-      ),
-    );
-  }
+  // ── Pagination — toujours visible, grisé si 1 page ──────────────────────
+  components.push(
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId('help:nav:home:first')
+        .setEmoji('⏮')
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(page === 1),
+      new ButtonBuilder()
+        .setCustomId(`help:nav:home:prev:${page}`)
+        .setEmoji('◀')
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(page === 1),
+      new ButtonBuilder()
+        .setCustomId(`help:nav:home:next:${page}`)
+        .setEmoji('▶')
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(page === totalPages),
+      new ButtonBuilder()
+        .setCustomId('help:nav:home:last')
+        .setEmoji('⏭')
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(page === totalPages),
+    ),
+  );
 
   return { embeds: [embed], components };
 }
@@ -271,39 +269,39 @@ function renderHelpCategory(category = null, page = 1) {
     new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
   );
 
-  // ── Pagination — customId UNIQUES ─────────────────────────────────────────
+  // ── Pagination — toujours visible, grisé si 1 page ──────────────────────
   if (totalPages > 1) {
     container.addTextDisplayComponents(
       new TextDisplayBuilder().setContent(`📄 **Page ${page}/${totalPages}**`),
     );
-    container.addActionRowComponents(
-      new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId(`help:nav:category:first:${category}`)
-          .setEmoji('⏮')
-          .setStyle(ButtonStyle.Secondary)
-          .setDisabled(page === 1),
-        new ButtonBuilder()
-          .setCustomId(`help:nav:category:prev:${category}:${page}`)
-          .setEmoji('◀')
-          .setStyle(ButtonStyle.Secondary)
-          .setDisabled(page === 1),
-        new ButtonBuilder()
-          .setCustomId(`help:nav:category:next:${category}:${page}`)
-          .setEmoji('▶')
-          .setStyle(ButtonStyle.Secondary)
-          .setDisabled(page === totalPages),
-        new ButtonBuilder()
-          .setCustomId(`help:nav:category:last:${category}`)
-          .setEmoji('⏭')
-          .setStyle(ButtonStyle.Secondary)
-          .setDisabled(page === totalPages),
-      ),
-    );
-    container.addSeparatorComponents(
-      new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
-    );
   }
+  container.addActionRowComponents(
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`help:nav:category:first:${category}`)
+        .setEmoji('⏮')
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(page === 1),
+      new ButtonBuilder()
+        .setCustomId(`help:nav:category:prev:${category}:${page}`)
+        .setEmoji('◀')
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(page === 1),
+      new ButtonBuilder()
+        .setCustomId(`help:nav:category:next:${category}:${page}`)
+        .setEmoji('▶')
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(page === totalPages),
+      new ButtonBuilder()
+        .setCustomId(`help:nav:category:last:${category}`)
+        .setEmoji('⏭')
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(page === totalPages),
+    ),
+  );
+  container.addSeparatorComponents(
+    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
+  );
 
   // ── Bas : Accueil + Rechercher ────────────────────────────────────────────
   container.addActionRowComponents(

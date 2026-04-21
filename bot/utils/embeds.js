@@ -61,7 +61,7 @@ function base(color = COLORS.PRIMARY) {
   return new EmbedBuilder()
     .setColor(color)
     .setAuthor({ name: _botIdentity.name, iconURL: _botIdentity.iconURL })
-    .setFooter({ text: '+help pour la liste des commandes' })
+    .setFooter({ text: `${process.env.PREFIX || ';'}help pour la liste des commandes` })
     .setTimestamp();
 }
 
