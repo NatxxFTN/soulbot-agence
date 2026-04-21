@@ -26,13 +26,20 @@ function gotoCategory(interaction, category, page) {
   });
 }
 
-// V2 → Embed : vide components + flags pour pouvoir remettre un Embed classique
-function gotoHome(interaction, page, botAvatarURL) {
-  return interaction.update({
-    components: [],
-    flags      : 0,
-    ...renderHelpHome(page, botAvatarURL),
-  });
+// V2 → Embed : IS_COMPONENTS_V2 est immuable sur un message existant.
+// Seule solution fiable : supprimer l'ancien message et en envoyer un nouveau.
+async function gotoHome(interaction, page, botAvatarURL) {
+  try {
+    await interaction.deferUpdate();
+    await interaction.deleteReply();
+    return interaction.followUp({ ...renderHelpHome(page, botAvatarURL), flags: 0 });
+  } catch (err) {
+    console.error('[gotoHome] Erreur :', err.message);
+    return interaction.followUp({
+      content: `✗ Retour accueil impossible. Tape \`;help\` pour revenir.`,
+      flags  : MessageFlags.Ephemeral,
+    }).catch(() => {});
+  }
 }
 
 // ─── Handler principal ────────────────────────────────────────────────────────
@@ -107,28 +114,34 @@ async function handleHelpInteraction(interaction) {
 
     // ── Navigation accueil (home → home) ────────────────────────────────────
     if (id === 'h:h:f') {
+      console.log('[help-handler] Match: HOME FIRST');
       return interaction.update(renderHelpHome(1, botAvatarURL));
     }
     if (id === 'h:h:l') {
+      console.log('[help-handler] Match: HOME LAST');
       const totalPages = Math.max(1, Math.ceil(Object.keys(scanCommands()).length / CATEGORIES_PER_PAGE));
       return interaction.update(renderHelpHome(totalPages, botAvatarURL));
     }
     if (id.startsWith('h:h:p:')) {
       const cur = parseInt(id.split(':')[3], 10) || 1;
+      console.log(`[help-handler] Match: HOME PREV cur=${cur}`);
       return interaction.update(renderHelpHome(Math.max(1, cur - 1), botAvatarURL));
     }
     if (id.startsWith('h:h:n:')) {
       const cur = parseInt(id.split(':')[3], 10) || 1;
+      console.log(`[help-handler] Match: HOME NEXT cur=${cur}`);
       return interaction.update(renderHelpHome(cur + 1, botAvatarURL));
     }
 
     // ── Navigation catégorie (cat → cat) ────────────────────────────────────
     if (id.startsWith('h:cf:')) {
       const category = id.substring('h:cf:'.length);
+      console.log(`[help-handler] Match: CAT FIRST cat=${category}`);
       return interaction.update(renderHelpCategory(category, 1));
     }
     if (id.startsWith('h:cl:')) {
       const category  = id.substring('h:cl:'.length);
+      console.log(`[help-handler] Match: CAT LAST cat=${category}`);
       const cmds      = (scanCommands()[category] || []);
       const totalPages = Math.max(1, Math.ceil(cmds.length / COMMANDS_PER_PAGE));
       return interaction.update(renderHelpCategory(category, totalPages));
@@ -137,12 +150,14 @@ async function handleHelpInteraction(interaction) {
       const parts    = id.substring('h:cp:'.length).split(':');
       const category = parts[0];
       const cur      = parseInt(parts[1], 10) || 1;
+      console.log(`[help-handler] Match: CAT PREV cat=${category} cur=${cur}`);
       return interaction.update(renderHelpCategory(category, Math.max(1, cur - 1)));
     }
     if (id.startsWith('h:cn:')) {
       const parts    = id.substring('h:cn:'.length).split(':');
       const category = parts[0];
       const cur      = parseInt(parts[1], 10) || 1;
+      console.log(`[help-handler] Match: CAT NEXT cat=${category} cur=${cur}`);
       return interaction.update(renderHelpCategory(category, cur + 1));
     }
 

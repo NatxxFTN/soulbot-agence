@@ -105,7 +105,7 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
       { name: 'Syntaxes',   value: syntaxesCol,   inline: true  },
       { name: '​',     value: statsBlock,     inline: false },
     )
-    .setFooter({ text: `Page ${page}/${totalPages}  ·  ${getCategoryEmoji(activeCat)} ${activeCat}` });
+    .setFooter({ text: `Page ${page}/${totalPages}` });
 
   if (botAvatarURL) embed.setThumbnail(botAvatarURL);
 
