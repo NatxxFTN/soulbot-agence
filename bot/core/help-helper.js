@@ -5,7 +5,7 @@ const path = require('path');
 
 const COMMANDS_DIR = path.join(__dirname, '../commands');
 
-const { categoryEmoji } = require('./emojis');
+const { categoryEmoji, categoryEmojiForButton } = require('./emojis');
 
 const CATEGORY_ANSI = {
   'Owner':         33,
@@ -44,6 +44,10 @@ const CATEGORY_ANSI = {
 
 function getCategoryEmoji(cat) {
   return categoryEmoji(cat);
+}
+
+function getCategoryEmojiObject(cat) {
+  return categoryEmojiForButton(cat);
 }
 
 function getCategoryAnsi(cat) {
@@ -98,4 +102,4 @@ function findCommand(name) {
   return null;
 }
 
-module.exports = { scanCommands, findCommand, getCategoryEmoji, getCategoryAnsi };
+module.exports = { scanCommands, findCommand, getCategoryEmoji, getCategoryEmojiObject, getCategoryAnsi };

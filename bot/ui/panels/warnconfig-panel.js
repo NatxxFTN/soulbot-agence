@@ -15,6 +15,7 @@ const {
 } = require('discord.js');
 const { COLORS } = require('../theme');
 const { getWarnConfig, getThresholds } = require('../../core/warn-helper');
+const { forButton } = require('../../core/emojis');
 
 const st = (on) => on ? '🟢' : '🔴';
 
@@ -177,7 +178,7 @@ function renderWarnconfigPanel(guildId) {
       new ButtonBuilder()
         .setCustomId('warnconfig:help')
         .setLabel('Aide')
-        .setEmoji('❓')
+        .setEmoji(forButton('btn_help'))
         .setStyle(ButtonStyle.Secondary),
     ),
   );

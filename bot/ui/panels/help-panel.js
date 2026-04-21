@@ -13,7 +13,8 @@ const {
   MessageFlags,
 } = require('discord.js');
 const { COLORS } = require('../theme');
-const { scanCommands, getCategoryEmoji, getCategoryAnsi } = require('../../core/help-helper');
+const { scanCommands, getCategoryEmoji, getCategoryEmojiObject, getCategoryAnsi } = require('../../core/help-helper');
+const { forButton } = require('../../core/emojis');
 
 let _pkg;
 function getPkg() {
@@ -113,13 +114,13 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
   const dropdown = new ActionRowBuilder().addComponents(
     new StringSelectMenuBuilder()
       .setCustomId('h:c')
-      .setPlaceholder('📂 Catégories')
+      .setPlaceholder('Catégories')
       .addOptions(
         catNames.slice(0, 25).map(cat => ({
           label      : cat,
           value      : cat,
           description: `${categories[cat].length} commande${categories[cat].length > 1 ? 's' : ''}`,
-          emoji      : getCategoryEmoji(cat),
+          emoji      : getCategoryEmojiObject(cat),
         })),
       ),
   );
@@ -128,22 +129,22 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
   const navRow = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId('h:h:f')
-      .setEmoji('⏮')
+      .setEmoji(forButton('btn_first'))
       .setStyle(ButtonStyle.Primary)
       .setDisabled(page === 1),
     new ButtonBuilder()
       .setCustomId(`h:h:p:${page}`)
-      .setEmoji('◀')
+      .setEmoji(forButton('btn_prev'))
       .setStyle(ButtonStyle.Primary)
       .setDisabled(page === 1),
     new ButtonBuilder()
       .setCustomId(`h:h:n:${page}`)
-      .setEmoji('▶')
+      .setEmoji(forButton('btn_next'))
       .setStyle(ButtonStyle.Primary)
       .setDisabled(page === totalPages),
     new ButtonBuilder()
       .setCustomId('h:h:l')
-      .setEmoji('⏭')
+      .setEmoji(forButton('btn_last'))
       .setStyle(ButtonStyle.Primary)
       .setDisabled(page === totalPages),
   );
@@ -199,13 +200,13 @@ function renderHelpCategory(category = null, page = 1) {
     new ActionRowBuilder().addComponents(
       new StringSelectMenuBuilder()
         .setCustomId('h:c')
-        .setPlaceholder(`${getCategoryEmoji(category)} ${category}`)
+        .setPlaceholder(category)
         .addOptions(
           catNames.slice(0, 25).map(cat => ({
             label      : cat,
             value      : cat,
             description: `${categories[cat].length} commande${categories[cat].length > 1 ? 's' : ''}`,
-            emoji      : getCategoryEmoji(cat),
+            emoji      : getCategoryEmojiObject(cat),
             default    : cat === category,
           })),
         ),
@@ -257,22 +258,22 @@ function renderHelpCategory(category = null, page = 1) {
     new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId(`h:cf:${catSlug}`)
-        .setEmoji('⏮')
+        .setEmoji(forButton('btn_first'))
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(page === 1),
       new ButtonBuilder()
         .setCustomId(`h:cp:${catSlug}:${page}`)
-        .setEmoji('◀')
+        .setEmoji(forButton('btn_prev'))
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(page === 1),
       new ButtonBuilder()
         .setCustomId(`h:cn:${catSlug}:${page}`)
-        .setEmoji('▶')
+        .setEmoji(forButton('btn_next'))
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(page === totalPages),
       new ButtonBuilder()
         .setCustomId(`h:cl:${catSlug}`)
-        .setEmoji('⏭')
+        .setEmoji(forButton('btn_last'))
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(page === totalPages),
     ),
@@ -287,12 +288,12 @@ function renderHelpCategory(category = null, page = 1) {
       new ButtonBuilder()
         .setCustomId('h:back')
         .setLabel('Accueil')
-        .setEmoji('🏠')
+        .setEmoji(forButton('btn_home'))
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('h:src')
         .setLabel('Rechercher')
-        .setEmoji('🔍')
+        .setEmoji(forButton('btn_search'))
         .setStyle(ButtonStyle.Primary),
     ),
   );

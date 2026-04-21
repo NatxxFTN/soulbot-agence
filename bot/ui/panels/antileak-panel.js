@@ -17,6 +17,7 @@ const {
 } = require('discord.js');
 const { COLORS } = require('../theme');
 const { getAntileakConfig, getWhitelistRoles } = require('../../core/antileak-helper');
+const { forButton } = require('../../core/emojis');
 
 const SANCTION_OPTIONS = [
   { label: 'Supprimer le message', value: 'delete',  emoji: '🗑️' },
@@ -215,12 +216,12 @@ function renderAntileakPanel(guildId) {
       new ButtonBuilder()
         .setCustomId('antileak:whitelist')
         .setLabel(`Whitelist (${whitelist.length})`)
-        .setEmoji('✅')
+        .setEmoji(forButton('btn_success'))
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('antileak:help')
         .setLabel('Aide')
-        .setEmoji('❓')
+        .setEmoji(forButton('btn_help'))
         .setStyle(ButtonStyle.Secondary),
     ),
   );

@@ -16,6 +16,7 @@ const {
 } = require('discord.js');
 const { COLORS, LABELS } = require('../theme');
 const { getConfig } = require('../../core/greeting-helper');
+const { forButton } = require('../../core/emojis');
 
 const STATUS = (val) => val ? '**Défini**' : '*Non défini*';
 
@@ -211,7 +212,7 @@ function renderPanel(guildId, mode = 'join') {
       new ButtonBuilder()
         .setCustomId(`greeting:${mode}:variables`)
         .setLabel('Variables')
-        .setEmoji('🔍')
+        .setEmoji(forButton('btn_search'))
         .setStyle(ButtonStyle.Secondary),
     ),
   );

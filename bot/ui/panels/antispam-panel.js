@@ -17,6 +17,7 @@ const {
 } = require('discord.js');
 const { COLORS } = require('../theme');
 const { getAntispamConfig, getWhitelistRoles } = require('../../core/antispam-helper');
+const { forButton } = require('../../core/emojis');
 
 const SANCTION_OPTIONS = [
   { label: 'Supprimer le message', value: 'delete',  emoji: '🗑️' },
@@ -214,12 +215,12 @@ function renderAntispamPanel(guildId) {
       new ButtonBuilder()
         .setCustomId('antispam:whitelist')
         .setLabel(`Whitelist (${whitelist.length})`)
-        .setEmoji('✅')
+        .setEmoji(forButton('btn_success'))
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('antispam:help')
         .setLabel('Aide')
-        .setEmoji('❓')
+        .setEmoji(forButton('btn_help'))
         .setStyle(ButtonStyle.Secondary),
     ),
   );

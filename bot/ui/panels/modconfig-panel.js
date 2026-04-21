@@ -16,6 +16,7 @@ const {
 } = require('discord.js');
 const { COLORS } = require('../theme');
 const { getModConfig } = require('../../core/mod-helper');
+const { forButton } = require('../../core/emojis');
 
 const st = (on) => on ? '🟢' : '🔴';
 
@@ -211,7 +212,7 @@ function renderModconfigPanel(guildId) {
       new ButtonBuilder()
         .setCustomId('modconfig:help')
         .setLabel('Aide')
-        .setEmoji('❓')
+        .setEmoji(forButton('btn_help'))
         .setStyle(ButtonStyle.Secondary),
     ),
   );
