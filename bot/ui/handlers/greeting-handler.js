@@ -81,7 +81,7 @@ async function handleGreetingInteraction(interaction) {
         inputs  : [
           { id: 'title',       label: 'Titre',       placeholder: 'Bienvenue !',                required: false, maxLength: 256,  value: saved.title       || '' },
           { id: 'description', label: 'Description', placeholder: 'Tu es le {count}ème membre !', required: true,  maxLength: 2000, paragraph: true, value: saved.description || '' },
-          { id: 'color',       label: 'Couleur hex', placeholder: 'F39C12',                     required: false, maxLength: 7,    value: saved.color       || '' },
+          { id: 'color',       label: 'Couleur hex', placeholder: 'FF0000',                     required: false, maxLength: 7,    value: saved.color       || '' },
         ],
       }));
     }
@@ -117,7 +117,7 @@ async function handleGreetingInteraction(interaction) {
         inputs  : [
           { id: 'title',       label: 'Titre',       required: false, maxLength: 256,  value: saved.title       || '' },
           { id: 'description', label: 'Description', required: true,  maxLength: 2000, paragraph: true, value: saved.description || '' },
-          { id: 'color',       label: 'Couleur hex', placeholder: 'F39C12', required: false, maxLength: 7, value: saved.color || '' },
+          { id: 'color',       label: 'Couleur hex', placeholder: 'FF0000', required: false, maxLength: 7, value: saved.color || '' },
         ],
       }));
     }

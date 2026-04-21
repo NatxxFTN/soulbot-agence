@@ -18,6 +18,7 @@
     "restart:win": "scripts\\safe-restart.bat",
     "start:bot": "bash scripts/start-soulbot.sh",
     "start:bot:win": "scripts\\start-soulbot.bat",
+    "emojis:upload": "node bot/scripts/upload-emojis.js",
     "start:full": "bash scripts/start-all.sh",
     "start:full:win": "scripts\\start-all.bat"
   },

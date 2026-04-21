@@ -17,6 +17,10 @@ module.exports = {
     console.log(`[Bot] Connecté en tant que ${client.user.tag}`);
     console.log(`[Bot] ${client.guilds.cache.size} serveur(s) | ${client.users.cache.size} utilisateur(s)`);
 
+    // Préchargement du cache emojis
+    const { reload: reloadEmojis } = require('../core/emojis');
+    reloadEmojis();
+
     // Présence
     const { version } = require('../../package.json');
     client.user.setPresence({
@@ -69,7 +73,7 @@ module.exports = {
             content: winners.length ? winners.map(w => `<@${w}>`).join(' ') : '',
             embeds: [
               new EmbedBuilder()
-                .setColor(0xF39C12)
+                .setColor(0xFF0000)
                 .setTitle('🎉 Giveaway terminé !')
                 .setDescription(`**Gain :** ${gw.prize}\n**Gagnant(s) :** ${mentions}`)
                 .setTimestamp(),

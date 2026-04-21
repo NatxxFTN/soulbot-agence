@@ -116,7 +116,7 @@ async function handleTicketInteraction(interaction) {
         inputs  : [
           { id: 'title',       label: 'Titre',       required: false, maxLength: 256,  value: safeStr(saved.title,       256)  },
           { id: 'description', label: 'Description', required: true,  maxLength: 2000, paragraph: true, value: safeStr(saved.description, 2000), placeholder: 'Bienvenue {user}, décris ton problème...' },
-          { id: 'color',       label: 'Couleur hex', required: false, maxLength: 7,    value: safeStr(saved.color,       7),    placeholder: 'F39C12' },
+          { id: 'color',       label: 'Couleur hex', required: false, maxLength: 7,    value: safeStr(saved.color,       7),    placeholder: 'FF0000' },
         ],
       }));
     }
@@ -194,7 +194,7 @@ async function handleTicketInteraction(interaction) {
         inputs  : [
           { id: 'title',       label: 'Titre',       required: false, maxLength: 256,  value: safeStr(saved.title,       256)  },
           { id: 'description', label: 'Description', required: true,  maxLength: 2000, paragraph: true, value: safeStr(saved.description, 2000) },
-          { id: 'color',       label: 'Couleur hex', required: false, maxLength: 7,    value: safeStr(saved.color,       7),    placeholder: 'F39C12' },
+          { id: 'color',       label: 'Couleur hex', required: false, maxLength: 7,    value: safeStr(saved.color,       7),    placeholder: 'FF0000' },
         ],
       }));
     }

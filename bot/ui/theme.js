@@ -2,37 +2,54 @@
 
 const { getEmoji } = require('../core/emoji-cache');
 
+// ═══════════════════════════════════════════════
+// SOULBOT THEME — Noir & Rouge Premium
+// ═══════════════════════════════════════════════
+
 const COLORS = {
-  accent:    0xF39C12,
-  success:   0x10B981,
-  danger:    0xEF4444,
-  warning:   0xF59E0B,
-  info:      0x3B82F6,
-  secondary: 0x6366F1,
-  dark:      0x0A0A0C,
-  surface:   0x1A1A1D,
-  muted:     0x6B7280,
+  accent:       0xFF0000,
+  accent_dark:  0xCC0000,
+  accent_soft:  0xE63946,
+  bg_deep:      0x0A0A0A,
+  bg_secondary: 0x1A1A1A,
+  bg_card:      0x2C2C2C,
+  text_primary: 0xF5F5F5,
+  text_muted:   0x666666,
+  success:      0x10B981,
+  danger:       0xFF0000,
+  warning:      0xF59E0B,
+  info:         0x3B82F6,
+  secondary:    0x6366F1,
+  dark:         0x0A0A0A,
+  surface:      0x1A1A1D,
+  muted:        0x6B7280,
+  primary:      0xFF0000,
 };
 
-// Emojis custom — fonctions (lues depuis le cache JSON à chaque appel)
-// Fallback Unicode si l'emoji n'a pas encore été uploadé
+const HEX = {
+  accent:      '#FF0000',
+  accent_dark: '#CC0000',
+  bg_deep:     '#0A0A0A',
+  success:     '#10B981',
+};
+
 const EMOJIS = {
   // Custom (via emoji-cache)
-  shield   : () => getEmoji('ui_shield',    '🛡️'),
-  save     : () => getEmoji('ui_save',      '💾'),
-  addGuild : () => getEmoji('ui_add_guild', '➕'),
-  search   : () => getEmoji('ui_search',    '🔍'),
-  mod      : () => getEmoji('ui_mod',       '🔨'),
-  warning  : () => getEmoji('ui_warning',   '⚠️'),
-  check    : () => getEmoji('ui_check',     '✅'),
-  cross    : () => getEmoji('ui_cross',     '❌'),
-  plus     : () => getEmoji('ui_plus',      '➕'),
-  minus    : () => getEmoji('ui_minus',     '➖'),
-  dev      : () => getEmoji('ui_dev',       '👨‍💻'),
-  star     : () => getEmoji('ui_star',      '⭐'),
-  chat     : () => getEmoji('ui_chat',      '💬'),
+  shield   : () => getEmoji('ui_antileak',   '🛡️'),
+  save     : () => getEmoji('ui_save',       '💾'),
+  addGuild : () => getEmoji('ui_add_guild',  '➕'),
+  search   : () => getEmoji('btn_search',    '🔍'),
+  mod      : () => getEmoji('cat_moderation','🔨'),
+  warning  : () => getEmoji('btn_flag',      '⚠️'),
+  check    : () => getEmoji('btn_success',   '✅'),
+  cross    : () => getEmoji('btn_error',     '❌'),
+  plus     : () => getEmoji('ui_plus',       '➕'),
+  minus    : () => getEmoji('ui_minus',      '➖'),
+  dev      : () => getEmoji('ui_git',        '👨‍💻'),
+  star     : () => getEmoji('ui_star',       '⭐'),
+  chat     : () => getEmoji('ui_chat',       '💬'),
 
-  // Navigation — Unicode standards (pas besoin de custom)
+  // Navigation
   first:   '⏮️',
   prev:    '◀️',
   next:    '▶️',
@@ -40,8 +57,8 @@ const EMOJIS = {
   back:    '↩️',
   refresh: '🔄',
 
-  // Thématiques Unicode
-  bot:      '🍊',
+  // Thématiques
+  bot:      '🔴',
   on:       '🟢',
   off:      '🔴',
   config:   '⚙️',
@@ -79,4 +96,4 @@ const LABELS = {
   selectOption:  'Sélectionner une option',
 };
 
-module.exports = { COLORS, EMOJIS, LABELS };
+module.exports = { COLORS, HEX, EMOJIS, LABELS };

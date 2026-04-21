@@ -5,35 +5,7 @@ const path = require('path');
 
 const COMMANDS_DIR = path.join(__dirname, '../commands');
 
-const CATEGORY_EMOJIS = {
-  'Greeting':      '🔔',
-  'Ticket':        '🎟️',
-  'Protection':    '🛡️',
-  'Moderation':    '🔨',
-  'Modération':    '🔨',
-  'Owner':         '👑',
-  'Level':         '📈',
-  'Niveau':        '📈',
-  'Custom':        '🎨',
-  'Utility':       '🔧',
-  'Utile':         '🔧',
-  'Information':   'ℹ️',
-  'Info':          'ℹ️',
-  'Fun':           '🎮',
-  'Game':          '🎲',
-  'Stats':         '📊',
-  'Statistique':   '📊',
-  'Statistiques':  '📊',
-  'Invitation':    '📨',
-  'Role':          '🏷️',
-  'Rôle':          '🏷️',
-  'Configuration': '⚙️',
-  'Config':        '⚙️',
-  'Giveaway':      '🎁',
-  'Automod':       '🤖',
-  'Welcomer':      '👋',
-  'Logs':          '📋',
-};
+const { categoryEmoji } = require('./emojis');
 
 const CATEGORY_ANSI = {
   'Owner':         33,
@@ -71,7 +43,7 @@ const CATEGORY_ANSI = {
 };
 
 function getCategoryEmoji(cat) {
-  return CATEGORY_EMOJIS[cat] || '📁';
+  return categoryEmoji(cat);
 }
 
 function getCategoryAnsi(cat) {

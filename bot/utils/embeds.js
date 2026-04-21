@@ -5,11 +5,11 @@ const { EmbedBuilder } = require('discord.js');
 // ─── Charte couleurs officielle — UI_UX_GUIDELINES.md §1.1 ───────────────────
 //
 // RÈGLE ABSOLUE : ces valeurs ne changent pas sans validation du Designer.
-// Toute déviation de PRIMARY = 0xF39C12 est un refus de livraison immédiat.
+// Toute déviation de PRIMARY = 0xFF0000 est un refus de livraison immédiat.
 // Référence : UI_UX_GUIDELINES.md §1.2 — "Pas notre orange → retour sans analyse"
 //
 const COLORS = {
-  PRIMARY : 0xF39C12,  // Orange identitaire — SEULE couleur par défaut admise
+  PRIMARY : 0xFF0000,  // Orange identitaire — SEULE couleur par défaut admise
   SUCCESS : 0x27AE60,  // Vert confirmation — action réussie, opération validée
   ERROR   : 0xE74C3C,  // Rouge erreur — refus, accès interdit, crash
   WARNING : 0xF1C40F,  // Jaune avertissement — action critique, irréversible imminente
@@ -102,7 +102,7 @@ function info(title, description) {
 
 /**
  * Embed statistiques — données, classements, compteurs.
- * Couleur PRIMARY (#F39C12) — signature orange du bot.
+ * Couleur PRIMARY (#FF0000) — signature orange du bot.
  * @param {string} title
  * @param {string} [description]
  */
