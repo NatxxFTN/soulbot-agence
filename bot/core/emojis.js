@@ -62,27 +62,65 @@ const FALLBACK_EMOJIS = {
 };
 
 // ─── Mapping catégorie → emoji key ───────────────────────────────────────────
+// Clés = noms de dossiers bot/commands/* (capitalisés par scanCommands)
+// ou variantes FR/EN. Les cat_* sans fichier uploadé ont un fallback Unicode.
 
 const CATEGORY_TO_EMOJI = {
-  'Owner':         'cat_owner',
-  'Moderation':    'cat_moderation',
-  'Modération':    'cat_moderation',
-  'Information':   'cat_information',
-  'Info':          'cat_information',
-  'Utility':       'cat_utility',
-  'Utile':         'cat_utility',
-  'Configuration': 'cat_configuration',
-  'Config':        'cat_configuration',
-  'Protection':    'cat_protection',
-  'Fun':           'cat_fun',
-  'Giveaway':      'cat_giveaway',
-  'Greeting':      'cat_greeting',
-  'Welcomer':      'cat_greeting',
-  'Level':         'cat_level',
-  'Niveau':        'cat_level',
-  'Economy':       'cat_economy',
-  'Économie':      'cat_economy',
-  'Ticket':        'cat_ticket',
+  // Owner
+  'Owner':          'cat_owner',
+  // Moderation (cat_moderation pas uploadé → fallback 🔨 depuis FALLBACK_EMOJIS)
+  'Moderation':     'cat_moderation',
+  'Modération':     'cat_moderation',
+  'Mod':            'cat_moderation',
+  // Information
+  'Information':    'cat_information',
+  'Info':           'cat_information',
+  // Utility (cat_utility pas uploadé → fallback 🔧)
+  'Utility':        'cat_utility',
+  'Utile':          'cat_utility',
+  'Utilities':      'cat_utility',
+  'Utils':          'cat_utility',
+  // Configuration
+  'Configuration':  'cat_configuration',
+  'Config':         'cat_configuration',
+  // Protection
+  'Protection':     'cat_protection',
+  // Fun (cat_fun pas uploadé → fallback 🎮)
+  'Fun':            'cat_fun',
+  'Game':           'cat_fun',
+  'Games':          'cat_fun',
+  // Giveaway
+  'Giveaway':       'cat_giveaway',
+  'Giveaways':      'cat_giveaway',
+  // Greeting / Welcomer
+  'Greeting':       'cat_greeting',
+  'Welcomer':       'cat_greeting',
+  'Welcome':        'cat_greeting',
+  // Level
+  'Level':          'cat_level',
+  'Levels':         'cat_level',
+  'Niveau':         'cat_level',
+  'Niveaux':        'cat_level',
+  // Economy
+  'Economy':        'cat_economy',
+  'Économie':       'cat_economy',
+  'Economie':       'cat_economy',
+  // Ticket
+  'Ticket':         'cat_ticket',
+  'Tickets':        'cat_ticket',
+  // Stats → cat_information (pas de cat_stats uploadé)
+  'Stats':          'cat_information',
+  'Statistique':    'cat_information',
+  'Statistiques':   'cat_information',
+  // Role → cat_configuration (pas de cat_role uploadé)
+  'Role':           'cat_configuration',
+  'Roles':          'cat_configuration',
+  'Rôle':           'cat_configuration',
+  // Invitation → cat_information
+  'Invitation':     'cat_information',
+  'Logs':           'cat_information',
+  'Custom':         'cat_configuration',
+  'Automod':        'cat_protection',
 };
 
 // ─── Fonctions publiques ──────────────────────────────────────────────────────
@@ -113,18 +151,21 @@ function forButton(name) {
  * Emoji pour une catégorie de commandes (string prête à l'emploi).
  */
 function categoryEmoji(category) {
-  const key = CATEGORY_TO_EMOJI[category];
-  if (!key) return FALLBACK_EMOJIS.cat_information || 'ℹ️';
-  return e(key);
+  if (!category) return e('cat_information');
+  const raw  = category.toString().trim();
+  const name = CATEGORY_TO_EMOJI[raw] || CATEGORY_TO_EMOJI[raw.charAt(0).toUpperCase() + raw.slice(1)] || 'cat_information';
+  return e(name);
 }
 
 /**
- * Emoji catégorie pour ButtonBuilder.setEmoji().
+ * Emoji catégorie pour ButtonBuilder.setEmoji() / options StringSelect.
+ * Retourne { name, id, animated } si uploadé, sinon string Unicode.
  */
 function categoryEmojiForButton(category) {
-  const key = CATEGORY_TO_EMOJI[category];
-  if (!key) return forButton('cat_information');
-  return forButton(key);
+  if (!category) return forButton('cat_information');
+  const raw  = category.toString().trim();
+  const name = CATEGORY_TO_EMOJI[raw] || CATEGORY_TO_EMOJI[raw.charAt(0).toUpperCase() + raw.slice(1)] || 'cat_information';
+  return forButton(name);
 }
 
 /**

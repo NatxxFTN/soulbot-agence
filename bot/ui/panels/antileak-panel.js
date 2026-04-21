@@ -17,7 +17,7 @@ const {
 } = require('discord.js');
 const { COLORS } = require('../theme');
 const { getAntileakConfig, getWhitelistRoles } = require('../../core/antileak-helper');
-const { forButton } = require('../../core/emojis');
+const { e, forButton } = require('../../core/emojis');
 
 const SANCTION_OPTIONS = [
   { label: 'Supprimer le message', value: 'delete',  emoji: '🗑️' },
@@ -62,7 +62,7 @@ function renderAntileakPanel(guildId) {
 
   // ── Titre + status ─────────────────────────────────────────────────────────
   container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent('# 🛡️ Configuration Anti-Leak'),
+    new TextDisplayBuilder().setContent(`# ${e('ani_world')} Configuration Anti-Leak`),
   );
   container.addTextDisplayComponents(
     new TextDisplayBuilder().setContent(

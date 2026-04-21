@@ -6,6 +6,7 @@ const { getNukeConfig, updateNukeConfig, checkCooldown, markNukeExecuted, logNuk
 const { createBackup } = require('../../core/backup-helper');
 const { isOwner } = require('../../core/permissions');
 const { EMOJIS } = require('../theme');
+const { e } = require('../../core/emojis');
 
 const MODE_LABELS = { classique: 'Classique', rapide: 'Rapide', urgence: 'Urgence' };
 
@@ -100,6 +101,8 @@ async function executeNuke(interaction, mode) {
   let rolesDeleted      = 0;
   let emojisDeleted     = 0;
   let errorMsg          = null;
+
+  await interaction.editReply({ content: `${e('ani_loading')} **Nuke ${MODE_LABELS[mode] || mode} en cours...** Backup en création...` }).catch(() => {});
 
   try {
     // Backup obligatoire

@@ -1,6 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name      : 'roll',
@@ -18,10 +19,9 @@ module.exports = {
       return message.reply({ embeds: [E.error('Valeur invalide', 'Le dé doit avoir entre **2** et **1000** faces.')] });
     }
 
+    const msg = await message.channel.send(`${e('ani_dice')} **Lancement du dé à ${faces} faces...**`);
+    await new Promise(r => setTimeout(r, 1500));
     const result = Math.floor(Math.random() * faces) + 1;
-    const embed  = E.success('Lancer de dé', `**${result}** sur ${faces}`)
-      .setFooter({ text: `Dé à ${faces} faces` });
-
-    message.channel.send({ embeds: [embed] });
+    await msg.edit(`${e('ani_dice')} Tu as fait : **${result}** / ${faces}`);
   },
 };

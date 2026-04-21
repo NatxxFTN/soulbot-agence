@@ -16,6 +16,7 @@ const {
 } = require('discord.js');
 const { COLORS } = require('../theme');
 const { getTicketConfig } = require('../../core/ticket-helper');
+const { forButton } = require('../../core/emojis');
 
 const STATUS = (val) => val ? '**Défini**' : '*Non défini*';
 
@@ -161,7 +162,7 @@ function renderTicketPanel(guildId) {
       new ButtonBuilder()
         .setCustomId('ticket:open_message_modal')
         .setLabel('Configurer le message')
-        .setEmoji('💬')
+        .setEmoji(forButton('ui_chat'))
         .setStyle(ButtonStyle.Primary),
     ),
   );
@@ -208,7 +209,7 @@ function renderTicketPanel(guildId) {
       new ButtonBuilder()
         .setCustomId('ticket:variables')
         .setLabel('Variables')
-        .setEmoji('🔍')
+        .setEmoji(forButton('btn_search'))
         .setStyle(ButtonStyle.Secondary),
     ),
   );
@@ -260,7 +261,7 @@ function renderTicketAdvancedPanel(guildId) {
       new ButtonBuilder()
         .setCustomId('ticket:close_message_modal')
         .setLabel('Configurer le message')
-        .setEmoji('💬')
+        .setEmoji(forButton('ui_chat'))
         .setStyle(ButtonStyle.Primary),
     ),
   );

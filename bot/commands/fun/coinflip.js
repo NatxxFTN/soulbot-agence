@@ -1,6 +1,6 @@
 'use strict';
 
-const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name      : 'coinflip',
@@ -12,8 +12,9 @@ module.exports = {
   guildOnly  : true,
 
   async execute(message) {
-    const result = Math.random() < 0.5 ? 'Pile' : 'Face';
-    const embed  = E.info('Pile ou Face', `Résultat : **${result}**`);
-    message.channel.send({ embeds: [embed] });
+    const msg = await message.channel.send(`${e('ani_coin')} **La pièce tourne...**`);
+    await new Promise(r => setTimeout(r, 2000));
+    const result = Math.random() < 0.5 ? '🪙 Pile' : '🟡 Face';
+    await msg.edit(`${e('ani_coin')} Résultat : **${result}** !`);
   },
 };
