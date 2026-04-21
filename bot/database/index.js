@@ -559,38 +559,60 @@ for (const [col, type] of Object.entries(TICKET_EXTRA_COLS)) {
   try { db.exec(`ALTER TABLE ticket_config ADD COLUMN ${col} ${type}`); } catch { /* déjà présent */ }
 }
 
-// ── welcome_config + welcome_fields ──────────────────────────────────────────
+// ── Welcome v2 — clean reset ──────────────────────────────────────────────────
+db.exec('DROP TABLE IF EXISTS welcome_config');
+db.exec('DROP TABLE IF EXISTS welcome_fields');
+db.exec('DROP TABLE IF EXISTS welcome_auto_roles');
+db.exec('DROP TABLE IF EXISTS welcome_stats');
+
 db.exec(`
-  CREATE TABLE IF NOT EXISTS welcome_config (
+  CREATE TABLE welcome_config (
     guild_id TEXT PRIMARY KEY,
     enabled INTEGER DEFAULT 0,
     mode TEXT DEFAULT 'embed',
     channel_id TEXT,
-    auto_role_id TEXT,
-    mention_user INTEGER DEFAULT 1,
+    secondary_channel_id TEXT,
     text_content TEXT,
+    text_reply INTEGER DEFAULT 0,
+    mention_user INTEGER DEFAULT 1,
+    mention_then_delete INTEGER DEFAULT 0,
     embed_title TEXT,
+    embed_title_url TEXT,
     embed_description TEXT,
     embed_color TEXT DEFAULT '#F39C12',
-    embed_url TEXT,
     embed_thumbnail_url TEXT,
+    embed_thumbnail_source TEXT DEFAULT 'custom',
     embed_image_url TEXT,
+    embed_image_source TEXT DEFAULT 'custom',
     embed_author_name TEXT,
     embed_author_icon TEXT,
+    embed_author_icon_source TEXT DEFAULT 'custom',
     embed_author_url TEXT,
     embed_footer_text TEXT,
     embed_footer_icon TEXT,
+    embed_footer_icon_source TEXT DEFAULT 'custom',
     embed_timestamp INTEGER DEFAULT 0,
     dm_enabled INTEGER DEFAULT 0,
     dm_content TEXT,
-    dm_embed INTEGER DEFAULT 0,
+    dm_embed_enabled INTEGER DEFAULT 0,
+    dm_embed_title TEXT,
+    dm_embed_description TEXT,
+    dm_embed_color TEXT,
+    dm_delay_seconds INTEGER DEFAULT 0,
     auto_delete_seconds INTEGER DEFAULT 0,
+    ignore_bots INTEGER DEFAULT 1,
+    min_account_age_days INTEGER DEFAULT 0,
+    cooldown_seconds INTEGER DEFAULT 0,
+    require_role_id TEXT,
+    active_hours_start INTEGER DEFAULT -1,
+    active_hours_end INTEGER DEFAULT -1,
+    active_weekdays TEXT DEFAULT '0,1,2,3,4,5,6',
     updated_at INTEGER,
     updated_by TEXT
   )
 `);
 db.exec(`
-  CREATE TABLE IF NOT EXISTS welcome_fields (
+  CREATE TABLE welcome_fields (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     guild_id TEXT NOT NULL,
     field_order INTEGER DEFAULT 0,
@@ -600,6 +622,28 @@ db.exec(`
     created_at INTEGER
   )
 `);
-db.exec(`CREATE INDEX IF NOT EXISTS idx_welcome_fields_guild ON welcome_fields(guild_id)`);
+db.exec(`
+  CREATE TABLE welcome_auto_roles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id TEXT NOT NULL,
+    role_id TEXT NOT NULL,
+    created_at INTEGER,
+    UNIQUE(guild_id, role_id)
+  )
+`);
+db.exec(`
+  CREATE TABLE welcome_stats (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    user_tag TEXT,
+    triggered_at INTEGER,
+    account_age_days INTEGER,
+    dm_sent INTEGER DEFAULT 0
+  )
+`);
+db.exec('CREATE INDEX IF NOT EXISTS idx_welcome_fields_guild ON welcome_fields(guild_id)');
+db.exec('CREATE INDEX IF NOT EXISTS idx_welcome_auto_roles_guild ON welcome_auto_roles(guild_id)');
+db.exec('CREATE INDEX IF NOT EXISTS idx_welcome_stats_guild ON welcome_stats(guild_id)');
 
 module.exports = { db, ensureGuild, getGuildSettings, setGuildSetting };

@@ -1,6 +1,6 @@
 'use strict';
 
-const { renderWelcomePanel } = require('../../ui/panels/welcome-panel');
+const { renderMainPanel } = require('../../ui/panels/welcome-panel');
 
 module.exports = {
   name       : 'welcomeconfig',
@@ -16,7 +16,7 @@ module.exports = {
       return message.reply({ content: '✗ Administrateur requis.' });
     }
     try {
-      return message.reply(renderWelcomePanel(message.guild.id));
+      return message.reply(renderMainPanel(message.guild.id));
     } catch (err) {
       console.error('[welcomeconfig]', err);
       return message.reply({ content: `✗ Erreur : ${err.message}` });

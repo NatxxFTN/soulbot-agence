@@ -61,17 +61,27 @@ module.exports = {
       if (ch) await ch.send(formatMessage(greetCfg.join_message, member)).catch(() => {});
     }
 
-    // ── Welcomer premium ─────────────────────────────────────────────────────
+    // ── Welcomer v2 ──────────────────────────────────────────────────────────
     try {
-      const { getWelcomeConfig, buildWelcomeMessage, replaceVariables } = require('../core/welcome-helper');
+      const {
+        getWelcomeConfig, shouldTriggerWelcome, buildWelcomeMessage,
+        replaceVariables, getAutoRoles, logWelcome,
+      } = require('../core/welcome-helper');
+
       const wCfg = getWelcomeConfig(guildId);
-      if (!wCfg || !wCfg.enabled || !wCfg.channel_id) return;
+      const { trigger } = shouldTriggerWelcome(wCfg, member);
+      if (!trigger) return;
 
       const channel = member.guild.channels.cache.get(wCfg.channel_id);
       if (!channel) return;
 
       const payload = buildWelcomeMessage(wCfg, member);
-      if (wCfg.mention_user) {
+
+      // Mention then delete : mention séparée puis supprimée après 3s
+      if (wCfg.mention_then_delete) {
+        const mentionMsg = await channel.send({ content: `<@${member.id}>` }).catch(() => null);
+        if (mentionMsg) setTimeout(() => mentionMsg.delete().catch(() => {}), 3000);
+      } else if (wCfg.mention_user) {
         payload.content = (`<@${member.id}> ` + (payload.content || '')).trim();
       }
 
@@ -81,14 +91,33 @@ module.exports = {
         setTimeout(() => sent.delete().catch(() => {}), wCfg.auto_delete_seconds * 1000);
       }
 
-      if (wCfg.auto_role_id) {
-        await member.roles.add(wCfg.auto_role_id).catch(e => console.error('[welcomer] rôle auto:', e.message));
+      // Salon secondaire
+      if (wCfg.secondary_channel_id) {
+        const ch2 = member.guild.channels.cache.get(wCfg.secondary_channel_id);
+        if (ch2) await ch2.send(payload).catch(() => {});
       }
 
+      // Rôles auto multiples
+      const autoRoles = getAutoRoles(guildId);
+      for (const r of autoRoles) {
+        await member.roles.add(r.role_id).catch(e => console.error('[welcomer] rôle auto:', e.message));
+      }
+
+      // DM avec délai optionnel
+      let dmSent = false;
       if (wCfg.dm_enabled && wCfg.dm_content) {
         const dmText = replaceVariables(wCfg.dm_content, member);
-        await member.send({ content: dmText }).catch(() => {});
+        const sendDm = () => member.send({ content: dmText }).then(() => { dmSent = true; }).catch(() => {});
+        if (wCfg.dm_delay_seconds > 0) {
+          setTimeout(sendDm, wCfg.dm_delay_seconds * 1000);
+        } else {
+          await sendDm();
+        }
       }
+
+      // Log stats
+      const ageDays = Math.floor((Date.now() - member.user.createdTimestamp) / 86400000);
+      logWelcome(guildId, member.id, member.user.tag, ageDays, dmSent);
     } catch (err) {
       console.error('[welcomer]', err);
     }
