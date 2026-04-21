@@ -16,6 +16,9 @@ const { register: registerNukeHandlers }      = require('./ui/handlers/nuke-hand
 const { register: registerLockdownHandlers }  = require('./ui/handlers/lockdown-handler');
 const { register: registerRaidmodeHandlers }  = require('./ui/handlers/raidmode-handler');
 const { register: registerMassbanHandlers }   = require('./ui/handlers/massban-handler');
+const { register: registerHelpHandlers }      = require('./ui/handlers/help-handler');
+const { register: registerModconfigHandlers } = require('./ui/handlers/modconfig-handler');
+const { register: registerWarnconfigHandlers }= require('./ui/handlers/warnconfig-handler');
 const { loadEvents }    = require('./handlers/EventHandler');
 const { db }            = require('./database');
 const logger            = require('./utils/logger');
@@ -63,6 +66,9 @@ registerNukeHandlers(client);
 registerLockdownHandlers(client);
 registerRaidmodeHandlers(client);
 registerMassbanHandlers(client);
+registerHelpHandlers(client);
+registerModconfigHandlers(client);
+registerWarnconfigHandlers(client);
 loadEvents(client);
 
 // ─── Events dashboard logging ────────────────────────────────────────────────

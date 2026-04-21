@@ -450,6 +450,45 @@ db.exec(`
     timestamp    INTEGER NOT NULL DEFAULT (unixepoch())
   );
   CREATE INDEX IF NOT EXISTS idx_massban_guild ON massban_logs(guild_id, timestamp DESC);
+
+  /* ---- Modération — configuration par serveur ---- */
+  CREATE TABLE IF NOT EXISTS mod_config (
+    guild_id                  TEXT    PRIMARY KEY,
+    logs_channel_id           TEXT,
+    mod_role_id               TEXT,
+    muted_role_id             TEXT,
+    default_mute_duration     INTEGER NOT NULL DEFAULT 600,
+    default_timeout_duration  INTEGER NOT NULL DEFAULT 600,
+    dm_sanctioned             INTEGER NOT NULL DEFAULT 1,
+    require_reason            INTEGER NOT NULL DEFAULT 0,
+    updated_at                INTEGER,
+    updated_by                TEXT
+  );
+
+  /* ---- Warns — configuration par serveur ---- */
+  CREATE TABLE IF NOT EXISTS warn_config (
+    guild_id         TEXT    PRIMARY KEY,
+    enabled          INTEGER NOT NULL DEFAULT 1,
+    logs_channel_id  TEXT,
+    thresholds       TEXT    NOT NULL DEFAULT '[]',
+    expiration_days  INTEGER NOT NULL DEFAULT 30,
+    dm_warned        INTEGER NOT NULL DEFAULT 1,
+    updated_at       INTEGER,
+    updated_by       TEXT
+  );
+
+  /* ---- Warns — entrées avec expiration ---- */
+  CREATE TABLE IF NOT EXISTS warns (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id     TEXT    NOT NULL,
+    user_id      TEXT    NOT NULL,
+    moderator_id TEXT    NOT NULL,
+    reason       TEXT,
+    created_at   INTEGER NOT NULL DEFAULT (unixepoch()),
+    expires_at   INTEGER
+  );
+  CREATE INDEX IF NOT EXISTS idx_warns_guild_user ON warns(guild_id, user_id);
+  CREATE INDEX IF NOT EXISTS idx_warns_expires    ON warns(expires_at);
 `);
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
