@@ -13,7 +13,7 @@ const {
   MessageFlags,
 } = require('discord.js');
 const { COLORS } = require('../theme');
-const { scanCommands, getCategoryEmoji } = require('../../core/help-helper');
+const { scanCommands, getCategoryEmoji, getCategoryAnsi } = require('../../core/help-helper');
 
 let _pkg;
 function getPkg() {
@@ -26,43 +26,21 @@ function getPkg() {
 const CMDS_PER_PAGE = 8;
 const CATS_PER_PAGE = 10;
 
-const CATEGORY_ANSI = {
-  'Owner':         33,
-  'Moderation':    31,
-  'Modération':    31,
-  'Information':   36,
-  'Info':          36,
-  'Utility':       32,
-  'Utile':         32,
-  'Configuration': 34,
-  'Config':        34,
-  'Protection':    35,
-  'Fun':           35,
-  'Stats':         37,
-  'Statistique':   37,
-  'Statistiques':  37,
-  'Ticket':        36,
-  'Game':          32,
-  'Games':         32,
-  'Giveaway':      33,
-  'Greeting':      33,
-  'Level':         34,
-  'Niveau':        34,
-  'Niveaux':       34,
-  'Economy':       32,
-  'Économie':      32,
-  'Custom':        35,
-  'Role':          33,
-  'Roles':         33,
-  'Rôle':          33,
-  'Invitation':    36,
-  'Logs':          37,
-  'Welcomer':      33,
-  'Automod':       31,
-};
+// ─── Guard unicité customIds ──────────────────────────────────────────────────
 
-function getAnsiColor(cat) {
-  return CATEGORY_ANSI[cat] ?? 37;
+function validateUniqueCustomIds(components) {
+  const seen = new Set();
+  for (const row of components) {
+    const rowComponents = row.components ?? [];
+    for (const c of rowComponents) {
+      const id = c.data?.custom_id ?? c.customId;
+      if (!id) continue;
+      if (seen.has(id)) {
+        throw new Error(`[help-panel] customId dupliqué détecté : "${id}"`);
+      }
+      seen.add(id);
+    }
+  }
 }
 
 // ─── ÉCRAN 1 — Accueil EmbedBuilder ANSI 2 colonnes ──────────────────────────
@@ -91,34 +69,33 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
   const pageCats  = catNames.slice((page - 1) * CATS_PER_PAGE, page * CATS_PER_PAGE);
   const activeCat = pageCats[0] || catNames[0];
 
-  const A = '';
+  const E = '';
 
-  // ── Colonne gauche : catégories en ANSI ───────────────────────────────────
-  const catsLines = pageCats.map(cat => `${A}[${getAnsiColor(cat)}m${cat}${A}[0m`);
+  // Colonne gauche : catégories ANSI
+  const catsLines = pageCats.map(cat => `${E}[${getCategoryAnsi(cat)}m${cat}${E}[0m`);
   if (catNames.length > CATS_PER_PAGE) {
-    catsLines.push(`${A}[90m+${catNames.length - CATS_PER_PAGE} catégories${A}[0m`);
+    catsLines.push(`${E}[90m+${catNames.length - CATS_PER_PAGE} catégories${E}[0m`);
   }
   const categoriesCol = '```ansi\n' + catsLines.join('\n') + '\n```';
 
-  // ── Colonne droite : syntaxes ANSI format Samy ────────────────────────────
+  // Colonne droite : syntaxes ANSI
   const syntaxesCol =
     '```ansi\n' +
-    `${A}[33m╭➤${A}[0m ${A}[1m${botName}${A}[0m\n` +
-    `${A}[33m┊${A}[0m - ;help ${A}[31m<commande>${A}[0m\n` +
-    `${A}[33m┊${A}[0m ${A}[31m<>${A}[0m・Obligatoire\n` +
-    `${A}[33m┊${A}[0m ${A}[32m[]${A}[0m・Optionnel\n` +
-    `${A}[33m┊${A}[0m ${A}[36m()${A}[0m・Spécification\n` +
-    `${A}[33m┊${A}[0m ${A}[35m/ ${A}[0m・Sépare syntaxes\n` +
+    `${E}[33m╭➤${E}[0m ${E}[1m${botName}${E}[0m\n` +
+    `${E}[33m┊${E}[0m - ;help ${E}[31m<commande>${E}[0m\n` +
+    `${E}[33m┊${E}[0m ${E}[31m<>${E}[0m・Obligatoire\n` +
+    `${E}[33m┊${E}[0m ${E}[32m[]${E}[0m・Optionnel\n` +
+    `${E}[33m┊${E}[0m ${E}[36m()${E}[0m・Spécification\n` +
+    `${E}[33m┊${E}[0m ${E}[35m/ ${E}[0m・Sépare syntaxes\n` +
     '```';
 
-  // ── Stats (inline:false — sous les 2 colonnes) ────────────────────────────
+  // Stats
   const statsBlock =
     '```\n' +
     `Nombre de commandes: ${totalCmds}\n` +
     `Commandes custom: ${customCnt}\n` +
     '```';
 
-  // ── Embed ─────────────────────────────────────────────────────────────────
   const embed = new EmbedBuilder()
     .setColor(COLORS.accent)
     .setTitle('Information')
@@ -132,10 +109,10 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
 
   if (botAvatarURL) embed.setThumbnail(botAvatarURL);
 
-  // ── Dropdown ──────────────────────────────────────────────────────────────
+  // Dropdown catégories
   const dropdown = new ActionRowBuilder().addComponents(
     new StringSelectMenuBuilder()
-      .setCustomId('help:category')
+      .setCustomId('h:cat')
       .setPlaceholder('📂 Catégories')
       .addOptions(
         catNames.slice(0, 25).map(cat => ({
@@ -147,38 +124,37 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
       ),
   );
 
-  const components = [dropdown];
-
-  // ── Pagination — toujours visible, grisé si 1 page ──────────────────────
-  components.push(
-    new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId('help:nav:home:first')
-        .setEmoji('⏮')
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(page === 1),
-      new ButtonBuilder()
-        .setCustomId(`help:nav:home:prev:${page}`)
-        .setEmoji('◀')
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(page === 1),
-      new ButtonBuilder()
-        .setCustomId(`help:nav:home:next:${page}`)
-        .setEmoji('▶')
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(page === totalPages),
-      new ButtonBuilder()
-        .setCustomId('help:nav:home:last')
-        .setEmoji('⏭')
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(page === totalPages),
-    ),
+  // Boutons navigation — toujours présents, désactivés aux limites
+  const navRow = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId('h:hf')
+      .setEmoji('⏮')
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(page === 1),
+    new ButtonBuilder()
+      .setCustomId(`h:hp:${page}`)
+      .setEmoji('◀')
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(page === 1),
+    new ButtonBuilder()
+      .setCustomId(`h:hn:${page}`)
+      .setEmoji('▶')
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(page === totalPages),
+    new ButtonBuilder()
+      .setCustomId('h:hl')
+      .setEmoji('⏭')
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(page === totalPages),
   );
+
+  const components = [dropdown, navRow];
+  validateUniqueCustomIds(components);
 
   return { embeds: [embed], components };
 }
 
-// ─── ÉCRAN 2 — Détails catégorie (Components V2) ──────────────────────────────
+// ─── ÉCRAN 2 — Détail catégorie (Components V2) ───────────────────────────────
 
 function renderHelpCategory(category = null, page = 1) {
   const categories = scanCommands();
@@ -202,7 +178,7 @@ function renderHelpCategory(category = null, page = 1) {
 
   const slice = commands.slice((page - 1) * CMDS_PER_PAGE, page * CMDS_PER_PAGE);
 
-  // ── Titre ─────────────────────────────────────────────────────────────────
+  // En-tête
   container.addTextDisplayComponents(
     new TextDisplayBuilder().setContent('# 📚 Aide Soulbot'),
   );
@@ -215,15 +191,14 @@ function renderHelpCategory(category = null, page = 1) {
     new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
   );
 
-  // ── Dropdown catégories ───────────────────────────────────────────────────
+  // Dropdown
   container.addTextDisplayComponents(
     new TextDisplayBuilder().setContent('### 📂 Catégorie'),
   );
-
   container.addActionRowComponents(
     new ActionRowBuilder().addComponents(
       new StringSelectMenuBuilder()
-        .setCustomId('help:category')
+        .setCustomId('h:cat')
         .setPlaceholder(`${getCategoryEmoji(category)} ${category}`)
         .addOptions(
           catNames.slice(0, 25).map(cat => ({
@@ -240,7 +215,7 @@ function renderHelpCategory(category = null, page = 1) {
     new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
   );
 
-  // ── Commandes ─────────────────────────────────────────────────────────────
+  // Commandes
   container.addTextDisplayComponents(
     new TextDisplayBuilder().setContent(
       `### ${getCategoryEmoji(category)} ${category}`,
@@ -269,31 +244,34 @@ function renderHelpCategory(category = null, page = 1) {
     new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
   );
 
-  // ── Pagination — toujours visible, grisé si 1 page ──────────────────────
+  // Pagination label
   if (totalPages > 1) {
     container.addTextDisplayComponents(
       new TextDisplayBuilder().setContent(`📄 **Page ${page}/${totalPages}**`),
     );
   }
+
+  // Boutons nav catégorie — toujours présents
+  const catSlug = encodeURIComponent(category).slice(0, 40);
   container.addActionRowComponents(
     new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setCustomId(`help:nav:category:first:${category}`)
+        .setCustomId(`h:cf:${catSlug}`)
         .setEmoji('⏮')
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(page === 1),
       new ButtonBuilder()
-        .setCustomId(`help:nav:category:prev:${category}:${page}`)
+        .setCustomId(`h:cp:${catSlug}:${page}`)
         .setEmoji('◀')
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(page === 1),
       new ButtonBuilder()
-        .setCustomId(`help:nav:category:next:${category}:${page}`)
+        .setCustomId(`h:cn:${catSlug}:${page}`)
         .setEmoji('▶')
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(page === totalPages),
       new ButtonBuilder()
-        .setCustomId(`help:nav:category:last:${category}`)
+        .setCustomId(`h:cl:${catSlug}`)
         .setEmoji('⏭')
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(page === totalPages),
@@ -303,16 +281,16 @@ function renderHelpCategory(category = null, page = 1) {
     new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
   );
 
-  // ── Bas : Accueil + Rechercher ────────────────────────────────────────────
+  // Bas : accueil + recherche
   container.addActionRowComponents(
     new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setCustomId('help:back_home')
+        .setCustomId('h:back')
         .setLabel('Accueil')
         .setEmoji('🏠')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
-        .setCustomId('help:search')
+        .setCustomId('h:search')
         .setLabel('Rechercher')
         .setEmoji('🔍')
         .setStyle(ButtonStyle.Primary),

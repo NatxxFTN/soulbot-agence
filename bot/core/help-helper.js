@@ -22,20 +22,62 @@ const CATEGORY_EMOJIS = {
   'Fun':           '🎮',
   'Game':          '🎲',
   'Stats':         '📊',
+  'Statistique':   '📊',
+  'Statistiques':  '📊',
   'Invitation':    '📨',
   'Role':          '🏷️',
+  'Rôle':          '🏷️',
   'Configuration': '⚙️',
+  'Config':        '⚙️',
   'Giveaway':      '🎁',
+  'Automod':       '🤖',
+  'Welcomer':      '👋',
+  'Logs':          '📋',
+};
+
+const CATEGORY_ANSI = {
+  'Owner':         33,
+  'Moderation':    31,
+  'Modération':    31,
+  'Information':   36,
+  'Info':          36,
+  'Utility':       32,
+  'Utile':         32,
+  'Configuration': 34,
+  'Config':        34,
+  'Protection':    35,
+  'Fun':           35,
+  'Stats':         37,
+  'Statistique':   37,
+  'Statistiques':  37,
+  'Ticket':        36,
+  'Game':          32,
+  'Games':         32,
+  'Giveaway':      33,
+  'Greeting':      33,
+  'Welcomer':      33,
+  'Level':         34,
+  'Niveau':        34,
+  'Niveaux':       34,
+  'Economy':       32,
+  'Économie':      32,
+  'Custom':        35,
+  'Role':          33,
+  'Roles':         33,
+  'Rôle':          33,
+  'Invitation':    36,
+  'Logs':          37,
+  'Automod':       31,
 };
 
 function getCategoryEmoji(cat) {
   return CATEGORY_EMOJIS[cat] || '📁';
 }
 
-/**
- * Scan récursif de commands/ groupé par catégorie.
- * Re-require désactivé intentionnellement — on lit depuis le cache pour perf.
- */
+function getCategoryAnsi(cat) {
+  return CATEGORY_ANSI[cat] ?? 37;
+}
+
 function scanCommands() {
   const categories = {};
   if (!fs.existsSync(COMMANDS_DIR)) return categories;
@@ -74,7 +116,6 @@ function scanCommands() {
   return categories;
 }
 
-/** Cherche une commande par nom ou alias dans toutes les catégories. */
 function findCommand(name) {
   const lc = name.toLowerCase();
   const cats = scanCommands();
@@ -85,4 +126,4 @@ function findCommand(name) {
   return null;
 }
 
-module.exports = { scanCommands, findCommand, getCategoryEmoji };
+module.exports = { scanCommands, findCommand, getCategoryEmoji, getCategoryAnsi };

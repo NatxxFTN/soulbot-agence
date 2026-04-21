@@ -14,66 +14,28 @@ const CATS_PER_PAGE = 10;
 const CMDS_PER_PAGE = 8;
 
 async function handleHelpInteraction(interaction) {
-  const customId    = interaction.customId;
+  const id           = interaction.customId;
   const botAvatarURL = interaction.client.user.displayAvatarURL({ size: 256, extension: 'png' });
 
   try {
-    // ── Dropdown sélection catégorie ──────────────────────────────────────────
-    if (customId === 'help:category') {
+
+    // ── h:cat — Dropdown sélection catégorie ─────────────────────────────────
+    if (id === 'h:cat') {
       return interaction.update(renderHelpCategory(interaction.values[0], 1));
     }
 
-    // ── Navigation : help:nav:<screen>:<action>[:<args>] ─────────────────────
-    if (customId.startsWith('help:nav:')) {
-      const parts  = customId.split(':');
-      const screen = parts[2]; // 'home' | 'category'
-      const action = parts[3]; // 'first' | 'prev' | 'next' | 'last'
-
-      if (screen === 'home') {
-        let targetPage;
-        if (action === 'first') {
-          targetPage = 1;
-        } else if (action === 'last') {
-          const names = Object.keys(scanCommands());
-          targetPage  = Math.max(1, Math.ceil(names.length / CATS_PER_PAGE));
-        } else if (action === 'prev') {
-          targetPage = Math.max(1, (parseInt(parts[4], 10) || 1) - 1);
-        } else {
-          targetPage = (parseInt(parts[4], 10) || 1) + 1;
-        }
-        return interaction.update(renderHelpHome(targetPage, botAvatarURL));
-      }
-
-      if (screen === 'category') {
-        const category = parts[4];
-        let targetPage;
-        if (action === 'first') {
-          targetPage = 1;
-        } else if (action === 'last') {
-          const cats = scanCommands();
-          const cmds = cats[category] || [];
-          targetPage  = Math.max(1, Math.ceil(cmds.length / CMDS_PER_PAGE));
-        } else if (action === 'prev') {
-          targetPage = Math.max(1, (parseInt(parts[5], 10) || 1) - 1);
-        } else {
-          targetPage = (parseInt(parts[5], 10) || 1) + 1;
-        }
-        return interaction.update(renderHelpCategory(category, targetPage));
-      }
-    }
-
-    // ── Retour accueil depuis catégorie V2 (V2→embed impossible via update) ──
-    if (customId === 'help:back_home') {
+    // ── h:back — Retour accueil depuis V2 (transition V2→embed) ──────────────
+    if (id === 'h:back') {
       await interaction.deferUpdate();
       await interaction.channel.send(renderHelpHome(1, botAvatarURL));
       await interaction.message.delete().catch(() => {});
       return;
     }
 
-    // ── Bouton Rechercher → ouvre modal ──────────────────────────────────────
-    if (customId === 'help:search') {
+    // ── h:search — Ouvre modal recherche ─────────────────────────────────────
+    if (id === 'h:search') {
       const modal = new ModalBuilder()
-        .setCustomId('help:search_submit')
+        .setCustomId('h:sq')
         .setTitle('Rechercher une commande');
       modal.addComponents(
         new ActionRowBuilder().addComponents(
@@ -89,8 +51,8 @@ async function handleHelpInteraction(interaction) {
       return interaction.showModal(modal);
     }
 
-    // ── Soumission modal recherche ────────────────────────────────────────────
-    if (customId === 'help:search_submit') {
+    // ── h:sq — Soumission modal recherche ────────────────────────────────────
+    if (id === 'h:sq') {
       const raw = interaction.fields.getTextInputValue('query').trim().toLowerCase().replace(/^;/, '');
       const cmd = findCommand(raw);
 
@@ -115,6 +77,51 @@ async function handleHelpInteraction(interaction) {
       });
     }
 
+    // ── Navigation accueil : h:hf · h:hp:<p> · h:hn:<p> · h:hl ─────────────
+    if (id === 'h:hf') {
+      return interaction.update(renderHelpHome(1, botAvatarURL));
+    }
+    if (id === 'h:hl') {
+      const names = Object.keys(scanCommands());
+      const last  = Math.max(1, Math.ceil(names.length / CATS_PER_PAGE));
+      return interaction.update(renderHelpHome(last, botAvatarURL));
+    }
+    if (id.startsWith('h:hp:')) {
+      const cur  = parseInt(id.split(':')[2], 10) || 1;
+      return interaction.update(renderHelpHome(Math.max(1, cur - 1), botAvatarURL));
+    }
+    if (id.startsWith('h:hn:')) {
+      const cur  = parseInt(id.split(':')[2], 10) || 1;
+      return interaction.update(renderHelpHome(cur + 1, botAvatarURL));
+    }
+
+    // ── Navigation catégorie : h:cf · h:cp · h:cn · h:cl ───────────────────
+    if (id.startsWith('h:cf:')) {
+      const cat = decodeURIComponent(id.slice(5));
+      return interaction.update(renderHelpCategory(cat, 1));
+    }
+    if (id.startsWith('h:cl:')) {
+      const cat  = decodeURIComponent(id.slice(5));
+      const cats = scanCommands();
+      const cmds = cats[cat] || [];
+      const last = Math.max(1, Math.ceil(cmds.length / CMDS_PER_PAGE));
+      return interaction.update(renderHelpCategory(cat, last));
+    }
+    if (id.startsWith('h:cp:')) {
+      // h:cp:<cat>:<page>
+      const parts = id.split(':');
+      const cat   = decodeURIComponent(parts[2]);
+      const cur   = parseInt(parts[3], 10) || 1;
+      return interaction.update(renderHelpCategory(cat, Math.max(1, cur - 1)));
+    }
+    if (id.startsWith('h:cn:')) {
+      // h:cn:<cat>:<page>
+      const parts = id.split(':');
+      const cat   = decodeURIComponent(parts[2]);
+      const cur   = parseInt(parts[3], 10) || 1;
+      return interaction.update(renderHelpCategory(cat, cur + 1));
+    }
+
   } catch (err) {
     console.error('[help-handler]', err);
     if (!interaction.replied && !interaction.deferred) {
@@ -127,9 +134,9 @@ async function handleHelpInteraction(interaction) {
 }
 
 function register(client) {
-  client.buttonHandlers.set('help', (i) => handleHelpInteraction(i));
-  client.selectHandlers.set('help', (i) => handleHelpInteraction(i));
-  client.modalHandlers .set('help', (i) => handleHelpInteraction(i));
+  client.buttonHandlers.set('h', (i) => handleHelpInteraction(i));
+  client.selectHandlers.set('h', (i) => handleHelpInteraction(i));
+  client.modalHandlers .set('h', (i) => handleHelpInteraction(i));
 }
 
 module.exports = { handleHelpInteraction, register };
