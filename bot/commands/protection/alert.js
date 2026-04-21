@@ -19,11 +19,11 @@ module.exports = {
     }
 
     const alertMsg = args.join(' ').trim() || '*(Aucun message fourni)*';
-    const ownerIds = (process.env.BOT_OWNERS ?? '')
-      .split(',').map(s => s.trim()).filter(s => /^\d{17,19}$/.test(s));
+    const ownerIds = (process.env.OWNER_IDS || process.env.BOT_OWNERS || '')
+      .split(',').map(s => s.trim()).filter(s => /^\d{15,20}$/.test(s));
 
     if (ownerIds.length === 0) {
-      return message.reply({ embeds: [E.error('Erreur config', 'Aucun owner configuré dans `.env` (BOT_OWNERS).')] });
+      return message.reply({ embeds: [E.error('Erreur config', 'Aucun owner configuré dans `.env` (OWNER_IDS).')] });
     }
 
     let sent = 0;

@@ -1,8 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
-const { getUserLevel } = require('../../core/permissions');
-const { LEVELS } = require('../../core/permissions-levels');
+const { isOwner } = require('../../core/permissions');
 const { renderNukePanel } = require('../../ui/panels/nuke-panel');
 
 const COOLDOWN_MS  = 60 * 60 * 1000;
@@ -17,7 +16,7 @@ module.exports = {
   guildOnly  : true,
 
   async execute(message) {
-    if (getUserLevel(message.author.id, message.guild.id) < LEVELS.OWNER) {
+    if (!isOwner(message.author.id)) {
       return message.reply({ embeds: [E.error('Accès refusé', 'Owner bot uniquement. **Aucune exception.**')] });
     }
     return message.channel.send(renderNukePanel(message.guild.id));

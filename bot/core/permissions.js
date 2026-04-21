@@ -32,11 +32,21 @@ const STMT_DELETE = db.prepare('DELETE FROM user_permissions WHERE guild_id = ? 
 const STMT_LIST   = db.prepare('SELECT * FROM user_permissions WHERE guild_id = ? ORDER BY permission_level DESC');
 const STMT_BL     = db.prepare('SELECT 1 FROM bot_blacklist WHERE user_id = ?');
 
+// Lit OWNER_IDS en priorité, puis BOT_OWNERS en fallback (compat historique)
 function _ownerIds() {
-  return (process.env.BOT_OWNERS ?? '')
+  const raw = process.env.OWNER_IDS || process.env.BOT_OWNERS || '';
+  return raw
     .split(',')
     .map(s => s.trim())
-    .filter(s => /^\d{17,19}$/.test(s));
+    .filter(s => /^\d{15,20}$/.test(s));
+}
+
+/**
+ * Vérifie si un userId est owner du bot (via OWNER_IDS ou BOT_OWNERS dans .env).
+ */
+function isOwner(userId) {
+  if (!userId) return false;
+  return _ownerIds().includes(String(userId));
 }
 
 /**
@@ -46,7 +56,7 @@ function _ownerIds() {
  * @param {string|null} guildId  null = DM, skip guild check
  */
 function getUserLevel(userId, guildId) {
-  if (_ownerIds().includes(userId)) return LEVELS.OWNER;
+  if (isOwner(userId)) return LEVELS.OWNER;
   if (!guildId) return LEVELS.USER;
 
   const row = STMT_GET.get(guildId, userId);
@@ -82,6 +92,7 @@ function listGuildLevels(guildId) {
 }
 
 module.exports = {
+  isOwner,
   getUserLevel,
   isGloballyBlacklisted,
   setUserLevel,

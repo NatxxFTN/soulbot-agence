@@ -4,14 +4,13 @@ const { ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle, Messag
 const { renderNukePanel, renderNukeHistoryPanel } = require('../panels/nuke-panel');
 const { getNukeConfig, updateNukeConfig, checkCooldown, markNukeExecuted, logNuke } = require('../../core/nuke-helper');
 const { createBackup } = require('../../core/backup-helper');
-const { getUserLevel } = require('../../core/permissions');
-const { LEVELS } = require('../../core/permissions-levels');
+const { isOwner } = require('../../core/permissions');
 const { EMOJIS } = require('../theme');
 
 const MODE_LABELS = { classique: 'Classique', rapide: 'Rapide', urgence: 'Urgence' };
 
 async function handleNukeInteraction(interaction) {
-  if (getUserLevel(interaction.user.id, interaction.guild.id) < LEVELS.OWNER) {
+  if (!isOwner(interaction.user.id)) {
     return interaction.reply({ content: `${EMOJIS.cross()} Owner bot uniquement.`, flags: MessageFlags.Ephemeral });
   }
 
@@ -135,7 +134,7 @@ async function executeNuke(interaction, mode) {
 
     // DM owner
     try {
-      const ownerIds = (process.env.BOT_OWNERS ?? '').split(',').map(s => s.trim()).filter(Boolean);
+      const ownerIds = (process.env.OWNER_IDS || process.env.BOT_OWNERS || '').split(',').map(s => s.trim()).filter(s => /^\d{15,20}$/.test(s));
       for (const ownerId of ownerIds) {
         const owner = await interaction.client.users.fetch(ownerId).catch(() => null);
         if (owner) {
