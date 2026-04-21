@@ -579,7 +579,7 @@ db.exec(`
     embed_title TEXT,
     embed_title_url TEXT,
     embed_description TEXT,
-    embed_color TEXT DEFAULT '#F39C12',
+    embed_color TEXT DEFAULT '#FF0000',
     embed_thumbnail_url TEXT,
     embed_thumbnail_source TEXT DEFAULT 'custom',
     embed_image_url TEXT,

@@ -245,7 +245,7 @@ async function handleWelcomeInteraction(interaction) {
       const cfg = getWelcomeConfig(guildId) || {};
       return interaction.showModal(
         modal('welcome:embed_color_submit', 'Couleur',
-          shortInput('value', 'Hex, nom (orange/red…) ou "random"', '#F39C12', cfg.embed_color || '#F39C12'),
+          shortInput('value', 'Hex, nom (orange/red…) ou "random"', '#FF0000', cfg.embed_color || '#FF0000'),
         ),
       );
     }

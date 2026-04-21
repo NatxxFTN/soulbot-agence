@@ -45,7 +45,7 @@ module.exports = {
         content: winners.length ? `<@${winners[0]}>` : '',
         embeds: [
           new EmbedBuilder()
-            .setColor(0xF39C12)
+            .setColor(0xFF0000)
             .setTitle('🔄 Reroll !')
             .setDescription(`**Nouveau gagnant :** ${mention}\n**Gain :** ${gw.prize}`)
             .setTimestamp(),

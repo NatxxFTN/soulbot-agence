@@ -5,7 +5,7 @@ const { db } = require('../database');
 // ─── Presets couleurs ────────────────────────────────────────────────────────
 
 const COLOR_PRESETS = {
-  'orange' : '#F39C12',
+  'orange' : '#FF0000',
   'red'    : '#E74C3C',
   'green'  : '#27AE60',
   'blue'   : '#3498DB',
@@ -24,7 +24,7 @@ const CONFIG_PRESETS = {
     mode              : 'embed',
     embed_title       : '👋 Bienvenue {user} !',
     embed_description : 'Salut {mention}, tu es le **{membercount_ordinal}** membre de **{server}** !\n\nN\'hésite pas à te présenter.',
-    embed_color       : '#F39C12',
+    embed_color       : '#FF0000',
     embed_thumbnail_source: 'user_avatar',
     embed_footer_text : 'Membre depuis {joined_at}',
     embed_timestamp   : 1,
@@ -165,11 +165,11 @@ function validateImageUrl(url) {
 }
 
 function validateColor(color) {
-  if (!color) return { valid: true, color: '#F39C12' };
+  if (!color) return { valid: true, color: '#FF0000' };
   if (color === 'random') return { valid: true, color: '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0') };
   if (COLOR_PRESETS[color]) return { valid: true, color: COLOR_PRESETS[color] };
   const hex = color.trim().startsWith('#') ? color.trim() : `#${color.trim()}`;
-  if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return { valid: false, error: 'Format hex invalide (ex: #F39C12)' };
+  if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return { valid: false, error: 'Format hex invalide (ex: #FF0000)' };
   return { valid: true, color: hex };
 }
 
@@ -262,7 +262,7 @@ function buildWelcomeMessage(cfg, member) {
 
   if (cfg.mode === 'embed' || cfg.mode === 'both' || cfg.mode === 'image') {
     const embed = new EmbedBuilder();
-    const color = validateColor(cfg.embed_color).color || '#F39C12';
+    const color = validateColor(cfg.embed_color).color || '#FF0000';
     embed.setColor(color);
 
     if (cfg.embed_title) {

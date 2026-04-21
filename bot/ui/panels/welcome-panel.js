@@ -248,7 +248,7 @@ function renderEmbedPanel(guildId) {
   container.addSectionComponents(
     new SectionBuilder()
       .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`**Couleur**\n\`${cfg.embed_color || '#F39C12'}\``),
+        new TextDisplayBuilder().setContent(`**Couleur**\n\`${cfg.embed_color || '#FF0000'}\``),
       )
       .setButtonAccessory(
         new ButtonBuilder().setCustomId('welcome:embed_color_edit').setLabel('Modifier').setStyle(ButtonStyle.Secondary),
@@ -603,7 +603,7 @@ function renderPreviewPanel(guildId) {
       `**Salon :** ${ch1}\n` +
       `**Mode :** \`${mode}\`\n` +
       (hasText  ? `**Texte :** ${cfg.text_content ? '✓ Défini' : '✗ Manquant'}\n` : '') +
-      (hasEmbed ? `**Embed :** ${cfg.embed_title ? '✓ Titre défini' : '~ Sans titre'} · Couleur \`${cfg.embed_color || '#F39C12'}\`\n` : '') +
+      (hasEmbed ? `**Embed :** ${cfg.embed_title ? '✓ Titre défini' : '~ Sans titre'} · Couleur \`${cfg.embed_color || '#FF0000'}\`\n` : '') +
       `**Champs :** ${fields.length}/25\n` +
       `**Rôles auto :** ${rolesLine}\n` +
       `**DM :** ${cfg.dm_enabled ? '🟢 Activé' : '🔴 Désactivé'}\n` +
