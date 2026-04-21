@@ -18,8 +18,9 @@ module.exports = {
     console.log(`[Bot] ${client.guilds.cache.size} serveur(s) | ${client.users.cache.size} utilisateur(s)`);
 
     // Présence
+    const { version } = require('../../package.json');
     client.user.setPresence({
-      activities : [{ name: `${client.guilds.cache.size} serveur(s) | ;help`, type: ActivityType.Watching }],
+      activities : [{ name: `Version ${version}`, type: ActivityType.Custom }],
       status     : 'online',
     });
 

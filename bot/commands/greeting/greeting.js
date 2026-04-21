@@ -6,7 +6,7 @@ const E = require('../../utils/embeds');
 
 module.exports = {
   name       : 'greeting',
-  aliases    : ['greet', 'welcomeconfig'],
+  aliases    : ['greet'],
   description: 'Ouvre le panel de configuration des arrivées/départs.',
   usage      : ';greeting',
   cooldown   : 3,
