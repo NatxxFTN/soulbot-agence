@@ -17,7 +17,7 @@
 
 require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
 
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, PermissionsBitField } = require('discord.js');
 const fs   = require('fs');
 const path = require('path');
 const { setEmojiId, loadCache } = require('../core/emoji-cache');
@@ -63,8 +63,74 @@ async function main() {
     await client.login(token);
     console.log(`🤖 Connecté : ${client.user.tag}`);
 
-    const guild = await client.guilds.fetch(guildId);
-    console.log(`🏠 Serveur  : ${guild.name} (tier ${guild.premiumTier})\n`);
+    // Nettoyer l'ID (trim + retirer guillemets éventuels)
+    const cleanGuildId = guildId.trim().replace(/['"]/g, '');
+
+    if (!/^\d{17,20}$/.test(cleanGuildId)) {
+      console.error('═══════════════════════════════════════════');
+      console.error('❌ EMOJI_GUILD_ID INVALIDE');
+      console.error('═══════════════════════════════════════════');
+      console.error(`   Valeur brute : "${guildId}"`);
+      console.error(`   Nettoyé      : "${cleanGuildId}"`);
+      console.error('');
+      console.error('   Un ID Discord valide = 17-20 chiffres');
+      console.error('   Exemple : 1234567890123456789');
+      console.error('');
+      console.error('   💡 Pour obtenir l\'ID :');
+      console.error('      1. Discord → Paramètres → Avancés → Mode développeur');
+      console.error('      2. Clic droit sur le SERVEUR (icône en haut à gauche)');
+      console.error('      3. "Copier l\'identifiant du serveur"');
+      console.error('      4. .env : EMOJI_GUILD_ID=<id>');
+      console.error('═══════════════════════════════════════════');
+      client.destroy();
+      process.exit(1);
+    }
+
+    let guild;
+    try {
+      guild = await client.guilds.fetch(cleanGuildId);
+    } catch (err) {
+      console.error('═══════════════════════════════════════════');
+      console.error('❌ SERVEUR INTROUVABLE');
+      console.error('═══════════════════════════════════════════');
+      console.error(`   ID cherché : ${cleanGuildId}`);
+      console.error(`   Erreur     : ${err.message}`);
+      console.error('');
+      console.error('   Causes possibles :');
+      console.error('   1. L\'ID est incorrect');
+      console.error('   2. Le bot n\'est PAS dans ce serveur');
+      console.error('');
+      console.error('   💡 Lance le diagnostic :');
+      console.error('      npm run emojis:check');
+      console.error('');
+      console.error('   💡 Pour inviter le bot dans le serveur :');
+      console.error(`      https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=1073741824&scope=bot`);
+      console.error('═══════════════════════════════════════════');
+      client.destroy();
+      process.exit(1);
+    }
+
+    const me = await guild.members.fetchMe();
+    const hasPerms = me.permissions.has(PermissionsBitField.Flags.ManageGuildExpressions)
+                  || me.permissions.has(PermissionsBitField.Flags.ManageEmojisAndStickers);
+    if (!hasPerms) {
+      console.error('═══════════════════════════════════════════');
+      console.error('❌ PERMISSION MANQUANTE');
+      console.error('═══════════════════════════════════════════');
+      console.error(`   Le bot n\'a pas "Gérer les expressions" dans :`);
+      console.error(`   ${guild.name}`);
+      console.error('');
+      console.error('   💡 Solution :');
+      console.error('      1. Paramètres serveur → Rôles');
+      console.error(`      2. Rôle du bot (${client.user.username})`);
+      console.error('      3. Active "Gérer les expressions"');
+      console.error('═══════════════════════════════════════════');
+      client.destroy();
+      process.exit(1);
+    }
+
+    console.log(`🏠 Serveur  : ${guild.name} (tier ${guild.premiumTier})`);
+    console.log(`📊 Emojis actuels : ${guild.emojis.cache.size}\n`);
 
     // Emojis déjà en cache local
     const existing = loadCache();
