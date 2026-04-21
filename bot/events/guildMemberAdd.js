@@ -53,12 +53,44 @@ module.exports = {
       }
     } catch { /* non bloquant */ }
 
-    // ── Message de bienvenue ─────────────────────────────────────────────────
+    // ── Greeting (système ancien) ────────────────────────────────────────────
     const { getConfig, formatMessage } = require('../core/greeting-helper');
-    const cfg = getConfig(guildId);
-    if (cfg?.join_enabled && cfg.join_channel_id) {
-      const ch = member.guild.channels.cache.get(cfg.join_channel_id);
-      if (ch) await ch.send(formatMessage(cfg.join_message, member)).catch(() => {});
+    const greetCfg = getConfig(guildId);
+    if (greetCfg?.join_enabled && greetCfg.join_channel_id) {
+      const ch = member.guild.channels.cache.get(greetCfg.join_channel_id);
+      if (ch) await ch.send(formatMessage(greetCfg.join_message, member)).catch(() => {});
+    }
+
+    // ── Welcomer premium ─────────────────────────────────────────────────────
+    try {
+      const { getWelcomeConfig, buildWelcomeMessage, replaceVariables } = require('../core/welcome-helper');
+      const wCfg = getWelcomeConfig(guildId);
+      if (!wCfg || !wCfg.enabled || !wCfg.channel_id) return;
+
+      const channel = member.guild.channels.cache.get(wCfg.channel_id);
+      if (!channel) return;
+
+      const payload = buildWelcomeMessage(wCfg, member);
+      if (wCfg.mention_user) {
+        payload.content = (`<@${member.id}> ` + (payload.content || '')).trim();
+      }
+
+      const sent = await channel.send(payload);
+
+      if (wCfg.auto_delete_seconds > 0) {
+        setTimeout(() => sent.delete().catch(() => {}), wCfg.auto_delete_seconds * 1000);
+      }
+
+      if (wCfg.auto_role_id) {
+        await member.roles.add(wCfg.auto_role_id).catch(e => console.error('[welcomer] rôle auto:', e.message));
+      }
+
+      if (wCfg.dm_enabled && wCfg.dm_content) {
+        const dmText = replaceVariables(wCfg.dm_content, member);
+        await member.send({ content: dmText }).catch(() => {});
+      }
+    } catch (err) {
+      console.error('[welcomer]', err);
     }
   },
 };

@@ -19,6 +19,7 @@ const { register: registerMassbanHandlers }   = require('./ui/handlers/massban-h
 const { register: registerHelpHandlers }      = require('./ui/handlers/help-handler');
 const { register: registerModconfigHandlers } = require('./ui/handlers/modconfig-handler');
 const { register: registerWarnconfigHandlers }= require('./ui/handlers/warnconfig-handler');
+const { register: registerWelcomeHandlers }   = require('./ui/handlers/welcome-handler');
 const { loadEvents }    = require('./handlers/EventHandler');
 const { db }            = require('./database');
 const logger            = require('./utils/logger');
@@ -69,6 +70,7 @@ registerMassbanHandlers(client);
 registerHelpHandlers(client);
 registerModconfigHandlers(client);
 registerWarnconfigHandlers(client);
+registerWelcomeHandlers(client);
 loadEvents(client);
 
 // ─── Events dashboard logging ────────────────────────────────────────────────
