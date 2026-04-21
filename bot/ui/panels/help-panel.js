@@ -67,7 +67,7 @@ function getAnsiColor(cat) {
 
 // ─── ÉCRAN 1 — Accueil EmbedBuilder ANSI style Samy/Mya ──────────────────────
 
-function renderHelpHome(page = 1) {
+function renderHelpHome(page = 1, botAvatarURL = null) {
   const categories = scanCommands();
   const catNames   = Object.keys(categories).sort();
 
@@ -128,6 +128,8 @@ function renderHelpHome(page = 1) {
       { name: '​',     value: statsField,   inline: false },
     )
     .setFooter({ text: `Page ${page}/${totalPages}  ·  ${getCategoryEmoji(activeCat)} ${activeCat}` });
+
+  if (botAvatarURL) embed.setThumbnail(botAvatarURL);
 
   // ── Dropdown ──────────────────────────────────────────────────────────────
   const dropdown = new ActionRowBuilder().addComponents(
@@ -326,8 +328,8 @@ function renderHelpCategory(category = null, page = 1) {
 /**
  * Route vers l'écran d'accueil (category = null) ou les détails d'une catégorie.
  */
-function renderHelpPanel(category = null, page = 1) {
-  if (!category) return renderHelpHome(page);
+function renderHelpPanel(category = null, page = 1, botAvatarURL = null) {
+  if (!category) return renderHelpHome(page, botAvatarURL);
   return renderHelpCategory(category, page);
 }
 

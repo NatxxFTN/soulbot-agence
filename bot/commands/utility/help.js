@@ -33,9 +33,10 @@ module.exports = {
       });
     }
 
-    // Panel dynamique Components V2
+    // Panel dynamique — accueil avec avatar du bot
     try {
-      return message.reply(renderHelpPanel());
+      const botAvatarURL = message.client.user.displayAvatarURL({ size: 256, extension: 'png' });
+      return message.reply(renderHelpPanel(null, 1, botAvatarURL));
     } catch (err) {
       console.error('[help]', err);
       return message.reply({ content: `✗ Erreur : ${err.message}` });

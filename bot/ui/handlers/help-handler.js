@@ -13,7 +13,8 @@ async function handleHelpInteraction(interaction) {
     // ── Bouton Accueil / pagination accueil : help:home:<page> ──────────────
     if (parts[1] === 'home') {
       const page = parseInt(parts[2], 10) || 1;
-      return interaction.update(renderHelpHome(page));
+      const botAvatarURL = interaction.client.user.displayAvatarURL({ size: 256, extension: 'png' });
+      return interaction.update(renderHelpHome(page, botAvatarURL));
     }
 
     // ── Dropdown sélection catégorie ─────────────────────────────────────────
