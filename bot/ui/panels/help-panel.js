@@ -26,7 +26,46 @@ function getPkg() {
 const CMDS_PER_PAGE = 8;
 const CATS_PER_PAGE = 10;
 
-// ─── ÉCRAN 1 — Accueil EmbedBuilder 2 colonnes style Samy/Mya ────────────────
+// Mapping catégorie → code ANSI couleur
+const CATEGORY_ANSI = {
+  'Owner':         33,
+  'Moderation':    31,
+  'Modération':    31,
+  'Information':   36,
+  'Info':          36,
+  'Utility':       32,
+  'Utile':         32,
+  'Configuration': 34,
+  'Config':        34,
+  'Protection':    35,
+  'Fun':           35,
+  'Stats':         37,
+  'Statistique':   37,
+  'Statistiques':  37,
+  'Ticket':        36,
+  'Game':          32,
+  'Games':         32,
+  'Giveaway':      33,
+  'Greeting':      33,
+  'Level':         34,
+  'Niveau':        34,
+  'Niveaux':       34,
+  'Economy':       32,
+  'Économie':      32,
+  'Custom':        35,
+  'Role':          33,
+  'Roles':         33,
+  'Invitation':    36,
+  'Logs':          37,
+  'Welcomer':      33,
+  'Automod':       31,
+};
+
+function getAnsiColor(cat) {
+  return CATEGORY_ANSI[cat] ?? 37;
+}
+
+// ─── ÉCRAN 1 — Accueil EmbedBuilder ANSI style Samy/Mya ──────────────────────
 
 function renderHelpHome(page = 1) {
   const categories = scanCommands();
@@ -42,7 +81,9 @@ function renderHelpHome(page = 1) {
 
   const totalCmds = Object.values(categories).reduce((s, c) => s + c.length, 0);
   const customCnt = (categories['Custom'] || []).length;
-  const version   = getPkg().version || '1.0.0';
+  const pkg       = getPkg();
+  const version   = pkg.version  || '1.0.0';
+  const botName   = pkg.name     || 'soulbot';
 
   const totalPages = Math.max(1, Math.ceil(catNames.length / CATS_PER_PAGE));
   page = Math.max(1, Math.min(page, totalPages));
@@ -50,30 +91,33 @@ function renderHelpHome(page = 1) {
   const pageCats  = catNames.slice((page - 1) * CATS_PER_PAGE, page * CATS_PER_PAGE);
   const activeCat = pageCats[0] || catNames[0];
 
-  // ── Colonne gauche : catégories en bloc diff (vert) ───────────────────────
-  const catsLines = pageCats.map(cat => `+ ${cat}`).join('\n');
-  const extra     = catNames.length > CATS_PER_PAGE
-    ? `\n+ ...+${catNames.length - CATS_PER_PAGE} catégories`
-    : '';
-  const catsField = `\`\`\`diff\n${catsLines}${extra}\n\`\`\``;
+  // ── Colonne gauche : catégories en ANSI ───────────────────────────────────
+  const A = '';
+  const catsLines = pageCats.map(cat => `${A}[${getAnsiColor(cat)}m${cat}${A}[0m`);
+  if (catNames.length > CATS_PER_PAGE) {
+    catsLines.push(`${A}[90m+${catNames.length - CATS_PER_PAGE} catégories${A}[0m`);
+  }
+  const catsField = '```ansi\n' + catsLines.join('\n') + '\n```';
 
-  // ── Colonne droite : syntaxes en bloc arm ─────────────────────────────────
+  // ── Colonne droite : syntaxes ANSI format Samy ────────────────────────────
   const syntaxField =
-    '```arm\n' +
-    '; ;help <commande>\n' +
-    '; <> Obligatoire\n' +
-    '; [] Optionnel\n' +
-    '; () Spécification\n' +
-    '; /  Sépare syntaxes\n' +
+    '```ansi\n' +
+    `${A}[33m╭➤${A}[0m ${A}[1m${botName}${A}[0m\n` +
+    `${A}[33m┊${A}[0m - ;help ${A}[31m<commande>${A}[0m\n` +
+    `${A}[33m┊${A}[0m ${A}[31m<>${A}[0m・Obligatoire\n` +
+    `${A}[33m┊${A}[0m ${A}[32m[]${A}[0m・Optionnel\n` +
+    `${A}[33m┊${A}[0m ${A}[36m()${A}[0m・Spécification\n` +
+    `${A}[33m┊${A}[0m ${A}[35m/ ${A}[0m・Sépare syntaxes\n` +
     '```';
 
-  // ── Ligne stats (inline false — passe sous les 2 colonnes) ───────────────
+  // ── Stats (inline:false — sous les 2 colonnes) ────────────────────────────
   const statsField =
     '```\n' +
     `Nombre de commandes: ${totalCmds}\n` +
-    `Commandes custom   : ${customCnt}\n` +
+    `Commandes custom: ${customCnt}\n` +
     '```';
 
+  // ── Embed ─────────────────────────────────────────────────────────────────
   const embed = new EmbedBuilder()
     .setColor(COLORS.accent)
     .setTitle('Information')
@@ -89,7 +133,7 @@ function renderHelpHome(page = 1) {
   const dropdown = new ActionRowBuilder().addComponents(
     new StringSelectMenuBuilder()
       .setCustomId('help:category')
-      .setPlaceholder('📂 Choisir une catégorie pour voir ses commandes')
+      .setPlaceholder('📂 Catégories')
       .addOptions(
         catNames.slice(0, 25).map(cat => ({
           label      : cat,
