@@ -1,6 +1,7 @@
 'use strict';
 
 const {
+  EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
@@ -25,97 +26,85 @@ function getPkg() {
 const CMDS_PER_PAGE = 8;
 const CATS_PER_PAGE = 10;
 
-// ─── ÉCRAN 1 — Accueil style Mya ─────────────────────────────────────────────
+// ─── ÉCRAN 1 — Accueil EmbedBuilder 2 colonnes style Samy/Mya ────────────────
 
 function renderHelpHome(page = 1) {
   const categories = scanCommands();
   const catNames   = Object.keys(categories).sort();
 
-  const container = new ContainerBuilder().setAccentColor(COLORS.accent);
-
   if (catNames.length === 0) {
-    container.addTextDisplayComponents(
-      new TextDisplayBuilder().setContent('# 📘 Information\n*Aucune commande chargée.*'),
-    );
-    return { components: [container], flags: MessageFlags.IsComponentsV2 };
+    const embed = new EmbedBuilder()
+      .setColor(COLORS.accent)
+      .setTitle('📘 Information')
+      .setDescription('*Aucune commande chargée.*');
+    return { embeds: [embed], components: [] };
   }
 
-  const totalCmds  = Object.values(categories).reduce((s, c) => s + c.length, 0);
-  const customCnt  = (categories['Custom'] || []).length;
-  const version    = getPkg().version || '1.0.0';
+  const totalCmds = Object.values(categories).reduce((s, c) => s + c.length, 0);
+  const customCnt = (categories['Custom'] || []).length;
+  const version   = getPkg().version || '1.0.0';
 
   const totalPages = Math.max(1, Math.ceil(catNames.length / CATS_PER_PAGE));
   page = Math.max(1, Math.min(page, totalPages));
 
-  const pageCats   = catNames.slice((page - 1) * CATS_PER_PAGE, page * CATS_PER_PAGE);
+  const pageCats  = catNames.slice((page - 1) * CATS_PER_PAGE, page * CATS_PER_PAGE);
+  const activeCat = pageCats[0] || catNames[0];
 
-  // ── Titre + version ───────────────────────────────────────────────────────
-  container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent('# 📘 Information'),
-  );
-  container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent(`\`\`\`► Version ${version}\`\`\``),
-  );
-  container.addSeparatorComponents(
-    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
-  );
-
-  // ── 2 colonnes : catégories + syntaxes ───────────────────────────────────
-  const catsBlock = pageCats
-    .map(cat => `${getCategoryEmoji(cat)} ${cat} *(${categories[cat].length})*`)
-    .join('\n');
-
-  const extra = catNames.length > CATS_PER_PAGE
-    ? `\n*+${catNames.length - CATS_PER_PAGE} autres — utilisez les flèches*`
+  // ── Colonne gauche : catégories en bloc diff (vert) ───────────────────────
+  const catsLines = pageCats.map(cat => `+ ${cat}`).join('\n');
+  const extra     = catNames.length > CATS_PER_PAGE
+    ? `\n+ ...+${catNames.length - CATS_PER_PAGE} catégories`
     : '';
+  const catsField = `\`\`\`diff\n${catsLines}${extra}\n\`\`\``;
 
-  container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent(`## 📂 Catégories\n${catsBlock}${extra}`),
+  // ── Colonne droite : syntaxes en bloc arm ─────────────────────────────────
+  const syntaxField =
+    '```arm\n' +
+    '; ;help <commande>\n' +
+    '; <> Obligatoire\n' +
+    '; [] Optionnel\n' +
+    '; () Spécification\n' +
+    '; /  Sépare syntaxes\n' +
+    '```';
+
+  // ── Ligne stats (inline false — passe sous les 2 colonnes) ───────────────
+  const statsField =
+    '```\n' +
+    `Nombre de commandes: ${totalCmds}\n` +
+    `Commandes custom   : ${customCnt}\n` +
+    '```';
+
+  const embed = new EmbedBuilder()
+    .setColor(COLORS.accent)
+    .setTitle('Information')
+    .setDescription('```ini\n► Version ' + version + '\n```')
+    .addFields(
+      { name: 'Catégories', value: catsField,   inline: true  },
+      { name: 'Syntaxes',   value: syntaxField,  inline: true  },
+      { name: '​',     value: statsField,   inline: false },
+    )
+    .setFooter({ text: `Page ${page}/${totalPages}  ·  ${getCategoryEmoji(activeCat)} ${activeCat}` });
+
+  // ── Dropdown ──────────────────────────────────────────────────────────────
+  const dropdown = new ActionRowBuilder().addComponents(
+    new StringSelectMenuBuilder()
+      .setCustomId('help:category')
+      .setPlaceholder('📂 Choisir une catégorie pour voir ses commandes')
+      .addOptions(
+        catNames.slice(0, 25).map(cat => ({
+          label      : cat,
+          value      : cat,
+          description: `${categories[cat].length} commande${categories[cat].length > 1 ? 's' : ''}`,
+          emoji      : getCategoryEmoji(cat),
+        })),
+      ),
   );
 
-  container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent(
-      `## 📖 Syntaxes\n` +
-      `\`\`\`\n` +
-      `;help <cmd>\n` +
-      `<> Obligatoire\n` +
-      `[] Optionnel\n` +
-      `() Spécification\n` +
-      `/  Sépare syntaxes\n` +
-      `\n` +
-      `Total  : ${totalCmds}\n` +
-      `Custom : ${customCnt}\n` +
-      `\`\`\``,
-    ),
-  );
-
-  container.addSeparatorComponents(
-    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
-  );
-
-  // ── Dropdown catégories ───────────────────────────────────────────────────
-  container.addActionRowComponents(
-    new ActionRowBuilder().addComponents(
-      new StringSelectMenuBuilder()
-        .setCustomId('help:category')
-        .setPlaceholder('📂 Choisir une catégorie pour voir ses commandes')
-        .addOptions(
-          catNames.slice(0, 25).map(cat => ({
-            label      : cat,
-            value      : cat,
-            description: `${categories[cat].length} commande${categories[cat].length > 1 ? 's' : ''}`,
-            emoji      : getCategoryEmoji(cat),
-          })),
-        ),
-    ),
-  );
+  const components = [dropdown];
 
   // ── Pagination accueil ────────────────────────────────────────────────────
   if (totalPages > 1) {
-    container.addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(`📄 **Page ${page}/${totalPages}**`),
-    );
-    container.addActionRowComponents(
+    components.push(
       new ActionRowBuilder().addComponents(
         new ButtonBuilder()
           .setCustomId('help:home:1')
@@ -141,7 +130,7 @@ function renderHelpHome(page = 1) {
     );
   }
 
-  return { components: [container], flags: MessageFlags.IsComponentsV2 };
+  return { embeds: [embed], components };
 }
 
 // ─── ÉCRAN 2 — Détails catégorie (préservé de Session 4) ─────────────────────
