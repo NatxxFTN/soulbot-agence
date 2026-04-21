@@ -1,12 +1,13 @@
 'use strict';
 
 const {
-  EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   StringSelectMenuBuilder,
   ContainerBuilder,
+  SectionBuilder,
+  ThumbnailBuilder,
   TextDisplayBuilder,
   SeparatorBuilder,
   SeparatorSpacingSize,
@@ -65,25 +66,26 @@ function getAnsiColor(cat) {
   return CATEGORY_ANSI[cat] ?? 37;
 }
 
-// ─── ÉCRAN 1 — Accueil EmbedBuilder ANSI style Samy/Mya ──────────────────────
+// ─── ÉCRAN 1 — Accueil Components V2 ANSI style Samy/Mya ─────────────────────
 
 function renderHelpHome(page = 1, botAvatarURL = null) {
   const categories = scanCommands();
   const catNames   = Object.keys(categories).sort();
 
+  const container = new ContainerBuilder().setAccentColor(COLORS.accent);
+
   if (catNames.length === 0) {
-    const embed = new EmbedBuilder()
-      .setColor(COLORS.accent)
-      .setTitle('📘 Information')
-      .setDescription('*Aucune commande chargée.*');
-    return { embeds: [embed], components: [] };
+    container.addTextDisplayComponents(
+      new TextDisplayBuilder().setContent('# 📘 Information\n*Aucune commande chargée.*'),
+    );
+    return { components: [container], flags: MessageFlags.IsComponentsV2 };
   }
 
   const totalCmds = Object.values(categories).reduce((s, c) => s + c.length, 0);
   const customCnt = (categories['Custom'] || []).length;
   const pkg       = getPkg();
-  const version   = pkg.version  || '1.0.0';
-  const botName   = pkg.name     || 'soulbot';
+  const version   = pkg.version || '1.0.0';
+  const botName   = pkg.name    || 'soulbot';
 
   const totalPages = Math.max(1, Math.ceil(catNames.length / CATS_PER_PAGE));
   page = Math.max(1, Math.min(page, totalPages));
@@ -91,16 +93,15 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
   const pageCats  = catNames.slice((page - 1) * CATS_PER_PAGE, page * CATS_PER_PAGE);
   const activeCat = pageCats[0] || catNames[0];
 
-  // ── Colonne gauche : catégories en ANSI ───────────────────────────────────
+  // ── Blocs ANSI ────────────────────────────────────────────────────────────
   const A = '';
   const catsLines = pageCats.map(cat => `${A}[${getAnsiColor(cat)}m${cat}${A}[0m`);
   if (catNames.length > CATS_PER_PAGE) {
     catsLines.push(`${A}[90m+${catNames.length - CATS_PER_PAGE} catégories${A}[0m`);
   }
-  const catsField = '```ansi\n' + catsLines.join('\n') + '\n```';
+  const catsBlock = '```ansi\n' + catsLines.join('\n') + '\n```';
 
-  // ── Colonne droite : syntaxes ANSI format Samy ────────────────────────────
-  const syntaxField =
+  const syntaxBlock =
     '```ansi\n' +
     `${A}[33m╭➤${A}[0m ${A}[1m${botName}${A}[0m\n` +
     `${A}[33m┊${A}[0m - ;help ${A}[31m<commande>${A}[0m\n` +
@@ -110,47 +111,76 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
     `${A}[33m┊${A}[0m ${A}[35m/ ${A}[0m・Sépare syntaxes\n` +
     '```';
 
-  // ── Stats (inline:false — sous les 2 colonnes) ────────────────────────────
-  const statsField =
+  const statsBlock =
     '```\n' +
     `Nombre de commandes: ${totalCmds}\n` +
     `Commandes custom: ${customCnt}\n` +
     '```';
 
-  // ── Embed ─────────────────────────────────────────────────────────────────
-  const embed = new EmbedBuilder()
-    .setColor(COLORS.accent)
-    .setTitle('Information')
-    .setDescription('```ini\n► Version ' + version + '\n```')
-    .addFields(
-      { name: 'Catégories', value: catsField,   inline: true  },
-      { name: 'Syntaxes',   value: syntaxField,  inline: true  },
-      { name: '​',     value: statsField,   inline: false },
-    )
-    .setFooter({ text: `Page ${page}/${totalPages}  ·  ${getCategoryEmoji(activeCat)} ${activeCat}` });
-
-  if (botAvatarURL) embed.setThumbnail(botAvatarURL);
-
-  // ── Dropdown ──────────────────────────────────────────────────────────────
-  const dropdown = new ActionRowBuilder().addComponents(
-    new StringSelectMenuBuilder()
-      .setCustomId('help:category')
-      .setPlaceholder('📂 Catégories')
-      .addOptions(
-        catNames.slice(0, 25).map(cat => ({
-          label      : cat,
-          value      : cat,
-          description: `${categories[cat].length} commande${categories[cat].length > 1 ? 's' : ''}`,
-          emoji      : getCategoryEmoji(cat),
-        })),
-      ),
+  // ── Titre + version (Section avec thumbnail si avatar disponible) ──────────
+  const titleText = new TextDisplayBuilder().setContent(
+    '# Information\n' +
+    '```ini\n► Version ' + version + '\n```',
   );
 
-  const components = [dropdown];
+  if (botAvatarURL) {
+    container.addSectionComponents(
+      new SectionBuilder()
+        .addTextDisplayComponents(titleText)
+        .setThumbnailAccessory(new ThumbnailBuilder().setURL(botAvatarURL)),
+    );
+  } else {
+    container.addTextDisplayComponents(titleText);
+  }
 
-  // ── Pagination accueil ────────────────────────────────────────────────────
+  container.addSeparatorComponents(
+    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
+  );
+
+  // ── Catégories ────────────────────────────────────────────────────────────
+  container.addTextDisplayComponents(
+    new TextDisplayBuilder().setContent('**Catégories**\n' + catsBlock),
+  );
+
+  // ── Syntaxes ──────────────────────────────────────────────────────────────
+  container.addTextDisplayComponents(
+    new TextDisplayBuilder().setContent('**Syntaxes**\n' + syntaxBlock),
+  );
+
+  // ── Stats ─────────────────────────────────────────────────────────────────
+  container.addTextDisplayComponents(
+    new TextDisplayBuilder().setContent(statsBlock),
+  );
+
+  container.addSeparatorComponents(
+    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
+  );
+
+  // ── Dropdown ──────────────────────────────────────────────────────────────
+  container.addActionRowComponents(
+    new ActionRowBuilder().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId('help:category')
+        .setPlaceholder('📂 Catégories')
+        .addOptions(
+          catNames.slice(0, 25).map(cat => ({
+            label      : cat,
+            value      : cat,
+            description: `${categories[cat].length} commande${categories[cat].length > 1 ? 's' : ''}`,
+            emoji      : getCategoryEmoji(cat),
+          })),
+        ),
+    ),
+  );
+
+  // ── Pagination ────────────────────────────────────────────────────────────
   if (totalPages > 1) {
-    components.push(
+    container.addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(
+        `📄 **Page ${page}/${totalPages}** · ${getCategoryEmoji(activeCat)} ${activeCat}`,
+      ),
+    );
+    container.addActionRowComponents(
       new ActionRowBuilder().addComponents(
         new ButtonBuilder()
           .setCustomId('help:home:1')
@@ -176,7 +206,7 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
     );
   }
 
-  return { embeds: [embed], components };
+  return { components: [container], flags: MessageFlags.IsComponentsV2 };
 }
 
 // ─── ÉCRAN 2 — Détails catégorie (préservé de Session 4) ─────────────────────
@@ -325,9 +355,6 @@ function renderHelpCategory(category = null, page = 1) {
 
 // ─── Router ───────────────────────────────────────────────────────────────────
 
-/**
- * Route vers l'écran d'accueil (category = null) ou les détails d'une catégorie.
- */
 function renderHelpPanel(category = null, page = 1, botAvatarURL = null) {
   if (!category) return renderHelpHome(page, botAvatarURL);
   return renderHelpCategory(category, page);

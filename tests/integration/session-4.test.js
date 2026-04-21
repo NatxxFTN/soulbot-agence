@@ -35,12 +35,11 @@ describe('Session 4 — Help exports', () => {
     const { renderHelpPanel } = require(p('bot/ui/panels/help-panel.js'));
     assert.equal(typeof renderHelpPanel, 'function');
   });
-  test('renderHelpPanel() home retourne un embed', () => {
+  test('renderHelpPanel() home retourne objet V2', () => {
     const { renderHelpPanel } = require(p('bot/ui/panels/help-panel.js'));
-    const panel = renderHelpPanel(); // sans arg = accueil EmbedBuilder
-    assert.ok(Array.isArray(panel.embeds));
-    assert.equal(panel.embeds.length, 1);
+    const panel = renderHelpPanel(); // sans arg = accueil Components V2
     assert.ok(Array.isArray(panel.components));
+    assert.equal(panel.flags, 32768); // MessageFlags.IsComponentsV2
   });
   test('renderHelpPanel(cat) retourne objet V2', () => {
     const { renderHelpPanel } = require(p('bot/ui/panels/help-panel.js'));
