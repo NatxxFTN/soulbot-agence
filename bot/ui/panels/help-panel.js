@@ -112,7 +112,7 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
   // Dropdown catégories
   const dropdown = new ActionRowBuilder().addComponents(
     new StringSelectMenuBuilder()
-      .setCustomId('h:cat')
+      .setCustomId('h:c')
       .setPlaceholder('📂 Catégories')
       .addOptions(
         catNames.slice(0, 25).map(cat => ({
@@ -127,22 +127,22 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
   // Boutons navigation — toujours présents, désactivés aux limites
   const navRow = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
-      .setCustomId('h:hf')
+      .setCustomId('h:h:f')
       .setEmoji('⏮')
       .setStyle(ButtonStyle.Primary)
       .setDisabled(page === 1),
     new ButtonBuilder()
-      .setCustomId(`h:hp:${page}`)
+      .setCustomId(`h:h:p:${page}`)
       .setEmoji('◀')
       .setStyle(ButtonStyle.Primary)
       .setDisabled(page === 1),
     new ButtonBuilder()
-      .setCustomId(`h:hn:${page}`)
+      .setCustomId(`h:h:n:${page}`)
       .setEmoji('▶')
       .setStyle(ButtonStyle.Primary)
       .setDisabled(page === totalPages),
     new ButtonBuilder()
-      .setCustomId('h:hl')
+      .setCustomId('h:h:l')
       .setEmoji('⏭')
       .setStyle(ButtonStyle.Primary)
       .setDisabled(page === totalPages),
@@ -198,7 +198,7 @@ function renderHelpCategory(category = null, page = 1) {
   container.addActionRowComponents(
     new ActionRowBuilder().addComponents(
       new StringSelectMenuBuilder()
-        .setCustomId('h:cat')
+        .setCustomId('h:c')
         .setPlaceholder(`${getCategoryEmoji(category)} ${category}`)
         .addOptions(
           catNames.slice(0, 25).map(cat => ({
@@ -252,7 +252,7 @@ function renderHelpCategory(category = null, page = 1) {
   }
 
   // Boutons nav catégorie — toujours présents
-  const catSlug = encodeURIComponent(category).slice(0, 40);
+  const catSlug = category.slice(0, 40);
   container.addActionRowComponents(
     new ActionRowBuilder().addComponents(
       new ButtonBuilder()
@@ -290,7 +290,7 @@ function renderHelpCategory(category = null, page = 1) {
         .setEmoji('🏠')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
-        .setCustomId('h:search')
+        .setCustomId('h:src')
         .setLabel('Rechercher')
         .setEmoji('🔍')
         .setStyle(ButtonStyle.Primary),
@@ -307,4 +307,10 @@ function renderHelpPanel(category = null, page = 1, botAvatarURL = null) {
   return renderHelpCategory(category, page);
 }
 
-module.exports = { renderHelpPanel, renderHelpHome, renderHelpCategory };
+module.exports = {
+  renderHelpPanel,
+  renderHelpHome,
+  renderHelpCategory,
+  CATEGORIES_PER_PAGE: CATS_PER_PAGE,
+  COMMANDS_PER_PAGE  : CMDS_PER_PAGE,
+};

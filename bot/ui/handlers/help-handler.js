@@ -1,48 +1,74 @@
 'use strict';
 
 const {
-  MessageFlags,
-  ActionRowBuilder,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
+  ActionRowBuilder,
+  MessageFlags,
 } = require('discord.js');
-const { renderHelpHome, renderHelpCategory } = require('../panels/help-panel');
-const { findCommand, scanCommands }          = require('../../core/help-helper');
+const {
+  renderHelpPanel,
+  renderHelpHome,
+  renderHelpCategory,
+  CATEGORIES_PER_PAGE,
+  COMMANDS_PER_PAGE,
+} = require('../panels/help-panel');
+const { scanCommands, findCommand } = require('../../core/help-helper');
 
-const CATS_PER_PAGE = 10;
-const CMDS_PER_PAGE = 8;
+// ─── Helpers de transition Embed ↔ V2 ────────────────────────────────────────
+
+// Embed → V2 : vide embeds pour que Discord accepte IS_COMPONENTS_V2
+function gotoCategory(interaction, category, page) {
+  return interaction.update({
+    embeds: [],
+    ...renderHelpCategory(category, page),
+  });
+}
+
+// V2 → Embed : vide components + flags pour pouvoir remettre un Embed classique
+function gotoHome(interaction, page, botAvatarURL) {
+  return interaction.update({
+    components: [],
+    flags      : 0,
+    ...renderHelpHome(page, botAvatarURL),
+  });
+}
+
+// ─── Handler principal ────────────────────────────────────────────────────────
 
 async function handleHelpInteraction(interaction) {
   const id           = interaction.customId;
   const botAvatarURL = interaction.client.user.displayAvatarURL({ size: 256, extension: 'png' });
 
+  console.log(`[help-handler] customId="${id}"`);
+
   try {
 
-    // ── h:cat — Dropdown sélection catégorie ─────────────────────────────────
-    if (id === 'h:cat') {
-      return interaction.update(renderHelpCategory(interaction.values[0], 1));
+    // ── h:c — Dropdown catégorie (home → cat OU cat → cat) ──────────────────
+    if (id === 'h:c') {
+      const category = interaction.values[0];
+      console.log(`[help-handler] → Catégorie : ${category}`);
+      return gotoCategory(interaction, category, 1);
     }
 
-    // ── h:back — Retour accueil depuis V2 (transition V2→embed) ──────────────
+    // ── h:back — Retour accueil depuis V2 ───────────────────────────────────
     if (id === 'h:back') {
-      await interaction.deferUpdate();
-      await interaction.channel.send(renderHelpHome(1, botAvatarURL));
-      await interaction.message.delete().catch(() => {});
-      return;
+      console.log('[help-handler] → Retour accueil');
+      return gotoHome(interaction, 1, botAvatarURL);
     }
 
-    // ── h:search — Ouvre modal recherche ─────────────────────────────────────
-    if (id === 'h:search') {
+    // ── h:src — Ouvre modal recherche ───────────────────────────────────────
+    if (id === 'h:src') {
       const modal = new ModalBuilder()
-        .setCustomId('h:sq')
+        .setCustomId('h:src:s')
         .setTitle('Rechercher une commande');
       modal.addComponents(
         new ActionRowBuilder().addComponents(
           new TextInputBuilder()
             .setCustomId('query')
-            .setLabel('Nom de la commande (sans le préfixe)')
-            .setPlaceholder('ex: greeting, ticket, nuke...')
+            .setLabel('Nom de la commande')
+            .setPlaceholder('ex: greeting, ticket, nuke')
             .setStyle(TextInputStyle.Short)
             .setRequired(true)
             .setMaxLength(50),
@@ -51,19 +77,21 @@ async function handleHelpInteraction(interaction) {
       return interaction.showModal(modal);
     }
 
-    // ── h:sq — Soumission modal recherche ────────────────────────────────────
-    if (id === 'h:sq') {
-      const raw = interaction.fields.getTextInputValue('query').trim().toLowerCase().replace(/^;/, '');
-      const cmd = findCommand(raw);
+    // ── h:src:s — Soumission modal recherche ────────────────────────────────
+    if (id === 'h:src:s') {
+      const PREFIX = process.env.PREFIX || ';';
+      const query  = interaction.fields.getTextInputValue('query')
+        .trim().toLowerCase().replace(/^[;+!?]/, '');
+      const cmd    = findCommand(query);
 
       if (!cmd) {
         return interaction.reply({
-          content: `✗ Aucune commande \`${raw}\` trouvée.`,
+          content: `✗ Aucune commande \`${query}\` trouvée.\nTape \`${PREFIX}help\` pour la liste.`,
           flags  : MessageFlags.Ephemeral,
         });
       }
 
-      const badges  = cmd.ownerOnly ? '\n👑 **Owner only**' : '';
+      const badges  = cmd.ownerOnly ? '\n👑 Owner only' : '';
       const aliases = cmd.aliases.length > 0
         ? `\n**Aliases :** ${cmd.aliases.map(a => `\`${a}\``).join(', ')}`
         : '';
@@ -77,53 +105,65 @@ async function handleHelpInteraction(interaction) {
       });
     }
 
-    // ── Navigation accueil : h:hf · h:hp:<p> · h:hn:<p> · h:hl ─────────────
-    if (id === 'h:hf') {
+    // ── Navigation accueil (home → home) ────────────────────────────────────
+    if (id === 'h:h:f') {
       return interaction.update(renderHelpHome(1, botAvatarURL));
     }
-    if (id === 'h:hl') {
-      const names = Object.keys(scanCommands());
-      const last  = Math.max(1, Math.ceil(names.length / CATS_PER_PAGE));
-      return interaction.update(renderHelpHome(last, botAvatarURL));
+    if (id === 'h:h:l') {
+      const totalPages = Math.max(1, Math.ceil(Object.keys(scanCommands()).length / CATEGORIES_PER_PAGE));
+      return interaction.update(renderHelpHome(totalPages, botAvatarURL));
     }
-    if (id.startsWith('h:hp:')) {
-      const cur  = parseInt(id.split(':')[2], 10) || 1;
+    if (id.startsWith('h:h:p:')) {
+      const cur = parseInt(id.split(':')[3], 10) || 1;
       return interaction.update(renderHelpHome(Math.max(1, cur - 1), botAvatarURL));
     }
-    if (id.startsWith('h:hn:')) {
-      const cur  = parseInt(id.split(':')[2], 10) || 1;
+    if (id.startsWith('h:h:n:')) {
+      const cur = parseInt(id.split(':')[3], 10) || 1;
       return interaction.update(renderHelpHome(cur + 1, botAvatarURL));
     }
 
-    // ── Navigation catégorie : h:cf · h:cp · h:cn · h:cl ───────────────────
+    // ── Navigation catégorie (cat → cat) ────────────────────────────────────
     if (id.startsWith('h:cf:')) {
-      const cat = decodeURIComponent(id.slice(5));
-      return interaction.update(renderHelpCategory(cat, 1));
+      const category = id.substring('h:cf:'.length);
+      return interaction.update(renderHelpCategory(category, 1));
     }
     if (id.startsWith('h:cl:')) {
-      const cat  = decodeURIComponent(id.slice(5));
-      const cats = scanCommands();
-      const cmds = cats[cat] || [];
-      const last = Math.max(1, Math.ceil(cmds.length / CMDS_PER_PAGE));
-      return interaction.update(renderHelpCategory(cat, last));
+      const category  = id.substring('h:cl:'.length);
+      const cmds      = (scanCommands()[category] || []);
+      const totalPages = Math.max(1, Math.ceil(cmds.length / COMMANDS_PER_PAGE));
+      return interaction.update(renderHelpCategory(category, totalPages));
     }
     if (id.startsWith('h:cp:')) {
-      // h:cp:<cat>:<page>
-      const parts = id.split(':');
-      const cat   = decodeURIComponent(parts[2]);
-      const cur   = parseInt(parts[3], 10) || 1;
-      return interaction.update(renderHelpCategory(cat, Math.max(1, cur - 1)));
+      const parts    = id.substring('h:cp:'.length).split(':');
+      const category = parts[0];
+      const cur      = parseInt(parts[1], 10) || 1;
+      return interaction.update(renderHelpCategory(category, Math.max(1, cur - 1)));
     }
     if (id.startsWith('h:cn:')) {
-      // h:cn:<cat>:<page>
-      const parts = id.split(':');
-      const cat   = decodeURIComponent(parts[2]);
-      const cur   = parseInt(parts[3], 10) || 1;
-      return interaction.update(renderHelpCategory(cat, cur + 1));
+      const parts    = id.substring('h:cn:'.length).split(':');
+      const category = parts[0];
+      const cur      = parseInt(parts[1], 10) || 1;
+      return interaction.update(renderHelpCategory(category, cur + 1));
+    }
+
+    // ── customId non reconnu ─────────────────────────────────────────────────
+    console.warn(`[help-handler] customId NON RECONNU : "${id}"`);
+    if (!interaction.replied && !interaction.deferred) {
+      return interaction.reply({
+        content: `⚠️ Action non reconnue : \`${id}\``,
+        flags  : MessageFlags.Ephemeral,
+      });
     }
 
   } catch (err) {
-    console.error('[help-handler]', err);
+    console.error('═══════════════════════════════════════');
+    console.error('❌ ERREUR help-handler');
+    console.error('CustomId :', id);
+    console.error('User     :', interaction.user.tag);
+    console.error('Message  :', err.message);
+    console.error('Stack    :', err.stack);
+    console.error('═══════════════════════════════════════');
+
     if (!interaction.replied && !interaction.deferred) {
       await interaction.reply({
         content: `✗ Erreur : ${err.message}`,
