@@ -2,13 +2,32 @@
 
 Bot Discord complet + Dashboard web sur `http://localhost:3000`
 
-## 🚀 Installation rapide
+## 🚀 Démarrage
+
+### Bot seul
+| OS | Commande |
+|----|----------|
+| Linux / Mac / Git Bash | `npm run start:bot` |
+| Windows (cmd) | `npm run start:bot:win` |
+
+### Bot + Dashboard
+| OS | Commande |
+|----|----------|
+| Linux / Mac / Git Bash | `npm run start:full` |
+| Windows (cmd) | `npm run start:full:win` |
+
+Ces scripts tuent les process zombies, suppriment `.bot.lock`, vérifient `.env` et `node_modules`, puis lancent proprement.
+
+---
+
+## 🔧 Installation initiale
 
 ```bash
 cd discord-manager
 npm install
 cp .env.example .env
-node index.js
+# Remplir .env, puis :
+npm run start:bot
 ```
 
 Ouvre ensuite **http://localhost:3000** dans ton navigateur.

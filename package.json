@@ -15,7 +15,11 @@
     "dev:all": "concurrently -n bot,dashboard -c cyan,yellow \"npm run dev:bot\" \"npm run dashboard\"",
     "test": "node --test tests/",
     "restart": "node scripts/kill-bot.js && rm -f .bot.lock && npm run dev",
-    "restart:win": "scripts\\safe-restart.bat"
+    "restart:win": "scripts\\safe-restart.bat",
+    "start:bot": "bash scripts/start-soulbot.sh",
+    "start:bot:win": "scripts\\start-soulbot.bat",
+    "start:full": "bash scripts/start-all.sh",
+    "start:full:win": "scripts\\start-all.bat"
   },
   "dependencies": {
     "better-sqlite3": "^12.8.0",
