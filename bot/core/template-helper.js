@@ -169,12 +169,13 @@ async function* applyTemplate(guild, template, options = {}) {
         hoist       : roleData.hoist,
         mentionable : roleData.mentionable,
         permissions : filterSafePermissions(roleData.permissions),
+        reason      : `Template ${template.name || name}`,
       });
       stats.rolesCreated++;
       yield { status: 'role_created', current: stats.rolesCreated, total: template.roles.length, message: `🎭 Rôles : ${stats.rolesCreated}/${template.roles.length}` };
       await sleep(500);
     } catch (err) {
-      stats.errors.push(`Rôle ${roleData.name}: ${err.message}`);
+      stats.errors.push(`Rôle "${roleData.name}": ${err.message}${err.code ? ` (code ${err.code})` : ''}`);
     }
   }
 
@@ -186,7 +187,7 @@ async function* applyTemplate(guild, template, options = {}) {
     try {
       let category = null;
       if (catData.name !== '_ROOT_') {
-        category = await guild.channels.create({ name: catData.name, type: ChannelType.GuildCategory });
+        category = await guild.channels.create({ name: catData.name, type: ChannelType.GuildCategory, reason: `Template ${template.name || name}` });
         stats.categoriesCreated++;
       }
       for (const chData of catData.channels || []) {
@@ -200,16 +201,17 @@ async function* applyTemplate(guild, template, options = {}) {
             rateLimitPerUser: chData.rateLimitPerUser || 0,
             bitrate         : chData.bitrate || undefined,
             userLimit       : chData.userLimit || undefined,
+            reason          : `Template ${template.name || name}`,
           });
           stats.channelsCreated++;
           yield { status: 'channel_created', current: stats.channelsCreated, total: totalChannels, message: `📁 Salons : ${stats.channelsCreated}/${totalChannels}` };
           await sleep(400);
         } catch (err) {
-          stats.errors.push(`Salon ${chData.name}: ${err.message}`);
+          stats.errors.push(`Salon "${chData.name}": ${err.message}${err.code ? ` (code ${err.code})` : ''}`);
         }
       }
     } catch (err) {
-      stats.errors.push(`Catégorie ${catData.name}: ${err.message}`);
+      stats.errors.push(`Catégorie "${catData.name}": ${err.message}${err.code ? ` (code ${err.code})` : ''}`);
     }
   }
 
@@ -222,7 +224,7 @@ async function* applyTemplate(guild, template, options = {}) {
         stats.emojisCreated++;
         await sleep(1000);
       } catch (err) {
-        stats.errors.push(`Emoji ${e.name}: ${err.message}`);
+        stats.errors.push(`Emoji "${e.name}": ${err.message}${err.code ? ` (code ${err.code})` : ''}`);
       }
     }
   }

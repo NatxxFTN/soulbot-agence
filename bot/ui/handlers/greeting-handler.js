@@ -53,15 +53,18 @@ async function handleGreetingInteraction(interaction) {
     if (action === 'message_modal') {
       const cfg = getConfig(guildId) || {};
       const key = mode === 'join' ? 'join_message' : 'leave_message';
+      let val = cfg[key] ?? '';
+      if (typeof val !== 'string') val = String(val);
+      if (val.length > 1000) val = val.substring(0, 1000);
       return interaction.showModal(buildModal({
         customId: `greeting:${mode}:message_save`,
         title   : mode === 'join' ? 'Message d\'arrivée' : 'Message de départ',
         inputs  : [{
           id         : 'message',
-          label      : 'Message (variables : {user}, {username}, {server}, {count})',
+          label      : 'Message ({user} {server} {count})',
           paragraph  : true,
-          placeholder: mode === 'join' ? 'Bienvenue {user} sur **{server}** ! 🎉' : '{username} a quitté **{server}**. 👋',
-          value      : cfg[key] || '',
+          placeholder: mode === 'join' ? 'Bienvenue {user} sur **{server}** !' : '{username} a quitté **{server}**.',
+          value      : val,
           maxLength  : 1000,
           required   : true,
         }],
@@ -86,15 +89,18 @@ async function handleGreetingInteraction(interaction) {
     if (action === 'dm_modal') {
       const cfg = getConfig(guildId) || {};
       const key = mode === 'join' ? 'join_dm' : 'leave_dm';
+      let val = cfg[key] ?? '';
+      if (typeof val !== 'string') val = String(val);
+      if (val.length > 1000) val = val.substring(0, 1000);
       return interaction.showModal(buildModal({
         customId: `greeting:${mode}:dm_save`,
         title   : mode === 'join' ? 'DM arrivée' : 'DM départ',
         inputs  : [{
           id         : 'dm',
-          label      : 'Message DM',
+          label      : 'Message DM ({user} {server})',
           paragraph  : true,
           placeholder: 'Salut {username}, bienvenue sur **{server}** !',
-          value      : cfg[key] || '',
+          value      : val,
           maxLength  : 1000,
           required   : true,
         }],

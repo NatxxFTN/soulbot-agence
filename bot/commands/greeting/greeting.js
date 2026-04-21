@@ -1,7 +1,7 @@
 'use strict';
 
 const { PermissionFlagsBits } = require('discord.js');
-const { renderMainPanel } = require('../../ui/panels/greeting-panel');
+const { renderPanel: renderMainPanel } = require('../../ui/panels/greeting-panel');
 const E = require('../../utils/embeds');
 
 module.exports = {

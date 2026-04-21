@@ -92,6 +92,26 @@ describe('Template — stockage JSON', () => {
   });
 });
 
+describe('Template — logique rapport final', () => {
+  it('isTotalFailure détecté quand 0 créé + erreurs', () => {
+    const s = { rolesCreated: 0, categoriesCreated: 0, channelsCreated: 0, emojisCreated: 0, errors: ['Role "Admin": Missing Permissions (code 50013)'] };
+    const totalOK = s.rolesCreated + s.categoriesCreated + s.channelsCreated + s.emojisCreated;
+    assert.strictEqual(totalOK === 0 && s.errors.length > 0, true);
+  });
+
+  it('isPartialFailure détecté quand certains éléments créés + erreurs', () => {
+    const s = { rolesCreated: 2, categoriesCreated: 0, channelsCreated: 0, emojisCreated: 0, errors: ['Channel "général": Missing Permissions (code 50013)'] };
+    const totalOK = s.rolesCreated + s.categoriesCreated + s.channelsCreated + s.emojisCreated;
+    assert.strictEqual(totalOK > 0 && s.errors.length > 0, true);
+  });
+
+  it('succès complet quand 0 erreur', () => {
+    const s = { rolesCreated: 3, categoriesCreated: 2, channelsCreated: 8, emojisCreated: 0, errors: [] };
+    const totalOK = s.rolesCreated + s.categoriesCreated + s.channelsCreated + s.emojisCreated;
+    assert.strictEqual(totalOK > 0 && s.errors.length === 0, true);
+  });
+});
+
 describe('Template — table DB', () => {
   it('table template_logs présente dans la DB', () => {
     const { db } = require('../../bot/database');

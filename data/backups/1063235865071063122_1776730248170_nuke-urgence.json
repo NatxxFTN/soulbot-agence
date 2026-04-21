@@ -1,0 +1,1400 @@
+{
+  "guildId": "1063235865071063122",
+  "guildName": "👁👄👁",
+  "memberCount": 2,
+  "createdAt": 1776730248170,
+  "label": "nuke-urgence",
+  "roles": [
+    {
+      "id": "1063235865217880083",
+      "name": "╭───𒌋𒀖 「🜲・ 👑」",
+      "color": 0,
+      "hoist": false,
+      "position": 80,
+      "permissions": "8804682432255",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865217880082",
+      "name": "╭────────⎝ ・  S Σ Ꮯ U R Σ D  ・ ⎠───────➤",
+      "color": 0,
+      "hoist": false,
+      "position": 79,
+      "permissions": "8804653059839",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865217880081",
+      "name": "╭───𒌋𒀖 「🜲・ F Ω U П D Σ R」",
+      "color": 16715520,
+      "hoist": true,
+      "position": 78,
+      "permissions": "8804682432255",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865217880080",
+      "name": "╭───𒌋𒀖 「🜲・Ꮯ Ꮢ Σ Λ Ƭ Ω Ꮢ」",
+      "color": 16711935,
+      "hoist": true,
+      "position": 77,
+      "permissions": "8804653072127",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865217880079",
+      "name": "╭───𒌋𒀖 「🜲・CΣØ/FØUПDΣR」",
+      "color": 16252672,
+      "hoist": true,
+      "position": 76,
+      "permissions": "6844567291",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865217880078",
+      "name": "╭────────⎝ ・  FULL POWER  ・ ⎠───────➤",
+      "color": 0,
+      "hoist": false,
+      "position": 75,
+      "permissions": "6815207167",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865217880077",
+      "name": "╭───𒌋𒀖 「🜲・ᏟØ-FΩUNDΣᏒ」",
+      "color": 2807551,
+      "hoist": true,
+      "position": 74,
+      "permissions": "8804116188927",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865217880076",
+      "name": "╭───𒌋𒀖 「🜲・ΣXΣᏟUƬIVΣ」",
+      "color": 4915079,
+      "hoist": true,
+      "position": 73,
+      "permissions": "8804665655037",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865217880075",
+      "name": "╭───𒌋𒀖 「🜲・DIᏒΣᏟƬΩᏒ」",
+      "color": 5024511,
+      "hoist": true,
+      "position": 72,
+      "permissions": "8804653063935",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865217880074",
+      "name": "╭───𒌋𒀖 「🜲・ПAME IS ENOUGH」",
+      "color": 16777215,
+      "hoist": true,
+      "position": 71,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865188503611",
+      "name": "╭───𒌋𒀖 「🜲・MOST ACTIVE [CHAT]」",
+      "color": 526344,
+      "hoist": false,
+      "position": 70,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865188503610",
+      "name": "╭────────⎝ ・  PERMS ACCESS  ・ ⎠───────➤",
+      "color": 0,
+      "hoist": false,
+      "position": 69,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865188503609",
+      "name": "╭───𒌋𒀖 「🜲・KICK-BAN PERMS」",
+      "color": 0,
+      "hoist": false,
+      "position": 68,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865188503608",
+      "name": "╭───𒌋𒀖 「🜲・MANAGE EMOJI PERMS」",
+      "color": 0,
+      "hoist": false,
+      "position": 67,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865188503607",
+      "name": "╭───𒌋𒀖 「🜲・AUDITLOG PERMS」",
+      "color": 0,
+      "hoist": false,
+      "position": 66,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865188503606",
+      "name": "╭───𒌋𒀖 「🜲・MANAGE ROLES PERMS」",
+      "color": 0,
+      "hoist": false,
+      "position": 65,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865188503605",
+      "name": "╭───𒌋𒀖 「🜲・MANAGE SERVER PERMS」",
+      "color": 0,
+      "hoist": false,
+      "position": 64,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865188503604",
+      "name": "╭───𒌋𒀖 「🜲・MANAGE CHANNELS PERMS」",
+      "color": 0,
+      "hoist": false,
+      "position": 63,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865188503603",
+      "name": "╭────────⎝ ・ SUPREME POWERS ・ ⎠───────➤",
+      "color": 0,
+      "hoist": false,
+      "position": 62,
+      "permissions": "8804682432255",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865188503602",
+      "name": "╭───𒌋𒀖 「🜲・HΣΛD MΛNΛGΣMΣNƬ 」",
+      "color": 458537,
+      "hoist": true,
+      "position": 61,
+      "permissions": "8804653059839",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865171738794",
+      "name": "╭───𒌋𒀖 「🜲・ΛDMIN」",
+      "color": 855567,
+      "hoist": true,
+      "position": 60,
+      "permissions": "8804653063927",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865171738793",
+      "name": "╭───𒌋𒀖 「🜲・MΛNΛGEMENƬ DIᏒΣᏟƬΩᏒ」",
+      "color": 15941887,
+      "hoist": true,
+      "position": 59,
+      "permissions": "8804682432247",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865171738792",
+      "name": "╭───𒌋𒀖 「🜲・SUPPORT TEAM 」",
+      "color": 9603071,
+      "hoist": true,
+      "position": 58,
+      "permissions": "6815207159",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865171738791",
+      "name": "╭───𒌋𒀖 「🜲・HΣΛD MΩDΣᏒΛƬΩᏒ」",
+      "color": 16774656,
+      "hoist": true,
+      "position": 57,
+      "permissions": "8804116188739",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865171738790",
+      "name": "╭───𒌋𒀖 「🜲・SΣПIΩᏒ MΩDΣᏒΛƬΩᏒ」",
+      "color": 16759685,
+      "hoist": true,
+      "position": 56,
+      "permissions": "6815075923",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865171738789",
+      "name": "╭───𒌋𒀖 「🜲・ᏟHΛƬ MΩDΣᏒΛƬΩᏒ」",
+      "color": 10092505,
+      "hoist": true,
+      "position": 55,
+      "permissions": "6815206995",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865171738788",
+      "name": "╭───𒌋𒀖 「🜲・ⱮΩDΣᏒΛƬΩᏒ」",
+      "color": 6684590,
+      "hoist": true,
+      "position": 54,
+      "permissions": "6949244419",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865171738787",
+      "name": "╭───𒌋𒀖 「🜲・GIRL MODERATOR」",
+      "color": 16735221,
+      "hoist": true,
+      "position": 53,
+      "permissions": "6815206995",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865171738786",
+      "name": "╭───𒌋𒀖 「🜲・PΛYΩUƬΣRS」",
+      "color": 16744825,
+      "hoist": true,
+      "position": 52,
+      "permissions": "6546640467",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865171738785",
+      "name": "╭────────⎝ ・STAFF POWERS ・ ⎠───────➤",
+      "color": 0,
+      "hoist": false,
+      "position": 51,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865133994063",
+      "name": "╭───𒌋𒀖 「🜲・TRAIL MODERATOR」",
+      "color": 8173055,
+      "hoist": true,
+      "position": 50,
+      "permissions": "6546591297",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865133994062",
+      "name": "╭───𒌋𒀖 「🜲・STAFF」",
+      "color": 53759,
+      "hoist": true,
+      "position": 49,
+      "permissions": "6546591297",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865133994061",
+      "name": "╭───𒌋𒀖 「🜲・OFFICIALS」",
+      "color": 16580500,
+      "hoist": true,
+      "position": 48,
+      "permissions": "6546591297",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865133994060",
+      "name": "╭───𒌋𒀖 「🜲・GIVEAWAY MANAGER」",
+      "color": 10071295,
+      "hoist": true,
+      "position": 47,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865133994059",
+      "name": "╭────────⎝ ・ L E V E L  ・ ⎠───────➤",
+      "color": 0,
+      "hoist": false,
+      "position": 46,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865133994058",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 100丨GOD」",
+      "color": 16711680,
+      "hoist": false,
+      "position": 45,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865133994057",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 95丨LEGEND」",
+      "color": 16732240,
+      "hoist": false,
+      "position": 44,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865133994056",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 90丨MEGA X 」",
+      "color": 1638655,
+      "hoist": false,
+      "position": 43,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865133994055",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 85丨MEGA Y 」",
+      "color": 8155635,
+      "hoist": false,
+      "position": 42,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865133994054",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 80丨KIRA 」",
+      "color": 3251199,
+      "hoist": false,
+      "position": 41,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865108811825",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 75丨LAWLIET L」",
+      "color": 2156031,
+      "hoist": false,
+      "position": 40,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865108811824",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 70丨SHINGAMI」",
+      "color": 4194222,
+      "hoist": false,
+      "position": 39,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865108811823",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 65丨ACE」",
+      "color": 4652939,
+      "hoist": false,
+      "position": 38,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865108811822",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 60丨GREAT」",
+      "color": 8716205,
+      "hoist": false,
+      "position": 37,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865108811821",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 55丨GRAND MASTER」",
+      "color": 2474073,
+      "hoist": false,
+      "position": 36,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865108811820",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 50丨CHAMPION」",
+      "color": 3129384,
+      "hoist": false,
+      "position": 35,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865108811819",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 45丨HACKER」",
+      "color": 14612270,
+      "hoist": false,
+      "position": 34,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865108811818",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 40丨PROFESSIONAL」",
+      "color": 16741120,
+      "hoist": false,
+      "position": 33,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865108811817",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 35丨MASTER」",
+      "color": 15372346,
+      "hoist": false,
+      "position": 32,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865108811816",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 30丨INSANE」",
+      "color": 16754014,
+      "hoist": false,
+      "position": 31,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865096241262",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 25丨EXTREME」",
+      "color": 16734296,
+      "hoist": false,
+      "position": 30,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865096241261",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 20丨SUPERB」",
+      "color": 16742777,
+      "hoist": false,
+      "position": 29,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865096241260",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 15丨COOL」",
+      "color": 16746375,
+      "hoist": false,
+      "position": 28,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865096241259",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 10丨NICE」",
+      "color": 16560304,
+      "hoist": false,
+      "position": 27,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865096241258",
+      "name": "╭───𒌋𒀖 「🜲・LEVEL 5丨BEGINNER」",
+      "color": 16764108,
+      "hoist": false,
+      "position": 26,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865096241257",
+      "name": "╭────────⎝ ・SECURITY ROLES   ・ ⎠───────➤",
+      "color": 0,
+      "hoist": false,
+      "position": 25,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865096241256",
+      "name": "╭───𒌋𒀖 「🜲・PARTNER MANAGER」",
+      "color": 3066993,
+      "hoist": false,
+      "position": 24,
+      "permissions": "934259576385",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865096241255",
+      "name": "╭───𒌋𒀖 「🜲・PARTNERS」",
+      "color": 9961402,
+      "hoist": true,
+      "position": 23,
+      "permissions": "6546591297",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865096241254",
+      "name": "╭───𒌋𒀖 「🜲・FRIENDS」",
+      "color": 5046177,
+      "hoist": true,
+      "position": 22,
+      "permissions": "6546591233",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865096241253",
+      "name": "╭───𒌋𒀖 「🜲・CLOSΣ  OПΣS」",
+      "color": 16740084,
+      "hoist": false,
+      "position": 21,
+      "permissions": "6546771521",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865083662477",
+      "name": "╭───𒌋𒀖 「🜲・MEMBERS」",
+      "color": 15441407,
+      "hoist": true,
+      "position": 20,
+      "permissions": "6546591233",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865083662476",
+      "name": "╭───𒌋𒀖 「🜲・ BOTS」",
+      "color": 12928767,
+      "hoist": true,
+      "position": 19,
+      "permissions": "8804049080057",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865083662475",
+      "name": "╭────────⎝ ・  A B O U T  M E   ・ ⎠───────➤",
+      "color": 0,
+      "hoist": false,
+      "position": 18,
+      "permissions": "6546591297",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865083662474",
+      "name": "╭───𒌋𒀖 「🜲・MALE」",
+      "color": 4300016,
+      "hoist": false,
+      "position": 17,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865083662473",
+      "name": "╭───𒌋𒀖 「🜲・FEMALE」",
+      "color": 15943813,
+      "hoist": false,
+      "position": 16,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865083662472",
+      "name": "╭───𒌋𒀖 「🜲・10-13」",
+      "color": 0,
+      "hoist": false,
+      "position": 15,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865083662471",
+      "name": "╭───𒌋𒀖 「🜲・13-15」",
+      "color": 0,
+      "hoist": false,
+      "position": 14,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865083662470",
+      "name": "╭───𒌋𒀖 「🜲・15-17」",
+      "color": 0,
+      "hoist": false,
+      "position": 13,
+      "permissions": "934259576385",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865083662469",
+      "name": "╭───𒌋𒀖 「🜲・18+」",
+      "color": 0,
+      "hoist": false,
+      "position": 12,
+      "permissions": "934259576385",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865083662468",
+      "name": "╭───𒌋𒀖 「🜲・SINGLE」",
+      "color": 0,
+      "hoist": false,
+      "position": 11,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865071063131",
+      "name": "╭───𒌋𒀖 「🜲・SEARCHING」",
+      "color": 0,
+      "hoist": false,
+      "position": 10,
+      "permissions": "934259576385",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865071063130",
+      "name": "╭───𒌋𒀖 「🜲・MINGLE」",
+      "color": 0,
+      "hoist": false,
+      "position": 9,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865071063129",
+      "name": "╭───𒌋𒀖 「🜲・SHOP ACCESS」",
+      "color": 0,
+      "hoist": false,
+      "position": 8,
+      "permissions": "934259576385",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865071063128",
+      "name": "╭───𒌋𒀖 「🜲・PFP/BANNERS ACCESS」",
+      "color": 0,
+      "hoist": false,
+      "position": 7,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865071063127",
+      "name": "╭────────⎝ ・  P I N G S  ・ ⎠───────➤",
+      "color": 0,
+      "hoist": false,
+      "position": 6,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865071063126",
+      "name": "╭───𒌋𒀖 「🜲・YOUTUBE PINGS」",
+      "color": 4762367,
+      "hoist": false,
+      "position": 5,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865071063125",
+      "name": "╭───𒌋𒀖 「🜲・GIVEAWAY PINGS」",
+      "color": 4762367,
+      "hoist": false,
+      "position": 4,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865071063124",
+      "name": "╭───𒌋𒀖 「🜲・PARTNERHIP PINGS」",
+      "color": 4762367,
+      "hoist": false,
+      "position": 3,
+      "permissions": "6546640449",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1063235865071063123",
+      "name": "╭───𒌋𒀖 「🜲・CHAT REVIVE」",
+      "color": 4762367,
+      "hoist": false,
+      "position": 2,
+      "permissions": "934259576385",
+      "mentionable": false,
+      "managed": false
+    },
+    {
+      "id": "1492291714684289066",
+      "name": "samy",
+      "color": 0,
+      "hoist": false,
+      "position": 1,
+      "permissions": "8",
+      "mentionable": false,
+      "managed": true
+    }
+  ],
+  "channels": [
+    {
+      "id": "1063235867000459352",
+      "name": "┌🍸・GΣNΣRΔŁ ᵛᶜ",
+      "type": 2,
+      "parentId": "1063235867000459349",
+      "position": 1
+    },
+    {
+      "id": "1063235865524060177",
+      "name": "✦└│🍓・self-roles",
+      "type": 0,
+      "parentId": "1063235865524060173",
+      "position": 3
+    },
+    {
+      "id": "1063235866211930175",
+      "name": "✦┌│🍏・alliance-info",
+      "type": 0,
+      "parentId": "1063235866211930174",
+      "position": 0
+    },
+    {
+      "id": "1063235867289862196",
+      "name": "── ✧ ───🥂─── ✧ ──",
+      "type": 2,
+      "parentId": "1063235867000459349",
+      "position": 6
+    },
+    {
+      "id": "1063235866476167210",
+      "name": "✠├│🍇・media-share",
+      "type": 0,
+      "parentId": "1063235866211930182",
+      "position": 1
+    },
+    {
+      "id": "1063235867549896759",
+      "name": "✦└│🎸・ZONE 4",
+      "type": 2,
+      "parentId": "1063235867289862202",
+      "position": 3
+    },
+    {
+      "id": "1063235867000459345",
+      "name": "─ ✧ ── S H O P ── ✧ ─",
+      "type": 4,
+      "parentId": null,
+      "position": 8
+    },
+    {
+      "id": "1063235866211930177",
+      "name": "─ ✧ ── S T A F F ── ✧ ─",
+      "type": 4,
+      "parentId": null,
+      "position": 5
+    },
+    {
+      "id": "1063235865524060171",
+      "name": "✧┌🍹・MEMBERS: 240",
+      "type": 2,
+      "parentId": "1063235865524060170",
+      "position": 0
+    },
+    {
+      "id": "1063235865524060170",
+      "name": "─ ✧ ── S T A T S  ── ✧ ─",
+      "type": 4,
+      "parentId": null,
+      "position": 0
+    },
+    {
+      "id": "1063235868074201214",
+      "name": "☆├│🍉・ticket-logs",
+      "type": 0,
+      "parentId": "1063235868074201210",
+      "position": 3
+    },
+    {
+      "id": "1063235867289862202",
+      "name": "─ ✧ ── m u s I c ── ✧ ─",
+      "type": 4,
+      "parentId": null,
+      "position": 10
+    },
+    {
+      "id": "1063235865524060179",
+      "name": "✮┌│🍍・giveaway",
+      "type": 0,
+      "parentId": "1063235865524060178",
+      "position": 0
+    },
+    {
+      "id": "1063235866211930178",
+      "name": "✠┌│🔐・staff-annnounce",
+      "type": 0,
+      "parentId": "1063235866211930177",
+      "position": 0
+    },
+    {
+      "id": "1063235867289862203",
+      "name": "✦┌│🎸・music-cmds",
+      "type": 0,
+      "parentId": "1063235867289862202",
+      "position": 0
+    },
+    {
+      "id": "1063235867000459347",
+      "name": "✠├│🎫・server-stock",
+      "type": 0,
+      "parentId": "1063235867000459345",
+      "position": 1
+    },
+    {
+      "id": "1063235868074201211",
+      "name": "☆┌│🍉・server-logs",
+      "type": 0,
+      "parentId": "1063235868074201210",
+      "position": 0
+    },
+    {
+      "id": "1063235868074201213",
+      "name": "☆└│🍉・leave-logs",
+      "type": 0,
+      "parentId": "1063235868074201210",
+      "position": 2
+    },
+    {
+      "id": "1063235865763123272",
+      "name": "✮├│🍍︰event",
+      "type": 0,
+      "parentId": "1063235865524060178",
+      "position": 3
+    },
+    {
+      "id": "1063235865763123279",
+      "name": "❖├│🥭︰boosters",
+      "type": 0,
+      "parentId": "1063235865763123276",
+      "position": 2
+    },
+    {
+      "id": "1063235866476167211",
+      "name": "✠├│🍇・memes-share",
+      "type": 0,
+      "parentId": "1063235866211930182",
+      "position": 2
+    },
+    {
+      "id": "1063235866476167217",
+      "name": "✠├│🛕・boys-banner",
+      "type": 0,
+      "parentId": "1063235866211930182",
+      "position": 8
+    },
+    {
+      "id": "1063235865524060173",
+      "name": "─ ✧ ── e n t r e n c e ── ✧ ─",
+      "type": 4,
+      "parentId": null,
+      "position": 1
+    },
+    {
+      "id": "1063235866211930180",
+      "name": "✠├│🔐・bot-setup",
+      "type": 0,
+      "parentId": "1063235866211930177",
+      "position": 2
+    },
+    {
+      "id": "1063235867289862194",
+      "name": "├🍸・ØWNΣRS ᵛᶜ",
+      "type": 2,
+      "parentId": "1063235867000459349",
+      "position": 4
+    },
+    {
+      "id": "1063235866702647349",
+      "name": "─ ✧ ── P E R K S ── ✧ ─",
+      "type": 4,
+      "parentId": null,
+      "position": 7
+    },
+    {
+      "id": "1063235866476167215",
+      "name": "✠└│🍇・dank-memer",
+      "type": 0,
+      "parentId": "1063235866211930182",
+      "position": 6
+    },
+    {
+      "id": "1063235866476167213",
+      "name": "✠├│🍇・bot-cmds",
+      "type": 0,
+      "parentId": "1063235866211930182",
+      "position": 4
+    },
+    {
+      "id": "1063235866211930176",
+      "name": "✦└│🍏・alliance",
+      "type": 0,
+      "parentId": "1063235866211930174",
+      "position": 1
+    },
+    {
+      "id": "1063235865524060178",
+      "name": "─ ✧ ── G I V E A W A Y── ✧ ─",
+      "type": 4,
+      "parentId": null,
+      "position": 2
+    },
+    {
+      "id": "1063235866702647354",
+      "name": "❖├│🍡・gwy-prks",
+      "type": 0,
+      "parentId": "1063235866702647349",
+      "position": 4
+    },
+    {
+      "id": "1063235865763123273",
+      "name": "✮├│🍍︰invite-rewards",
+      "type": 0,
+      "parentId": "1063235865524060178",
+      "position": 4
+    },
+    {
+      "id": "1063235866702647351",
+      "name": "❖├│🍡・chat-prks",
+      "type": 0,
+      "parentId": "1063235866702647349",
+      "position": 1
+    },
+    {
+      "id": "1063235867549896762",
+      "name": "─ ✧ ── c o n t a c t s ── ✧ ─",
+      "type": 4,
+      "parentId": null,
+      "position": 12
+    },
+    {
+      "id": "1063235865763123274",
+      "name": "✮├│🍍︰proofs",
+      "type": 0,
+      "parentId": "1063235865524060178",
+      "position": 5
+    },
+    {
+      "id": "1063235867289862195",
+      "name": "Join To Create Own Vc",
+      "type": 2,
+      "parentId": "1063235867000459349",
+      "position": 5
+    },
+    {
+      "id": "1063235867289862197",
+      "name": "├🍷・CŁΔSS #1",
+      "type": 2,
+      "parentId": "1063235867000459349",
+      "position": 7
+    },
+    {
+      "id": "1063235867000459354",
+      "name": "├🍸・VIP ᵛᶜ",
+      "type": 2,
+      "parentId": "1063235867000459349",
+      "position": 3
+    },
+    {
+      "id": "1063235865763123278",
+      "name": "❖├│🥭︰server-link",
+      "type": 0,
+      "parentId": "1063235865763123276",
+      "position": 1
+    },
+    {
+      "id": "1063235867289862199",
+      "name": "├🍷・CŁΔSS #3",
+      "type": 2,
+      "parentId": "1063235867000459349",
+      "position": 9
+    },
+    {
+      "id": "1063235865763123270",
+      "name": "✮├│🍍︰drops",
+      "type": 0,
+      "parentId": "1063235865524060178",
+      "position": 1
+    },
+    {
+      "id": "1063235867000459346",
+      "name": "✠┌│🎫・server-shop",
+      "type": 0,
+      "parentId": "1063235867000459345",
+      "position": 0
+    },
+    {
+      "id": "1063235867549896760",
+      "name": "─ ✧ ── a f k ── ✧ ─",
+      "type": 4,
+      "parentId": null,
+      "position": 11
+    },
+    {
+      "id": "1063235865763123277",
+      "name": "❖┌│🥭︰announcements",
+      "type": 0,
+      "parentId": "1063235865763123276",
+      "position": 0
+    },
+    {
+      "id": "1063235866702647348",
+      "name": "✠└│🛕・requests",
+      "type": 0,
+      "parentId": "1063235866211930182",
+      "position": 11
+    },
+    {
+      "id": "1063235867000459349",
+      "name": "─ ✧ ─ v o I c e  c h a n n e l s ─ ✧ ─",
+      "type": 4,
+      "parentId": null,
+      "position": 9
+    },
+    {
+      "id": "1063235866211930174",
+      "name": "─ ✧ ── a l l I a n c e ── ✧ ─",
+      "type": 4,
+      "parentId": null,
+      "position": 4
+    },
+    {
+      "id": "1063235867289862201",
+      "name": "╰─ ✧ ──🥂─── ✧ ─➤",
+      "type": 2,
+      "parentId": "1063235867000459349",
+      "position": 11
+    },
+    {
+      "id": "1063235867549896755",
+      "name": "✦├│🎸・ZONE 1",
+      "type": 2,
+      "parentId": "1063235867289862202",
+      "position": 0
+    },
+    {
+      "id": "1063235867289862198",
+      "name": "├🍷・CŁΔSS #2",
+      "type": 2,
+      "parentId": "1063235867000459349",
+      "position": 8
+    },
+    {
+      "id": "1063235866476167212",
+      "name": "✠├│🍇・art-showcase",
+      "type": 0,
+      "parentId": "1063235866211930182",
+      "position": 3
+    },
+    {
+      "id": "1063235865524060174",
+      "name": "✦┌│🍓・welcome",
+      "type": 0,
+      "parentId": "1063235865524060173",
+      "position": 0
+    },
+    {
+      "id": "1063235866702647347",
+      "name": "✠├│🛕・girls-banner",
+      "type": 0,
+      "parentId": "1063235866211930182",
+      "position": 10
+    },
+    {
+      "id": "1063235866211930181",
+      "name": "❖└│🔐・staff-test-msgs",
+      "type": 0,
+      "parentId": "1063235866211930177",
+      "position": 3
+    },
+    {
+      "id": "1063235867549896756",
+      "name": "✦├│🎸・ZONE 2",
+      "type": 2,
+      "parentId": "1063235867289862202",
+      "position": 1
+    },
+    {
+      "id": "1063235866476167216",
+      "name": "✠┌│🛕・boys-pfp",
+      "type": 0,
+      "parentId": "1063235866211930182",
+      "position": 7
+    },
+    {
+      "id": "1063235866702647352",
+      "name": "❖├│🍡・official-prks",
+      "type": 0,
+      "parentId": "1063235866702647349",
+      "position": 2
+    },
+    {
+      "id": "1063235868074201210",
+      "name": "─ ✧ ── L O G S ── ✧ ─",
+      "type": 4,
+      "parentId": null,
+      "position": 13
+    },
+    {
+      "id": "1063235867289862200",
+      "name": "├🍷・CŁΔSS #5",
+      "type": 2,
+      "parentId": "1063235867000459349",
+      "position": 10
+    },
+    {
+      "id": "1063235867000459348",
+      "name": "✠└│🎫・create-ticket",
+      "type": 0,
+      "parentId": "1063235867000459345",
+      "position": 2
+    },
+    {
+      "id": "1063235866702647350",
+      "name": "✠┌│🍡・staff-prks",
+      "type": 0,
+      "parentId": "1063235866702647349",
+      "position": 0
+    },
+    {
+      "id": "1063235866702647353",
+      "name": "❖├│🍡・status-log",
+      "type": 0,
+      "parentId": "1063235866702647349",
+      "position": 3
+    },
+    {
+      "id": "1063235866476167214",
+      "name": "✠├│🍇・owo",
+      "type": 0,
+      "parentId": "1063235866211930182",
+      "position": 5
+    },
+    {
+      "id": "1063235865524060175",
+      "name": "✦├│🍓・invites",
+      "type": 0,
+      "parentId": "1063235865524060173",
+      "position": 1
+    },
+    {
+      "id": "1063235865763123275",
+      "name": "✮└│🍍︰vouches",
+      "type": 0,
+      "parentId": "1063235865524060178",
+      "position": 6
+    },
+    {
+      "id": "1063235865524060172",
+      "name": "✧└🍹・.gg/belegit",
+      "type": 2,
+      "parentId": "1063235865524060170",
+      "position": 1
+    },
+    {
+      "id": "1063235866211930182",
+      "name": "─ ✧ ──  C O M M U N I T Y  ── ✧ ─",
+      "type": 4,
+      "parentId": null,
+      "position": 6
+    },
+    {
+      "id": "1063235866702647355",
+      "name": "❖├│🍡・prtnr-prks",
+      "type": 0,
+      "parentId": "1063235866702647349",
+      "position": 5
+    },
+    {
+      "id": "1063235867549896758",
+      "name": "✦├│🎸・ZONE 3",
+      "type": 2,
+      "parentId": "1063235867289862202",
+      "position": 2
+    },
+    {
+      "id": "1063235866476167218",
+      "name": "✠├│🛕・girls-pfp",
+      "type": 0,
+      "parentId": "1063235866211930182",
+      "position": 9
+    },
+    {
+      "id": "1063235867549896763",
+      "name": "✮┌│🥝・suggestions",
+      "type": 0,
+      "parentId": "1063235867549896762",
+      "position": 0
+    },
+    {
+      "id": "1063235867000459350",
+      "name": "vc-help",
+      "type": 0,
+      "parentId": "1063235867000459349",
+      "position": 0
+    },
+    {
+      "id": "1063235866702647356",
+      "name": "✮└│🍡・boost-prks",
+      "type": 0,
+      "parentId": "1063235866702647349",
+      "position": 6
+    },
+    {
+      "id": "1063235867549896761",
+      "name": "🍩・Δ F K・🍩",
+      "type": 2,
+      "parentId": "1063235867549896760",
+      "position": 0
+    },
+    {
+      "id": "1063235868074201212",
+      "name": "☆├│🍉・message-logs",
+      "type": 0,
+      "parentId": "1063235868074201210",
+      "position": 1
+    },
+    {
+      "id": "1063235865763123271",
+      "name": "✮├│🍍︰legitmacy",
+      "type": 0,
+      "parentId": "1063235865524060178",
+      "position": 2
+    },
+    {
+      "id": "1063235867549896764",
+      "name": "✮└│🥝・complain",
+      "type": 0,
+      "parentId": "1063235867549896762",
+      "position": 1
+    },
+    {
+      "id": "1063235865524060176",
+      "name": "✦├│🍓・rules",
+      "type": 0,
+      "parentId": "1063235865524060173",
+      "position": 2
+    },
+    {
+      "id": "1063235867000459351",
+      "name": "╭─ ✧ ──🥂─── ✧ ─➤",
+      "type": 2,
+      "parentId": "1063235867000459349",
+      "position": 0
+    },
+    {
+      "id": "1063235866476167209",
+      "name": "✠┌│🍇・chat",
+      "type": 0,
+      "parentId": "1063235866211930182",
+      "position": 0
+    },
+    {
+      "id": "1063235866211930179",
+      "name": "✠├│🔐・staff-chat",
+      "type": 0,
+      "parentId": "1063235866211930177",
+      "position": 1
+    },
+    {
+      "id": "1063235865763123276",
+      "name": "─ ✧ ── a b o u t  s e r v e r ── ✧ ─",
+      "type": 4,
+      "parentId": null,
+      "position": 3
+    },
+    {
+      "id": "1063235867000459353",
+      "name": "├🍸・ΔĐUŁT ᵛᶜ",
+      "type": 2,
+      "parentId": "1063235867000459349",
+      "position": 2
+    },
+    {
+      "id": "1063235866211930173",
+      "name": "❖└│🥭︰paid-promos",
+      "type": 0,
+      "parentId": "1063235865763123276",
+      "position": 3
+    }
+  ],
+  "emojis": []
+}

@@ -648,16 +648,17 @@ Tout le contenu est sur la page racine. Pas de lazy loading — un seul fetch su
 ### Dernière ingestion effective
 
 ```
-Date              : 2026-04-18
+Date              : 2026-04-20
 Agent pilote      : 🧘 Mentor
-Statut Toolbox    : ✅ ACCESSIBLE — PinchTab v0.8.6 · instance inst_0f03b064
+Statut Toolbox    : ✅ ACCESSIBLE — PinchTab v0.8.6 · instance inst_d05c5ca1
 Pages parcourues  : 1 (SPA — tout le contenu sur la racine)
 Skills ingérés    : 205 / 205 (grep -c "Ouvrir" == 205 ✅)
 Agents sourcés    : 41 / 49 (8 agents Squad Engineering en attente de création formelle)
-Prochaine ingest. : 2026-05-18 ou à chaque ajout de squad
+Diff 2026-04-20   : 0 perte · +9 skills assignés (P1) · ~66 orphelins restants (P2/P3)
+Prochaine ingest. : 2026-05-20 ou à chaque ajout de squad
 ```
 
-### Map skills → agents (ingestion réelle v7.2 — 2026-04-18)
+### Map skills → agents (ingestion réelle v7.2 — 2026-04-20)
 
 ```
 SQUAD PRINCIPALE (18 agents)
@@ -670,16 +671,19 @@ SQUAD PRINCIPALE (18 agents)
 🏛️ Architecte    Graphify · GitNexus · Understand-Anything · architecte-prompts
                  BMAD Method · GStack · context7 · self-healing-claude
                  MCP Builder (Anthropic) · Superpowers · Excalidraw
-                 claude-cognitive · public-apis
+                 claude-cognitive · public-apis · Claude-Mem
 
 🎨 Designer      frontend-design · emilkowalski-skill · refactoring-ui · ux-heuristics
                  theme-factory · canvas-design · Prompts Design Systems & Creative Strategy
                  Impeccable · make-interfaces-feel-better · ui-ux-pro-max-skill
-                 Brand Guidelines (Anthropic)
+                 Brand Guidelines (Anthropic) · ckm-brand · ckm-design
+                 ckm-design-system · ckm-banner-design · ckm-slides · ckm-ui-styling
+                 LogoCreator
 
 🖌️ Web Designer  framer-motion-skill · tailwind-v4-shadcn · shadcn-ui (developer-kit)
                  video-to-website (Antigravity) · UIverse · 21st-dev-magic
                  Figma to Code (Anthropic) · Pencil · website-builder-setup
+                 web-artifacts-builder
 
 🗄️ DB Admin      Supabase · Supabase MCP · Excel MCP Server · SpacetimeDB
                  Full Schema Audit · LightRAG
@@ -689,6 +693,7 @@ SQUAD PRINCIPALE (18 agents)
 🧘 Mentor        architecte-prompts · get-shit-done · Prompt Engineering Bootstrap
                  claude-reflect · awesome-claude-skills · skill-creator
                  Mémoire Persistante · Notion MCP · obsidian-skills · wondelai/skills
+                 Smithery.ai · template-skill · Claude-Mem
 
 🔐 SecOps        security · Anti-Abuse & Rate Limiting · Secrets & API Keys Protection
                  Secure Authentication Audit · Secure Deployment & Monitoring

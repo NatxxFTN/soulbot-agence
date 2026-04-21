@@ -70,13 +70,10 @@ module.exports = {
       // Recherche d'un handler enregistré pour cette action
       const handler = client.buttonHandlers?.get(action);
       if (!handler) {
-        // POURQUOI deferUpdate et non reply : les boutons sans handler global
-        // sont gérés par des message component collectors (ex: help, poll).
-        // Un reply() ici consommerait l'interaction avant que le collector
-        // puisse appeler update() — provoquant "Unknown Interaction".
-        // deferUpdate() acquitte l'interaction silencieusement (pas de loading,
-        // pas de changement visible) et laisse le collector faire editReply().
-        return interaction.deferUpdate().catch(() => {});
+        // Pas d'acquittement ici — le collector (help, poll, etc.) appelle
+        // interaction.update() lui-même. Un deferUpdate() ici provoquerait
+        // "already acknowledged" et bloquerait le collector.
+        return;
       }
 
       try {

@@ -76,7 +76,8 @@ async function handleMassbanInteraction(interaction) {
     }
 
     if (action === 'close') {
-      return interaction.update({ content: '🔨 Panel fermé.', components: [], flags: MessageFlags.IsComponentsV2 });
+      await interaction.deferUpdate();
+      return interaction.message.delete().catch(() => {});
     }
 
   } catch (err) {
