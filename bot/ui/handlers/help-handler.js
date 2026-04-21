@@ -2,7 +2,7 @@
 
 const { MessageFlags } = require('discord.js');
 const { buildModal }   = require('../components/modals');
-const { renderHelpPanel } = require('../panels/help-panel');
+const { renderHelpHome, renderHelpCategory } = require('../panels/help-panel');
 const { findCommand }  = require('../../core/help-helper');
 
 async function handleHelpInteraction(interaction) {
@@ -10,16 +10,22 @@ async function handleHelpInteraction(interaction) {
   const parts    = customId.split(':'); // ['help', 'category'|'page'|'search'|..., ...]
 
   try {
+    // ── Bouton Accueil / pagination accueil : help:home:<page> ──────────────
+    if (parts[1] === 'home') {
+      const page = parseInt(parts[2], 10) || 1;
+      return interaction.update(renderHelpHome(page));
+    }
+
     // ── Dropdown sélection catégorie ─────────────────────────────────────────
     if (customId === 'help:category') {
-      return interaction.update(renderHelpPanel(interaction.values[0], 1));
+      return interaction.update(renderHelpCategory(interaction.values[0], 1));
     }
 
     // ── Pagination bouton : help:page:<category>:<page> ──────────────────────
     if (parts[1] === 'page') {
       const category = parts[2];
       const page     = parseInt(parts[3], 10) || 1;
-      return interaction.update(renderHelpPanel(category, page));
+      return interaction.update(renderHelpCategory(category, page));
     }
 
     // ── Bouton Rechercher → ouvre modal ──────────────────────────────────────
