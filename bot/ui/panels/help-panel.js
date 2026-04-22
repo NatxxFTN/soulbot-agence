@@ -102,7 +102,7 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
     .setTitle('Information')
     .setDescription('```ini\n► Version ' + version + '\n```')
     .addFields(
-      { name: 'Catégories', value: categoriesCol, inline: true  },
+      { name: `${e('ui_folder')} Catégories`, value: categoriesCol, inline: true  },
       { name: 'Syntaxes',   value: syntaxesCol,   inline: true  },
       { name: '​',     value: statsBlock,     inline: false },
     )
