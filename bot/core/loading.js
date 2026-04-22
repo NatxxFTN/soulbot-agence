@@ -8,7 +8,7 @@ async function withLoading(message, loadingText, workFn) {
     allowedMentions: { repliedUser: false },
   });
   try {
-    const result = await workFn();
+    const result = await workFn(loadingMsg);
     return { loadingMsg, result };
   } catch (err) {
     await loadingMsg.edit({ content: `❌ Erreur : ${err.message}` }).catch(() => {});

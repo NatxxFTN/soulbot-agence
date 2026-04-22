@@ -3,6 +3,7 @@
 const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
 const { renderRaidmodePanel } = require('../../ui/panels/raidmode-panel');
+const { withLoading } = require('../../core/loading');
 
 module.exports = {
   name       : 'raidmode',
@@ -18,6 +19,9 @@ module.exports = {
     if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
       return message.reply({ embeds: [E.error('Accès refusé', 'Tu dois être administrateur.')] });
     }
-    return message.channel.send(renderRaidmodePanel(message.guild.id));
+    const { loadingMsg } = await withLoading(message, 'Chargement anti-raid...', async () => {
+      return message.channel.send(renderRaidmodePanel(message.guild.id));
+    });
+    await loadingMsg.delete().catch(() => {});
   },
 };

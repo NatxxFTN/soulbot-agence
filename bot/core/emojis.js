@@ -71,7 +71,7 @@ const CATEGORY_TO_EMOJI = {
   // Moderation
   'Moderation': 'cat_moderation', 'moderation': 'cat_moderation',
   'Modération': 'cat_moderation', 'modération': 'cat_moderation',
-  'Mod': 'cat_moderation', 'mod': 'cat_moderation',
+  'Mod': 'cat_moderation', 'mod': 'cat_moderation', 'MODERATION': 'cat_moderation',
   // Information
   'Information': 'cat_information', 'information': 'cat_information',
   'Info': 'cat_information', 'info': 'cat_information',
@@ -80,14 +80,14 @@ const CATEGORY_TO_EMOJI = {
   'Utilities': 'cat_utility', 'utilities': 'cat_utility',
   'Utils': 'cat_utility', 'utils': 'cat_utility',
   'Utile': 'cat_utility', 'utile': 'cat_utility',
-  'Utilité': 'cat_utility', 'utilité': 'cat_utility',
+  'Utilité': 'cat_utility', 'utilité': 'cat_utility', 'UTILITY': 'cat_utility',
   // Configuration
   'Configuration': 'cat_configuration', 'configuration': 'cat_configuration',
   'Config': 'cat_configuration', 'config': 'cat_configuration',
   // Protection
   'Protection': 'cat_protection', 'protection': 'cat_protection',
   // Fun
-  'Fun': 'cat_fun', 'fun': 'cat_fun', 'Funs': 'cat_fun', 'funs': 'cat_fun',
+  'Fun': 'cat_fun', 'fun': 'cat_fun', 'Funs': 'cat_fun', 'funs': 'cat_fun', 'FUN': 'cat_fun',
   'Game': 'cat_fun', 'game': 'cat_fun',
   'Games': 'cat_fun', 'games': 'cat_fun',
   // Giveaway
@@ -106,9 +106,10 @@ const CATEGORY_TO_EMOJI = {
   'Economy': 'cat_economy', 'economy': 'cat_economy',
   'Économie': 'cat_economy', 'économie': 'cat_economy',
   'Economie': 'cat_economy', 'economie': 'cat_economy',
+  'Eco': 'cat_economy', 'eco': 'cat_economy',
   // Ticket
   'Ticket': 'cat_ticket', 'ticket': 'cat_ticket',
-  'Tickets': 'cat_ticket', 'tickets': 'cat_ticket',
+  'Tickets': 'cat_ticket', 'tickets': 'cat_ticket', 'TICKET': 'cat_ticket',
   // Stats → cat_information (pas de cat_stats uploadé)
   'Stats': 'cat_information', 'stats': 'cat_information',
   'Statistique': 'cat_information', 'statistique': 'cat_information',
