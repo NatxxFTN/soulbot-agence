@@ -194,7 +194,7 @@ function renderHelpCategory(category = null, page = 1) {
 
   // Dropdown
   container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent('### 📂 Catégorie'),
+    new TextDisplayBuilder().setContent(`### ${e('ui_folder')} Catégorie`),
   );
   container.addActionRowComponents(
     new ActionRowBuilder().addComponents(
