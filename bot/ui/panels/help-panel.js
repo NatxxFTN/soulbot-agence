@@ -14,7 +14,7 @@ const {
 } = require('discord.js');
 const { COLORS } = require('../theme');
 const { scanCommands, getCategoryEmoji, getCategoryEmojiObject, getCategoryAnsi } = require('../../core/help-helper');
-const { forButton } = require('../../core/emojis');
+const { forButton, e } = require('../../core/emojis');
 
 let _pkg;
 function getPkg() {
@@ -73,7 +73,7 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
   const E = '';
 
   // Colonne gauche : catégories ANSI
-  const catsLines = pageCats.map(cat => `${E}[${getCategoryAnsi(cat)}m${cat}${E}[0m`);
+  const catsLines = pageCats.map(cat => `${e('folder')} ${E}[${getCategoryAnsi(cat)}m${cat}${E}[0m`);
   if (catNames.length > CATS_PER_PAGE) {
     catsLines.push(`${E}[90m+${catNames.length - CATS_PER_PAGE} catégories${E}[0m`);
   }

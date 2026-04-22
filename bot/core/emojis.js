@@ -45,6 +45,8 @@ const FALLBACK_EMOJIS = {
   ui_speaker:     '🔊',
   ui_mail:        '📧',
   ui_mail_letter: '📬',
+  ui_folder:      '📁',
+  folder:         '📁',
   ui_antileak:    '🚫',
   ui_antispam:    '🛡️',
   ui_pin:         '📌',
