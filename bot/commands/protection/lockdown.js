@@ -3,6 +3,7 @@
 const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
 const { renderLockdownPanel } = require('../../ui/panels/lockdown-panel');
+const { withLoading } = require('../../core/loading');
 
 module.exports = {
   name       : 'lockdown',
@@ -18,6 +19,9 @@ module.exports = {
     if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
       return message.reply({ embeds: [E.error('Accès refusé', 'Tu dois être administrateur.')] });
     }
-    return message.channel.send(renderLockdownPanel(message.guild.id));
+    const { loadingMsg } = await withLoading(message, 'Verrouillage...', async () => {
+      return message.channel.send(renderLockdownPanel(message.guild.id));
+    });
+    await loadingMsg.delete().catch(() => {});
   },
 };

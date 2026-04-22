@@ -3,6 +3,7 @@
 const E = require('../../utils/embeds');
 const { isOwner } = require('../../core/permissions');
 const { renderNukePanel } = require('../../ui/panels/nuke-panel');
+const { withLoading } = require('../../core/loading');
 
 const COOLDOWN_MS  = 60 * 60 * 1000;
 const activeResets = new Map();
@@ -19,7 +20,10 @@ module.exports = {
     if (!isOwner(message.author.id)) {
       return message.reply({ embeds: [E.error('Accès refusé', 'Owner bot uniquement. **Aucune exception.**')] });
     }
-    return message.channel.send(renderNukePanel(message.guild.id));
+    const { loadingMsg } = await withLoading(message, 'Nuke en cours...', async () => {
+      return message.channel.send(renderNukePanel(message.guild.id));
+    });
+    await loadingMsg.delete().catch(() => {});
   },
 };
 

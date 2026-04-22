@@ -3,6 +3,7 @@
 const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
 const { renderMassbanPanel } = require('../../ui/panels/massban-panel');
+const { withLoading } = require('../../core/loading');
 
 module.exports = {
   name       : 'massban',
@@ -18,6 +19,9 @@ module.exports = {
     if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
       return message.reply({ embeds: [E.error('Accès refusé', 'Tu dois être administrateur.')] });
     }
-    return message.channel.send(renderMassbanPanel(message.guild.id));
+    const { loadingMsg } = await withLoading(message, 'Ban en masse...', async () => {
+      return message.channel.send(renderMassbanPanel(message.guild.id));
+    });
+    await loadingMsg.delete().catch(() => {});
   },
 };

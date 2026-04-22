@@ -2,6 +2,7 @@
 
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const E = require('../../utils/embeds');
+const { withLoading } = require('../../core/loading');
 const {
   serializeGuild, saveTemplate, listTemplates,
   loadTemplate, deleteTemplate, logAction, sanitizeName,
@@ -51,21 +52,22 @@ async function handleCreate(message, args) {
   if (name.length > 50) return message.reply({ embeds: [E.error('Nom trop long', 'Maximum 50 caractères.')] });
 
   const includeEmojis = args.includes('--emojis');
-  const loading = await message.reply({ embeds: [E.info('Backup en cours...', 'Analyse de la structure du serveur.')] });
 
   try {
-    const data       = await serializeGuild(message.guild, { includeEmojis });
-    const { safeName } = saveTemplate(name, data);
-    const totalCh    = data.categories.reduce((s, c) => s + (c.channels?.length || 0), 0);
-
-    logAction({
-      action: 'save', templateName: safeName,
-      userId: message.author.id, guildId: message.guild.id, guildName: message.guild.name,
-      stats : { roles: data.roles.length, categories: data.categories.length, channels: totalCh, emojis: data.emojis.length },
-      success: true,
+    const { loadingMsg, result } = await withLoading(message, 'Sauvegarde en cours...', async () => {
+      const data        = await serializeGuild(message.guild, { includeEmojis });
+      const { safeName } = saveTemplate(name, data);
+      const totalCh     = data.categories.reduce((s, c) => s + (c.channels?.length || 0), 0);
+      logAction({
+        action: 'save', templateName: safeName,
+        userId: message.author.id, guildId: message.guild.id, guildName: message.guild.name,
+        stats : { roles: data.roles.length, categories: data.categories.length, channels: totalCh, emojis: data.emojis.length },
+        success: true,
+      });
+      return { safeName, data, totalCh };
     });
-
-    return loading.edit({
+    const { safeName, data, totalCh } = result;
+    return loadingMsg.edit({
       embeds: [
         E.success('Backup créé')
           .addFields(
@@ -76,9 +78,7 @@ async function handleCreate(message, args) {
             { name: 'Emojis',     value: String(data.emojis.length),     inline: true },
           )],
     });
-  } catch (err) {
-    return loading.edit({ embeds: [E.error('Erreur de backup', err.message)] });
-  }
+  } catch { /* withLoading a déjà édité le message d'erreur */ }
 }
 
 // ─── List ─────────────────────────────────────────────────────────────────────
