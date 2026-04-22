@@ -16,7 +16,7 @@ const {
 } = require('discord.js');
 const { COLORS } = require('../theme');
 const { getTicketConfig } = require('../../core/ticket-helper');
-const { forButton } = require('../../core/emojis');
+const { e, forButton } = require('../../core/emojis');
 
 const STATUS = (val) => val ? '**Défini**' : '*Non défini*';
 
@@ -39,7 +39,7 @@ function renderTicketPanel(guildId) {
 
   // ── Titre ─────────────────────────────────────────────────────────────────
   container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent('# 🎟️ Configuration Tickets'),
+    new TextDisplayBuilder().setContent(`# ${e('cat_ticket')} Configuration Tickets`),
   );
   container.addTextDisplayComponents(
     new TextDisplayBuilder().setContent(
@@ -66,7 +66,7 @@ function renderTicketPanel(guildId) {
   container.addSectionComponents(
     new SectionBuilder()
       .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`📁 **Catégorie :** ${catDisplay}`),
+        new TextDisplayBuilder().setContent(`${e('ui_folder')} **Catégorie :** ${catDisplay}`),
       )
       .setButtonAccessory(
         new ButtonBuilder()

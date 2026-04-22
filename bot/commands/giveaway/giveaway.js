@@ -1,6 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'giveaway',
@@ -16,7 +17,7 @@ module.exports = {
     return message.channel.send({
       embeds: [
         E.base()
-          .setTitle('🎁 Système de Giveaway')
+          .setTitle(`${e('cat_giveaway')} Système de Giveaway`)
           .setDescription('Crée et gère des tirages au sort sur ton serveur.')
           .addFields(
             { name: '`;gcreate #salon <durée> <gain>`', value: 'Créer un giveaway avec timer automatique.' },

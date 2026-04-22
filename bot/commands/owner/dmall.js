@@ -1,6 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 const BAR_SIZE     = 14;
 const SEND_DELAY   = 400;   // ms entre chaque DM
@@ -34,7 +35,7 @@ function progressEmbed(sent, failed, total, startTime, texte) {
   const preview   = texte.length > 60 ? texte.slice(0, 60) + '…' : texte;
 
   return E.base()
-    .setTitle('📨 Envoi DM en cours...')
+    .setTitle(`${e('ui_mail')} Envoi DM en cours...`)
     .setDescription(
       `**Message :** ${preview}\n\n` +
       `\`${barStr}\`  **${pct}%**  (${done}/${total})`
@@ -42,7 +43,7 @@ function progressEmbed(sent, failed, total, startTime, texte) {
     .addFields(
       { name: '✓ Envoyés',   value: `\`${sent}\``,        inline: true },
       { name: '✗ Échecs',    value: `\`${failed}\``,      inline: true },
-      { name: '⏳ Restants',  value: `\`${remaining}\``,   inline: true },
+      { name: `${e('ani_loading')} Restants`,  value: `\`${remaining}\``,   inline: true },
       { name: '⚡ Vitesse',   value: `\`${speed}/s\``,     inline: true },
       { name: '⏱ ETA',       value: `\`${etaStr}\``,      inline: true },
       { name: '📊 Total',    value: `\`${total}\``,        inline: true },

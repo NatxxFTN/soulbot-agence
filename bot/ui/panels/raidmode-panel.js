@@ -14,6 +14,7 @@ const {
 } = require('discord.js');
 const { COLORS } = require('../theme');
 const { getRaidmodeConfig, getRecentDetections } = require('../../core/raidmode-helper');
+const { e, forButton } = require('../../core/emojis');
 
 const ACTION_LABELS = { kick: 'Expulser', ban: 'Bannir', timeout: 'Timeout 10min' };
 
@@ -32,7 +33,7 @@ function renderRaidmodePanel(guildId) {
   const container = new ContainerBuilder().setAccentColor(COLORS.accent);
 
   container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent('# 🛡️ Raidmode Anti-Raid'),
+    new TextDisplayBuilder().setContent(`# ${e('cat_protection')} Raidmode Anti-Raid`),
   );
   container.addTextDisplayComponents(
     new TextDisplayBuilder().setContent(
@@ -79,7 +80,7 @@ function renderRaidmodePanel(guildId) {
         .setPlaceholder(`Action : ${ACTION_LABELS[action] || action}`)
         .addOptions([
           { label: 'Expulser',      value: 'kick',    emoji: '👢' },
-          { label: 'Bannir',        value: 'ban',     emoji: '🔨' },
+          { label: 'Bannir',        value: 'ban',     emoji: forButton('cat_moderation') },
           { label: 'Timeout 10min', value: 'timeout', emoji: '⏱️' },
         ]),
     ),

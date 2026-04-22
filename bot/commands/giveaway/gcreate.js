@@ -3,6 +3,7 @@
 const { PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const E = require('../../utils/embeds');
 const { parseDuration, formatDuration, createGiveaway } = require('../../core/giveaway-helper');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'gcreate',
@@ -45,7 +46,7 @@ module.exports = {
     try {
       const embed = new EmbedBuilder()
         .setColor(0xFF0000)
-        .setTitle('🎁 GIVEAWAY')
+        .setTitle(`${e('cat_giveaway')} GIVEAWAY`)
         .setDescription(
           `**Gain :** ${prize}\n` +
           `**Se termine :** <t:${Math.floor(endsAt / 1000)}:R>\n` +

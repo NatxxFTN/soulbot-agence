@@ -8,25 +8,26 @@ const {
 } = require('discord.js');
 const E = require('../../utils/embeds');
 const { version } = require('../../../package.json');
+const { e } = require('../../core/emojis');
 
 // ─── Catalogue catégories — clés = noms de dossiers réels ───────────────────
 const CATEGORIES = {
-  owner        : { label: 'Owner',        icon: '👑' },
-  moderation   : { label: 'Modération',   icon: '🛡️' },
-  information  : { label: 'Information',  icon: '📢' },
-  utility      : { label: 'Utile',        icon: '🔧' },
-  configuration: { label: 'Configuration',icon: '⚙️' },
-  protection   : { label: 'Protection',   icon: '🔒' },
-  fun          : { label: 'Fun',          icon: '🎮' },
-  stats        : { label: 'Statistique',  icon: '📊' },
-  ticket       : { label: 'Ticket',       icon: '🎫' },
-  game         : { label: 'Game',         icon: '🕹️' },
-  custom       : { label: 'Custom',       icon: '🔵' },
-  giveaway     : { label: 'Giveaway',     icon: '🎁' },
-  greeting     : { label: 'Greeting',     icon: '👋' },
-  invitation   : { label: 'Invitation',   icon: '📨' },
-  level        : { label: 'Niveau',       icon: '⬆️' },
-  role         : { label: 'Rôle',         icon: '🎭' },
+  owner        : { label: 'Owner',        icon: e('cat_owner') },
+  moderation   : { label: 'Modération',   icon: e('cat_moderation') },
+  information  : { label: 'Information',  icon: e('cat_information') },
+  utility      : { label: 'Utile',        icon: e('cat_utility') },
+  configuration: { label: 'Configuration',icon: e('cat_configuration') },
+  protection   : { label: 'Protection',   icon: e('cat_protection') },
+  fun          : { label: 'Fun',          icon: e('cat_fun') },
+  stats        : { label: 'Statistique',  icon: e('cat_information') },
+  ticket       : { label: 'Ticket',       icon: e('cat_ticket') },
+  game         : { label: 'Game',         icon: e('cat_fun') },
+  custom       : { label: 'Custom',       icon: e('cat_configuration') },
+  giveaway     : { label: 'Giveaway',     icon: e('cat_giveaway') },
+  greeting     : { label: 'Greeting',     icon: e('cat_greeting') },
+  invitation   : { label: 'Invitation',   icon: e('cat_information') },
+  level        : { label: 'Niveau',       icon: e('cat_level') },
+  role         : { label: 'Rôle',         icon: e('cat_configuration') },
 };
 
 const CATEGORY_ORDER = [
@@ -61,7 +62,7 @@ module.exports = {
         });
       }
 
-      const cat = CATEGORIES[cmd.category] ?? { label: cmd.category ?? 'Misc', icon: '📁' };
+      const cat = CATEGORIES[cmd.category] ?? { label: cmd.category ?? 'Misc', icon: e('ui_folder') };
 
       return message.channel.send({
         embeds: [
@@ -69,8 +70,8 @@ module.exports = {
             .setTitle(`${cat.icon}  Commande : \`${cmd.name}\``)
             .addFields(
               { name: '📝 Description', value: cmd.description || '*Aucune description.*', inline: false },
-              { name: '📌 Usage',       value: `\`${cmd.usage || `;${cmd.name}`}\``,       inline: true  },
-              { name: '📂 Catégorie',   value: `${cat.icon} ${cat.label}`,                 inline: true  },
+              { name: `${e('ui_pin')} Usage`,       value: `\`${cmd.usage || `;${cmd.name}`}\``,       inline: true  },
+              { name: `${e('ui_folder')} Catégorie`,   value: `${cat.icon} ${cat.label}`,                 inline: true  },
               { name: '⏱️ Cooldown',    value: cmd.cooldown ? `${cmd.cooldown}s` : 'Aucun', inline: true  },
               {
                 name : '🔀 Alias',
@@ -200,7 +201,7 @@ function buildPages(categories, client, ver) {
 
   // Catégorie suivante pour le footer
   const firstCat  = categories[0];
-  const firstMeta = firstCat ? (CATEGORIES[firstCat[0]] ?? { label: firstCat[0], icon: '📁' }) : null;
+  const firstMeta = firstCat ? (CATEGORIES[firstCat[0]] ?? { label: firstCat[0], icon: e('ui_folder') }) : null;
   const firstFooter = firstMeta ? `| ${firstMeta.icon} ${firstMeta.label}` : '';
 
   const overview = E.base()
@@ -237,9 +238,9 @@ function buildPages(categories, client, ver) {
   // ── Pages 1..N : une par catégorie ───────────────────────────────────
   for (let i = 0; i < categories.length; i++) {
     const [cat, cmds]   = categories[i];
-    const meta          = CATEGORIES[cat] ?? { label: cat, icon: '📁' };
+    const meta          = CATEGORIES[cat] ?? { label: cat, icon: e('ui_folder') };
     const nextEntry     = categories[i + 1];
-    const nextMeta      = nextEntry ? (CATEGORIES[nextEntry[0]] ?? { label: nextEntry[0], icon: '📁' }) : null;
+    const nextMeta      = nextEntry ? (CATEGORIES[nextEntry[0]] ?? { label: nextEntry[0], icon: e('ui_folder') }) : null;
 
     const sorted = [...cmds].sort((a, b) => a.name.localeCompare(b.name));
 

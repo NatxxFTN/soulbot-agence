@@ -2,6 +2,7 @@
 
 const { PermissionFlagsBits, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = require('discord.js');
 const E = require('../../utils/embeds');
+const { e, forButton } = require('../../core/emojis');
 
 module.exports = {
   name       : 'ticketload',
@@ -22,10 +23,10 @@ module.exports = {
       .setCustomId('ticket_type')
       .setPlaceholder('Choisis le type de ticket…')
       .addOptions(
-        new StringSelectMenuOptionBuilder().setLabel('Support général').setValue('support').setEmoji('💬'),
+        new StringSelectMenuOptionBuilder().setLabel('Support général').setValue('support').setEmoji(forButton('ui_chat')),
         new StringSelectMenuOptionBuilder().setLabel('Bug / problème').setValue('bug').setEmoji('🐛'),
         new StringSelectMenuOptionBuilder().setLabel('Partenariat').setValue('partnership').setEmoji('🤝'),
-        new StringSelectMenuOptionBuilder().setLabel('Autre').setValue('other').setEmoji('❓'),
+        new StringSelectMenuOptionBuilder().setLabel('Autre').setValue('other').setEmoji(forButton('btn_help')),
       );
 
     const row = new ActionRowBuilder().addComponents(menu);
@@ -33,7 +34,7 @@ module.exports = {
     await message.channel.send({
       embeds: [
         E.base()
-          .setTitle('🎫 Ouvrir un ticket')
+          .setTitle(`${e('cat_ticket')} Ouvrir un ticket`)
           .setDescription('Sélectionne le type de ticket dans le menu ci-dessous.'),
       ],
       components: [row],

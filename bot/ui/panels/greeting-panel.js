@@ -16,7 +16,7 @@ const {
 } = require('discord.js');
 const { COLORS, LABELS } = require('../theme');
 const { getConfig } = require('../../core/greeting-helper');
-const { forButton } = require('../../core/emojis');
+const { e, forButton } = require('../../core/emojis');
 
 const STATUS = (val) => val ? '**Défini**' : '*Non défini*';
 
@@ -39,7 +39,7 @@ function renderPanel(guildId, mode = 'join') {
   const isEnabled = isJoin ? !!cfg.join_enabled   : !!cfg.leave_enabled;
 
   const modeLabel = isJoin ? 'Arrivée' : 'Départ';
-  const modeEmoji = isJoin ? '🔔' : '👋';
+  const modeEmoji = isJoin ? '🔔' : e('cat_greeting');
 
   const container = new ContainerBuilder().setAccentColor(COLORS.accent);
 
@@ -54,8 +54,8 @@ function renderPanel(guildId, mode = 'join') {
         .setCustomId('greeting:mode:select')
         .setPlaceholder(`${modeEmoji} ${modeLabel}`)
         .addOptions(
-          { label: 'Arrivée', value: 'join',  emoji: '🔔', default: isJoin  },
-          { label: 'Départ',  value: 'leave', emoji: '👋', default: !isJoin },
+          { label: 'Arrivée', value: 'join',  emoji: '🔔',                       default: isJoin  },
+          { label: 'Départ',  value: 'leave', emoji: forButton('cat_greeting'), default: !isJoin },
         ),
     ),
   );
@@ -106,7 +106,7 @@ function renderPanel(guildId, mode = 'join') {
   container.addSectionComponents(
     new SectionBuilder()
       .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`💬 Message : ${STATUS(!!message)}`),
+        new TextDisplayBuilder().setContent(`${e('ui_chat')} Message : ${STATUS(!!message)}`),
       )
       .setButtonAccessory(
         new ButtonBuilder()
@@ -158,7 +158,7 @@ function renderPanel(guildId, mode = 'join') {
   container.addSectionComponents(
     new SectionBuilder()
       .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`📨 DM : ${STATUS(!!dm)}`),
+        new TextDisplayBuilder().setContent(`${e('ui_mail')} DM : ${STATUS(!!dm)}`),
       )
       .setButtonAccessory(
         new ButtonBuilder()

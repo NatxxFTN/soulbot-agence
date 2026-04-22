@@ -2,6 +2,7 @@
 
 const E = require('../../utils/embeds');
 const { getGiveaway, getParticipants } = require('../../core/giveaway-helper');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'gparticipants',
@@ -41,7 +42,7 @@ module.exports = {
     return message.channel.send({
       embeds: [
         E.base()
-          .setTitle(`🎁 Participants — ${gw.prize}`)
+          .setTitle(`${e('cat_giveaway')} Participants — ${gw.prize}`)
           .setDescription(`${visible}${more}`)
           .addFields(
             { name: 'Total',  value: `${participants.length}`, inline: true },

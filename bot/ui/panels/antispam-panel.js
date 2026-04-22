@@ -17,14 +17,14 @@ const {
 } = require('discord.js');
 const { COLORS } = require('../theme');
 const { getAntispamConfig, getWhitelistRoles } = require('../../core/antispam-helper');
-const { forButton } = require('../../core/emojis');
+const { e, forButton } = require('../../core/emojis');
 
 const SANCTION_OPTIONS = [
-  { label: 'Supprimer le message', value: 'delete',  emoji: '🗑️' },
+  { label: 'Supprimer le message', value: 'delete',  emoji: forButton('btn_trash') },
   { label: 'Avertir',              value: 'warn',    emoji: '⚠️' },
   { label: 'Timeout 10 min',       value: 'timeout', emoji: '⏱️' },
   { label: 'Expulser',             value: 'kick',    emoji: '👢' },
-  { label: 'Bannir',               value: 'ban',     emoji: '🔨' },
+  { label: 'Bannir',               value: 'ban',     emoji: forButton('cat_moderation') },
   { label: 'Aucune action',        value: 'none',    emoji: '🚫' },
 ];
 
@@ -237,7 +237,7 @@ function renderAntispamWhitelistPanel(guildId) {
   const container = new ContainerBuilder().setAccentColor(COLORS.accent);
 
   container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent('# ✅ Whitelist Anti-Spam'),
+    new TextDisplayBuilder().setContent(`# ${e('btn_success')} Whitelist Anti-Spam`),
   );
 
   const listContent = whitelist.length > 0

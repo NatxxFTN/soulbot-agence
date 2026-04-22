@@ -16,7 +16,7 @@ const {
 } = require('discord.js');
 const { COLORS } = require('../theme');
 const { getModConfig } = require('../../core/mod-helper');
-const { forButton } = require('../../core/emojis');
+const { e, forButton } = require('../../core/emojis');
 
 const st = (on) => on ? '🟢' : '🔴';
 
@@ -45,7 +45,7 @@ function renderModconfigPanel(guildId) {
 
   // ── Titre ────────────────────────────────────────────────────────────────────
   container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent('# 🔨 Configuration Modération'),
+    new TextDisplayBuilder().setContent(`# ${e('cat_moderation')} Configuration Modération`),
   );
   container.addSeparatorComponents(
     new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
@@ -85,7 +85,7 @@ function renderModconfigPanel(guildId) {
     new SectionBuilder()
       .addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-          `🛡️ **Rôle modérateur** : ${modRoleId ? `<@&${modRoleId}>` : '*Non défini*'}`,
+          `${e('cat_protection')} **Rôle modérateur** : ${modRoleId ? `<@&${modRoleId}>` : '*Non défini*'}`,
         ),
       )
       .setButtonAccessory(

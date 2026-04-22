@@ -3,6 +3,7 @@
 const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
 const { getConfig, formatMessage } = require('../../core/greeting-helper');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'testgreet',
@@ -30,7 +31,7 @@ module.exports = {
     return message.channel.send({
       embeds: [
         E.base()
-          .setTitle('👋 Aperçu des messages Greeting')
+          .setTitle(`${e('cat_greeting')} Aperçu des messages Greeting`)
           .addFields(
             { name: '🟢 Arrivée — salon',    value: joinStatus,   inline: true },
             { name: '🔴 Départ — salon',     value: leaveStatus,  inline: true },

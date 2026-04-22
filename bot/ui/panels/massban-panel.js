@@ -11,6 +11,7 @@ const {
   MessageFlags,
 } = require('discord.js');
 const { COLORS } = require('../theme');
+const { e } = require('../../core/emojis');
 const { db } = require('../../database');
 
 function getRecentMassbans(guildId) {
@@ -26,7 +27,7 @@ function renderMassbanPanel(guildId) {
   const container = new ContainerBuilder().setAccentColor(COLORS.accent);
 
   container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent('# 🔨 Massban Ciblé'),
+    new TextDisplayBuilder().setContent(`# ${e('cat_moderation')} Massban Ciblé`),
   );
   container.addTextDisplayComponents(
     new TextDisplayBuilder().setContent(

@@ -3,6 +3,7 @@
 const { PermissionFlagsBits, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const E = require('../../utils/embeds');
 const { setConfig } = require('../../core/ticket-helper');
+const { e, forButton } = require('../../core/emojis');
 
 module.exports = {
   name       : 'quickticket',
@@ -48,14 +49,14 @@ module.exports = {
         new ButtonBuilder()
           .setCustomId('ticket_open')
           .setLabel('Ouvrir un ticket')
-          .setEmoji('🎫')
+          .setEmoji(forButton('cat_ticket'))
           .setStyle(ButtonStyle.Primary),
       );
 
       const panel = await message.channel.send({
         embeds: [
           E.base()
-            .setTitle('🎫 Support')
+            .setTitle(`${e('cat_ticket')} Support`)
             .setDescription('Clique sur le bouton ci-dessous pour ouvrir un ticket.\nUn membre du staff te répondra dès que possible.'),
         ],
         components: [row],
