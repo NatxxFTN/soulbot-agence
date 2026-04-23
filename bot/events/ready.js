@@ -89,9 +89,10 @@ module.exports = {
     const { createTicket, getConfig } = require('../core/ticket-helper');
 
     client.buttonHandlers.set('ticket_open', async (interaction) => {
+      await interaction.deferReply({ ephemeral: true }).catch(() => {});
       try {
         const { channel, number } = await createTicket(interaction.guild, interaction.user);
-        await interaction.reply({ content: `✓ Ticket créé : ${channel}`, ephemeral: true });
+        await interaction.editReply({ content: `✓ Ticket créé : ${channel}` }).catch(() => {});
         await channel.send({
           content: interaction.user.toString(),
           embeds : [
@@ -101,21 +102,22 @@ module.exports = {
           ],
         });
       } catch (err) {
-        const payload = { content: `✗ ${err.message}`, ephemeral: true };
-        if (interaction.replied || interaction.deferred) {
-          await interaction.followUp(payload).catch(() => {});
+        const payload = { content: `✗ ${err.message}` };
+        if (interaction.deferred || interaction.replied) {
+          await interaction.editReply(payload).catch(() => {});
         } else {
-          await interaction.reply(payload).catch(() => {});
+          await interaction.reply({ ...payload, ephemeral: true }).catch(() => {});
         }
       }
     });
 
     client.selectHandlers.set('ticket_type', async (interaction) => {
+      await interaction.deferReply({ ephemeral: true }).catch(() => {});
       const type = interaction.values[0];
       const labels = { support: 'Support général', bug: 'Bug / problème', partnership: 'Partenariat', other: 'Autre' };
       try {
         const { channel, number } = await createTicket(interaction.guild, interaction.user, type);
-        await interaction.reply({ content: `✓ Ticket créé : ${channel}`, ephemeral: true });
+        await interaction.editReply({ content: `✓ Ticket créé : ${channel}` }).catch(() => {});
         await channel.send({
           content: interaction.user.toString(),
           embeds : [
@@ -125,11 +127,11 @@ module.exports = {
           ],
         });
       } catch (err) {
-        const payload = { content: `✗ ${err.message}`, ephemeral: true };
-        if (interaction.replied || interaction.deferred) {
-          await interaction.followUp(payload).catch(() => {});
+        const payload = { content: `✗ ${err.message}` };
+        if (interaction.deferred || interaction.replied) {
+          await interaction.editReply(payload).catch(() => {});
         } else {
-          await interaction.reply(payload).catch(() => {});
+          await interaction.reply({ ...payload, ephemeral: true }).catch(() => {});
         }
       }
     });
@@ -467,6 +469,120 @@ module.exports = {
         }).catch(() => {});
       }
     });
+
+    // ── Handler Embed Builder ────────────────────────────────────────────────
+    const { handleEmbedInteraction } = require('../ui/handlers/embed-handler');
+    client.buttonHandlers.set('emb', handleEmbedInteraction);
+
+    // ── Handlers Bump Disboard ───────────────────────────────────────────────
+    const { handleBumpInteraction } = require('../ui/handlers/bump-handler');
+    const {
+      handleBumpConfigInteraction,
+      handleBumpConfigModal,
+    } = require('../ui/handlers/bumpconfig-handler');
+
+    client.buttonHandlers.set('bump',    handleBumpInteraction);
+    client.buttonHandlers.set('bumpcfg', handleBumpConfigInteraction);
+    client.selectHandlers.set('bumpcfg', handleBumpConfigInteraction);
+    client.modalHandlers .set('bumpcfg_modal', handleBumpConfigModal);
+
+    // ── Handlers Access Control (buyers + owners panels) ─────────────────────
+    const { handleBuyersInteraction } = require('../ui/handlers/buyers-handler');
+    const { handleOwnersInteraction } = require('../ui/handlers/owners-handler');
+    client.buttonHandlers.set('buyers', handleBuyersInteraction);
+    client.buttonHandlers.set('owners', handleOwnersInteraction);
+
+    // ── Handlers Custom Commands (panel + modals + selects) ──────────────────
+    const {
+      handleCustomInteraction,
+      handleCustomModal,
+      handleCustomSelect,
+    } = require('../ui/handlers/custom-handler');
+    client.buttonHandlers.set('custom',        handleCustomInteraction);
+    client.modalHandlers .set('custom_modal',  handleCustomModal);
+    client.selectHandlers.set('custom_select', handleCustomSelect);
+
+    // ── Handler Security (panel + toggle/config selects + buttons) ───────────
+    const { handleSecurityInteraction } = require('../ui/handlers/security-handler');
+    client.buttonHandlers.set('security', handleSecurityInteraction);
+    client.selectHandlers.set('security', handleSecurityInteraction);
+
+    // ── Handler Security Feature (mini-panels secfeat:<feature>:*) ───────────
+    const { handleSecurityFeatureInteraction } = require('../ui/handlers/security-feature-handler');
+    client.buttonHandlers.set('secfeat', handleSecurityFeatureInteraction);
+    client.selectHandlers.set('secfeat', handleSecurityFeatureInteraction);
+
+    // ── Scheduler Bump (check pending reminders toutes les 60s) ──────────────
+    const { startBumpScheduler } = require('../core/bump-scheduler');
+    startBumpScheduler(client);
+
+    // ── Handlers Advanced Tools Pack (Prompt 2/3) ────────────────────────────
+    const { handleTempvocInteraction, handleTempvocModal } = require('../ui/handlers/tempvoc-handler');
+    client.selectHandlers.set('tempvoc',       handleTempvocInteraction);
+    client.buttonHandlers.set('tempvoc',       handleTempvocInteraction);
+    client.modalHandlers .set('tempvoc_modal', handleTempvocModal);
+
+    const { handleFormInteraction, handleFormModal } = require('../ui/handlers/form-handler');
+    client.buttonHandlers.set('form',       handleFormInteraction);
+    client.modalHandlers .set('form_modal', handleFormModal);
+
+    const { handleSuggestionInteraction, handleSuggestionModal, handleSuggconfigInteraction } = require('../ui/handlers/suggestion-handler');
+    client.buttonHandlers.set('suggest',       handleSuggestionInteraction);
+    client.modalHandlers .set('suggest_modal', handleSuggestionModal);
+    client.buttonHandlers.set('suggconfig',    handleSuggconfigInteraction);
+    client.selectHandlers.set('suggconfig',    handleSuggconfigInteraction);
+
+    const { handleServerbackupInteraction } = require('../ui/handlers/serverbackup-handler');
+    client.buttonHandlers.set('sbackcfg',     handleServerbackupInteraction);
+    client.selectHandlers.set('sbackcfg',     handleServerbackupInteraction);
+    client.buttonHandlers.set('sbackrestore', handleServerbackupInteraction);
+
+    const { handleTwitchInteraction, handleTwitchModal } = require('../ui/handlers/twitch-handler');
+    client.buttonHandlers.set('twcfg',       handleTwitchInteraction);
+    client.selectHandlers.set('twcfg',       handleTwitchInteraction);
+    client.modalHandlers .set('twcfg_modal', handleTwitchModal);
+
+    const { handleReminderButton, handleReminderModal } = require('../ui/handlers/reminder-handler');
+    client.buttonHandlers.set('reminder',       handleReminderButton);
+    client.modalHandlers .set('reminder_modal', handleReminderModal);
+
+    const { handleTransferInteraction } = require('../commands/owner/customtransfer');
+    client.buttonHandlers.set('cxfer', handleTransferInteraction);
+
+    // NOTE : autoreactListener.js et tempvocListener.js sont auto-chargés par
+    // bot/core/EventHandler.js qui scanne bot/events/ — pas de client.on() ici
+    // pour éviter les listeners en double.
+
+    // Schedulers
+    const { startServerbackupScheduler } = require('../core/serverbackup-scheduler');
+    const { startTwitchScheduler }       = require('../core/twitch-scheduler');
+    const { startReminderScheduler }     = require('../core/reminder-scheduler');
+    startServerbackupScheduler(client);
+    startTwitchScheduler(client);
+    startReminderScheduler(client);
+
+    // ── Handlers Innovation Pack 3/3 ─────────────────────────────────────────
+    const { handleConfessionInteraction, handleConfessionModal } = require('../ui/handlers/confession-handler');
+    client.buttonHandlers.set('confession',        handleConfessionInteraction);
+    client.buttonHandlers.set('confessioncfg',     handleConfessionInteraction);
+    client.selectHandlers.set('confessioncfg',     handleConfessionInteraction);
+    client.modalHandlers .set('confession_modal',  handleConfessionModal);
+    client.modalHandlers .set('confessioncfg_modal', handleConfessionModal);
+
+    const { handleBdayConfigInteraction, handleBdayConfigModal } = require('../ui/handlers/bday-handler');
+    client.buttonHandlers.set('bdaycfg',       handleBdayConfigInteraction);
+    client.selectHandlers.set('bdaycfg',       handleBdayConfigInteraction);
+    client.modalHandlers .set('bdaycfg_modal', handleBdayConfigModal);
+
+    const { handlePairupInteraction } = require('../ui/handlers/pairup-handler');
+    client.buttonHandlers.set('pairupcfg', handlePairupInteraction);
+    client.selectHandlers.set('pairupcfg', handlePairupInteraction);
+
+    // Schedulers Innovation Pack
+    const { startBdayScheduler } = require('../core/bday-scheduler');
+    const { startPairupScheduler } = require('../core/pairup-scheduler');
+    startBdayScheduler(client);
+    startPairupScheduler(client);
 
     console.log('[Bot] Prêt !');
   },

@@ -8,6 +8,18 @@
 
 const { getEmoji, getEmojiId, loadCache } = require('./emoji-cache');
 
+// ─── Serveurs emoji configurés (multi-serveur) ────────────────────────────────
+// Lecture depuis .env — un emoji peut résider sur n'importe lequel des serveurs
+// listés. L'ID Discord suffit à résoudre <:name:id>, donc `guildId` n'est pas
+// utilisé à l'affichage — uniquement par le script d'upload pour répartir.
+
+const EMOJI_GUILD_IDS = [
+  process.env.EMOJI_GUILD_ID,
+  process.env.EMOJI_GUILD_ID_2,
+  process.env.EMOJI_GUILD_ID_3,
+  process.env.EMOJI_GUILD_ID_4,
+].filter(Boolean);
+
 // ─── Fallbacks Unicode ────────────────────────────────────────────────────────
 
 const FALLBACK_EMOJIS = {
@@ -55,6 +67,14 @@ const FALLBACK_EMOJIS = {
   ui_smiley:      '😊',
   ui_bulb:        '💡',
   ui_git:         '🔶',
+  // Membres / UI complémentaires
+  ui_user:                   '👤',
+  ui_members:                '👥',
+  ui_membersatroisperssone:  '👥',
+  ui_eye:                    '👁️',
+  ui_lock:                   '🔒',
+  ui_unlock:                 '🔓',
+  ui_diamond:                '💎',
   // Animés (ani_world = globe animé dans les assets)
   ani_world:   '🌍',
   ani_globe:   '🌍',
@@ -192,12 +212,21 @@ function reload() {
   console.log(`[emojis] ${Object.keys(cache).length} emojis chargés`);
 }
 
+/**
+ * Liste des guildes configurées pour stocker les emojis custom.
+ * Ordre = EMOJI_GUILD_ID, EMOJI_GUILD_ID_2, ..._3, ..._4 (null filtrés).
+ */
+function getEmojiGuilds() {
+  return [...EMOJI_GUILD_IDS];
+}
+
 module.exports = {
   e,
   forButton,
   categoryEmoji,
   categoryEmojiForButton,
   reload,
+  getEmojiGuilds,
   FALLBACK_EMOJIS,
   CATEGORY_TO_EMOJI,
 };

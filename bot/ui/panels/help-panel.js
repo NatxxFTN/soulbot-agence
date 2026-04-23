@@ -165,7 +165,7 @@ function renderHelpCategory(category = null, page = 1) {
 
   if (catNames.length === 0) {
     container.addTextDisplayComponents(
-      new TextDisplayBuilder().setContent('# 📚 Aide Soulbot\n*Aucune commande chargée.*'),
+      new TextDisplayBuilder().setContent(`# ${e('ani_diamond')} Aide Soulbot\n*Aucune commande chargée.*`),
     );
     return { components: [container], flags: MessageFlags.IsComponentsV2 };
   }
@@ -181,7 +181,7 @@ function renderHelpCategory(category = null, page = 1) {
 
   // En-tête
   container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent('# 📚 Aide Soulbot'),
+    new TextDisplayBuilder().setContent(`# ${e('ani_diamond')} Aide Soulbot`),
   );
   container.addTextDisplayComponents(
     new TextDisplayBuilder().setContent(
@@ -229,7 +229,7 @@ function renderHelpCategory(category = null, page = 1) {
     );
   } else {
     const lines = slice.map(cmd => {
-      const badges  = cmd.ownerOnly ? ' 👑' : '';
+      const badges  = cmd.ownerOnly ? ` ${e('cat_owner')}` : '';
       const aliases = cmd.aliases.length > 0
         ? ` *(${cmd.aliases.map(a => `\`${a}\``).join(', ')})*`
         : '';

@@ -2,13 +2,15 @@
 
 /**
  * ═══════════════════════════════════════════════
- * CHECK EMOJI SETUP — Soulbot
+ * CHECK EMOJI SETUP — Soulbot (multi-serveur)
  * ═══════════════════════════════════════════════
  * Vérifie que tout est prêt pour l'upload des emojis.
  * À lancer AVANT npm run emojis:upload.
  *
  * Usage : node bot/scripts/check-emoji-setup.js
  *         npm run emojis:check
+ *
+ * Supporte EMOJI_GUILD_ID, EMOJI_GUILD_ID_2, _3, _4.
  * ═══════════════════════════════════════════════
  */
 
@@ -19,10 +21,23 @@ const fs   = require('fs');
 const path = require('path');
 
 const EMOJIS_DIR = path.join(__dirname, '../assets/emojis');
+const JSON_PATH  = path.join(__dirname, '../../data/emojis-ids.json');
+
+const LIMIT_STATIC   = 50;
+const LIMIT_ANIMATED = 50;
+
+function getConfiguredGuildIds() {
+  return [
+    { label: 'EMOJI_GUILD_ID',   id: process.env.EMOJI_GUILD_ID   },
+    { label: 'EMOJI_GUILD_ID_2', id: process.env.EMOJI_GUILD_ID_2 },
+    { label: 'EMOJI_GUILD_ID_3', id: process.env.EMOJI_GUILD_ID_3 },
+    { label: 'EMOJI_GUILD_ID_4', id: process.env.EMOJI_GUILD_ID_4 },
+  ].filter(e => e.id).map(e => ({ label: e.label, id: e.id.trim().replace(/['"]/g, '') }));
+}
 
 async function main() {
   console.log('═══════════════════════════════════════════');
-  console.log('🔍 CHECK SETUP EMOJIS SOULBOT');
+  console.log('🔍 CHECK SETUP EMOJIS SOULBOT (MULTI-SERVEUR)');
   console.log('═══════════════════════════════════════════\n');
 
   let errors   = 0;
@@ -31,7 +46,7 @@ async function main() {
   // ─── Check 1 : Variables .env ───────────────────────────────────────────────
   console.log('📋 Check 1 : Variables .env');
   const token   = process.env.DISCORD_TOKEN;
-  const guildId = process.env.EMOJI_GUILD_ID;
+  const guilds  = getConfiguredGuildIds();
 
   if (!token) {
     console.log('   ❌ DISCORD_TOKEN manquant');
@@ -40,60 +55,43 @@ async function main() {
     console.log(`   ✅ DISCORD_TOKEN présent (${token.substring(0, 10)}...)`);
   }
 
-  if (!guildId) {
-    console.log('   ❌ EMOJI_GUILD_ID manquant dans .env');
-    console.log('      Ajoute : EMOJI_GUILD_ID=123456789012345678');
+  if (guilds.length === 0) {
+    console.log('   ❌ Aucune variable EMOJI_GUILD_ID* définie');
+    console.log('      Ajoute au moins : EMOJI_GUILD_ID=123456789012345678');
     errors++;
   } else {
-    const cleanId = guildId.trim().replace(/['"]/g, '');
-
-    if (cleanId !== guildId) {
-      console.log(`   ⚠️  EMOJI_GUILD_ID contient espaces/guillemets`);
-      console.log(`      Actuel   : "${guildId}"`);
-      console.log(`      Corrigé  : ${cleanId}`);
-      warnings++;
-    }
-
-    if (!/^\d{17,20}$/.test(cleanId)) {
-      console.log(`   ❌ EMOJI_GUILD_ID invalide (doit être 17-20 chiffres)`);
-      console.log(`      Actuel  : "${cleanId}"`);
-      console.log(`      Exemple : 1234567890123456789`);
-      console.log('');
-      console.log('   💡 Pour obtenir l\'ID :');
-      console.log('      1. Discord → Paramètres utilisateur → Avancés');
-      console.log('      2. Active "Mode développeur"');
-      console.log('      3. Clic droit sur le SERVEUR (icône en haut à gauche)');
-      console.log('      4. "Copier l\'identifiant du serveur"');
-      console.log('      5. Colle dans .env : EMOJI_GUILD_ID=<id>');
-      errors++;
-    } else {
-      console.log(`   ✅ EMOJI_GUILD_ID valide : ${cleanId}`);
+    console.log(`   ✅ ${guilds.length} serveur(s) configuré(s) :`);
+    for (const g of guilds) {
+      if (!/^\d{17,20}$/.test(g.id)) {
+        console.log(`   ❌ ${g.label} invalide : "${g.id}" (attendu : 17-20 chiffres)`);
+        errors++;
+      } else {
+        console.log(`      • ${g.label} : ***${g.id.slice(-4)} ✓`);
+      }
     }
   }
 
   // ─── Check 2 : Dossier emojis ───────────────────────────────────────────────
   console.log('\n📋 Check 2 : Dossier bot/assets/emojis/');
 
+  let files = [];
   if (!fs.existsSync(EMOJIS_DIR)) {
     console.log(`   ❌ Dossier introuvable : ${EMOJIS_DIR}`);
     errors++;
   } else {
-    const files = fs.readdirSync(EMOJIS_DIR);
-    const pngs  = files.filter(f => f.endsWith('.png'));
-    const gifs  = files.filter(f => f.endsWith('.gif'));
-    const total = pngs.length + gifs.length;
+    files      = fs.readdirSync(EMOJIS_DIR).filter(f => /\.(png|gif)$/i.test(f));
+    const pngs = files.filter(f => f.endsWith('.png'));
+    const gifs = files.filter(f => f.endsWith('.gif'));
 
     console.log(`   ✅ Dossier existe`);
-    console.log(`   📊 ${pngs.length} fichiers .png`);
-    console.log(`   📊 ${gifs.length} fichiers .gif`);
-    console.log(`   📊 ${total} total`);
+    console.log(`   📊 ${pngs.length} fichiers .png · ${gifs.length} fichiers .gif · ${files.length} total`);
 
-    if (total === 0) {
-      console.log('   ❌ Aucun fichier à uploader');
-      errors++;
+    if (files.length === 0) {
+      console.log('   ⚠️  Aucun fichier — rien à uploader');
+      warnings++;
     }
 
-    for (const file of [...pngs, ...gifs]) {
+    for (const file of files) {
       const stats = fs.statSync(path.join(EMOJIS_DIR, file));
       if (stats.size > 262144) {
         console.log(`   ⚠️  ${file} : ${(stats.size / 1024).toFixed(0)}KB > 256KB (limite Discord)`);
@@ -102,6 +100,28 @@ async function main() {
     }
   }
 
+  // ─── Check 3 : JSON local ───────────────────────────────────────────────────
+  console.log('\n📋 Check 3 : data/emojis-ids.json');
+  let cache = {};
+  if (fs.existsSync(JSON_PATH)) {
+    try {
+      cache = JSON.parse(fs.readFileSync(JSON_PATH, 'utf-8'));
+      const names = Object.keys(cache);
+      const withGuildId = names.filter(n => cache[n].guildId).length;
+      console.log(`   ✅ ${names.length} emoji(s) en cache · ${withGuildId} avec guildId`);
+      if (withGuildId < names.length) {
+        console.log(`   ⚠️  ${names.length - withGuildId} emoji(s) sans guildId (migration au prochain upload)`);
+        warnings++;
+      }
+    } catch (err) {
+      console.log(`   ❌ JSON corrompu : ${err.message}`);
+      errors++;
+    }
+  } else {
+    console.log('   ℹ️  Aucun cache existant (normal au 1er run)');
+  }
+
+  // ─── Stop si erreurs bloquantes ─────────────────────────────────────────────
   if (errors > 0) {
     console.log('\n═══════════════════════════════════════════');
     console.log(`❌ ${errors} erreur(s) détectée(s). Fix avant de continuer.`);
@@ -109,91 +129,92 @@ async function main() {
     process.exit(1);
   }
 
-  // ─── Check 3 : Connexion Discord ────────────────────────────────────────────
-  console.log('\n📋 Check 3 : Connexion Discord');
+  // ─── Check 4 : Connexion Discord ────────────────────────────────────────────
+  console.log('\n📋 Check 4 : Connexion Discord + serveurs cibles');
 
   const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
   try {
+    const ready = new Promise(res => client.once('clientReady', res));
     await client.login(token);
-    console.log(`   ✅ Bot connecté : ${client.user.tag}`);
+    await ready;
+    console.log(`   ✅ Bot connecté : ${client.user.tag}\n`);
 
-    // ─── Check 4 : Serveurs du bot ────────────────────────────────────────────
-    console.log('\n📋 Check 4 : Serveurs du bot');
-    const guilds   = client.guilds.cache;
-    const cleanId  = guildId.trim().replace(/['"]/g, '');
+    const existingNames = new Set(Object.keys(cache));
+    const pendingFiles  = files.filter(f => !existingNames.has(f.replace(/\.(png|gif)$/i, '')));
 
-    console.log(`   📊 Bot présent dans ${guilds.size} serveur(s)`);
+    let totalStaticSlots   = 0;
+    let totalAnimatedSlots = 0;
 
-    if (guilds.size === 0) {
-      console.log('   ❌ Le bot n\'est dans AUCUN serveur !');
-      errors++;
+    for (const g of guilds) {
+      console.log(`   ── ${g.label} (***${g.id.slice(-4)}) ──`);
+
+      let guild;
+      try {
+        guild = await client.guilds.fetch(g.id);
+        await guild.emojis.fetch();
+      } catch (err) {
+        console.log(`   ❌ Inaccessible : ${err.message}`);
+        errors++;
+        continue;
+      }
+
+      const me = await guild.members.fetchMe();
+      const hasPerms = me.permissions.has(PermissionsBitField.Flags.ManageGuildExpressions)
+                    || me.permissions.has(PermissionsBitField.Flags.ManageEmojisAndStickers);
+
+      const staticCount   = guild.emojis.cache.filter(em => !em.animated).size;
+      const animatedCount = guild.emojis.cache.filter(em =>  em.animated).size;
+      const staticSlots   = LIMIT_STATIC   - staticCount;
+      const animatedSlots = LIMIT_ANIMATED - animatedCount;
+
+      totalStaticSlots   += staticSlots;
+      totalAnimatedSlots += animatedSlots;
+
+      console.log(`   ✅ Serveur : ${guild.name} · tier ${guild.premiumTier}`);
+      console.log(`      Statiques : ${staticCount}/${LIMIT_STATIC} (${staticSlots} libres)`);
+      console.log(`      Animés    : ${animatedCount}/${LIMIT_ANIMATED} (${animatedSlots} libres)`);
+      console.log(`      Permission MANAGE_GUILD_EXPRESSIONS : ${hasPerms ? '✅' : '❌'}`);
+      if (!hasPerms) {
+        console.log('      💡 Paramètres serveur → Rôles → rôle du bot → "Gérer les expressions"');
+        errors++;
+      }
+      console.log('');
+    }
+
+    // ─── Upload pending ─────────────────────────────────────────────────────
+    console.log(`📋 Check 5 : Fichiers en attente d'upload`);
+    if (pendingFiles.length === 0) {
+      console.log('   ✅ Aucun — tout est à jour');
     } else {
-      console.log('\n   Liste des serveurs :');
-      guilds.forEach(g => {
-        const match = g.id === cleanId ? ' ← CIBLE ✅' : '';
-        console.log(`   • ${g.name} (${g.id})${match}`);
-      });
+      const pendingStatic   = pendingFiles.filter(f => f.endsWith('.png')).length;
+      const pendingAnimated = pendingFiles.filter(f => f.endsWith('.gif')).length;
+      console.log(`   📊 ${pendingFiles.length} fichier(s) à uploader : ${pendingStatic} PNG · ${pendingAnimated} GIF`);
+      console.log(`   📊 Capacité cumulée : ${totalStaticSlots} slots statiques · ${totalAnimatedSlots} slots animés`);
+      if (pendingStatic > totalStaticSlots) {
+        console.log(`   ⚠️  Pas assez de slots statiques (${pendingStatic} > ${totalStaticSlots})`);
+        warnings++;
+      }
+      if (pendingAnimated > totalAnimatedSlots) {
+        console.log(`   ⚠️  Pas assez de slots animés (${pendingAnimated} > ${totalAnimatedSlots})`);
+        warnings++;
+      }
+      for (const f of pendingFiles) console.log(`      • ${f}`);
     }
 
-    // ─── Check 5 : Serveur cible ──────────────────────────────────────────────
-    console.log(`\n📋 Check 5 : Serveur cible (${cleanId})`);
-
-    let guild;
-    try {
-      guild = await client.guilds.fetch(cleanId);
-    } catch {
-      console.log('   ❌ Serveur introuvable ou bot pas membre');
-      console.log('   💡 Solutions :');
-      console.log('      1. Vérifie que l\'ID est correct');
-      console.log(`      2. Invite le bot dans ce serveur :`);
-      console.log(`         https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=1073741824&scope=bot`);
-      client.destroy();
-      process.exit(1);
-    }
-
-    console.log(`   ✅ Serveur trouvé : ${guild.name}`);
-    console.log(`   📊 Tier boost     : ${guild.premiumTier}`);
-    const slots = guild.premiumTier === 0 ? 50 : guild.premiumTier === 1 ? 100 : guild.premiumTier === 2 ? 150 : 250;
-    console.log(`   📊 Slots emojis   : ${slots}`);
-    console.log(`   📊 Emojis actuels : ${guild.emojis.cache.size}`);
-
-    // ─── Check 6 : Permissions ────────────────────────────────────────────────
-    console.log('\n📋 Check 6 : Permissions du bot');
-    const me = await guild.members.fetchMe();
-
-    const hasManageExpressions = me.permissions.has(PermissionsBitField.Flags.ManageGuildExpressions);
-    const hasManageEmojis      = me.permissions.has(PermissionsBitField.Flags.ManageEmojisAndStickers);
-
-    if (hasManageExpressions || hasManageEmojis) {
-      console.log('   ✅ Permission "Gérer les expressions" OK');
-    } else {
-      console.log('   ❌ Permission "Gérer les expressions" MANQUANTE');
-      console.log('   💡 Solutions :');
-      console.log('      1. Paramètres serveur → Rôles → rôle du bot');
-      console.log('      2. Active "Gérer les expressions"');
-      console.log('      OU réinvite le bot avec cette permission :');
-      console.log(`         https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=1073741824&scope=bot`);
-      errors++;
-    }
-
-    // ─── Résumé ───────────────────────────────────────────────────────────────
+    // ─── Résumé ─────────────────────────────────────────────────────────────
     console.log('\n═══════════════════════════════════════════');
     if (errors === 0 && warnings === 0) {
-      console.log('✅ TOUT EST BON !');
-      console.log('   Lance : npm run emojis:upload');
+      console.log('✅ TOUT EST BON — lance npm run emojis:upload');
     } else if (errors === 0) {
-      console.log(`⚠️  ${warnings} avertissement(s) — upload possible mais vérifie quand même.`);
-      console.log('   Lance : npm run emojis:upload');
+      console.log(`⚠️  ${warnings} avertissement(s) — upload possible avec réserve.`);
     } else {
-      console.log(`❌ ${errors} erreur(s), ⚠️  ${warnings} avertissement(s)`);
-      console.log('   Fix avant de lancer l\'upload.');
+      console.log(`❌ ${errors} erreur(s), ⚠️  ${warnings} avertissement(s) — fix d'abord.`);
     }
     console.log('═══════════════════════════════════════════\n');
 
     client.destroy();
     process.exit(errors > 0 ? 1 : 0);
-
   } catch (err) {
     console.error(`\n❌ Erreur connexion : ${err.message}`);
     client.destroy();

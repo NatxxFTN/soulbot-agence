@@ -63,3 +63,20 @@ data/templates/*.json
 # Cache IDs emojis custom (généré par ;setupemojis)
 data/emojis-ids.json
 .backup-rebranding-*/
+
+# Rollback backups (snapshots pris avant modifs chirurgicales)
+.backup-rollback/
+.backup-welcome-v1/
+
+# Fichiers .bak (snapshots ad-hoc)
+*.bak
+*.bak-*
+
+# Backups de données serveur (nuke, restauration, etc.)
+data/backups/
+
+# Serveur emoji local (configuration perso)
+emoji_icon_bot/
+
+# Images de travail (screenshots, tests)
+image/

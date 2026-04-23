@@ -90,6 +90,20 @@ module.exports = {
       return;
     }
 
+    // ── Embed Builder — Modals ──────────────────────────────────────────────
+    if (interaction.isModalSubmit() && interaction.customId?.startsWith('emb_modal:')) {
+      const { handleEmbedModalSubmit } = require('../ui/handlers/embed-handler');
+      await handleEmbedModalSubmit(interaction, client);
+      return;
+    }
+
+    // ── Embed Builder — Select Menus ─────────────────────────────────────────
+    if (interaction.isAnySelectMenu() && interaction.customId?.startsWith('emb_select:')) {
+      const { handleEmbedSelectMenu } = require('../ui/handlers/embed-handler');
+      await handleEmbedSelectMenu(interaction, client);
+      return;
+    }
+
     // ── Modals ──────────────────────────────────────────────────────────────
     if (interaction.isModalSubmit()) {
       const [action, ...params] = interaction.customId.split(':');

@@ -7,7 +7,7 @@ const { withLoading } = require('../../core/loading');
 
 module.exports = {
   name       : 'lockdown',
-  aliases    : ['ld', 'lock'],
+  aliases    : ['ld'],
   description: 'Ouvre le panel de verrouillage d\'urgence du serveur.',
   usage      : ';lockdown',
   cooldown   : 3,
