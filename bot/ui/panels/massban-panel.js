@@ -11,7 +11,7 @@ const {
   MessageFlags,
 } = require('discord.js');
 const { COLORS } = require('../theme');
-const { e } = require('../../core/emojis');
+const { e, forButton } = require('../../core/emojis');
 const { db } = require('../../database');
 
 function getRecentMassbans(guildId) {
@@ -44,7 +44,8 @@ function renderMassbanPanel(guildId) {
     new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('massban:open_modal')
-        .setLabel('🔨 Bannir des utilisateurs')
+        .setLabel('Bannir des utilisateurs')
+        .setEmoji(forButton('cat_moderation'))
         .setStyle(ButtonStyle.Danger),
     ),
   );

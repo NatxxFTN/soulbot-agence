@@ -63,7 +63,7 @@ function renderRaidmodePanel(guildId) {
   container.addSectionComponents(
     new SectionBuilder()
       .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`⚙️ **Seuil de détection :** ${thresh} joins en ${window}s`),
+        new TextDisplayBuilder().setContent(`${e('cat_configuration')} **Seuil de détection :** ${thresh} joins en ${window}s`),
       )
       .setButtonAccessory(
         new ButtonBuilder()

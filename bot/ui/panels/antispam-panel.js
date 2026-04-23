@@ -111,7 +111,7 @@ function renderAntispamPanel(guildId) {
     new SectionBuilder()
       .addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-          `📢 **Mentions** : max **${mentionsT}** mentions/msg | Sanction : **${sl(cfg.mentions_sanction)}**`,
+          `${e('cat_information')} **Mentions** : max **${mentionsT}** mentions/msg | Sanction : **${sl(cfg.mentions_sanction)}**`,
         ),
       )
       .setButtonAccessory(

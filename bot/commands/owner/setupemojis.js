@@ -5,6 +5,7 @@ const path = require('path');
 const { PermissionFlagsBits } = require('discord.js');
 const { setEmojiId, getEmojiId, loadCache, clearCache } = require('../../core/emoji-cache');
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 const EMOJIS_DIR    = path.join(__dirname, '../../../data/emojis');
 const MAX_FILE_SIZE = 256 * 1024; // 256 KB — limite Discord
@@ -40,7 +41,7 @@ module.exports = {
     // 2. Dossier source
     if (!fs.existsSync(EMOJIS_DIR)) {
       return message.reply({
-        embeds: [E.error('📁 Dossier manquant', `Le dossier \`data/emojis/\` est introuvable.`)],
+        embeds: [E.error(`${e('ui_folder')} Dossier manquant`, `Le dossier \`data/emojis/\` est introuvable.`)],
       });
     }
 

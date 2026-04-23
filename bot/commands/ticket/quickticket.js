@@ -64,7 +64,8 @@ module.exports = {
 
       setConfig(message.guild.id, { panel_message_id: panel.id });
 
-      return message.reply({
+      await message.delete().catch(() => {});
+      return message.channel.send({
         embeds: [
           E.success('Tickets configurés')
             .addFields(

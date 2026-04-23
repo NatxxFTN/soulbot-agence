@@ -148,7 +148,7 @@ function renderTicketPanel(guildId) {
   container.addSectionComponents(
     new SectionBuilder()
       .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`💬 **Message d'ouverture :** ${STATUS(!!openMsg)}`),
+        new TextDisplayBuilder().setContent(`${e('ui_chat')} **Message d'ouverture :** ${STATUS(!!openMsg)}`),
       )
       .setButtonAccessory(
         new ButtonBuilder()
@@ -204,7 +204,7 @@ function renderTicketPanel(guildId) {
       new ButtonBuilder()
         .setCustomId('ticket:advanced')
         .setLabel('Configuration avancée')
-        .setEmoji('⚙️')
+        .setEmoji(forButton('cat_configuration'))
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('ticket:variables')
@@ -236,7 +236,7 @@ function renderTicketAdvancedPanel(guildId) {
   const container = new ContainerBuilder().setAccentColor(COLORS.accent);
 
   container.addTextDisplayComponents(
-    new TextDisplayBuilder().setContent('# ⚙️ Tickets — Configuration avancée'),
+    new TextDisplayBuilder().setContent(`# ${e('cat_configuration')} Tickets — Configuration avancée`),
   );
 
   container.addSeparatorComponents(
@@ -247,7 +247,7 @@ function renderTicketAdvancedPanel(guildId) {
   container.addSectionComponents(
     new SectionBuilder()
       .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`💬 **Message de fermeture :** ${STATUS(!!closeMsg)}`),
+        new TextDisplayBuilder().setContent(`${e('ui_chat')} **Message de fermeture :** ${STATUS(!!closeMsg)}`),
       )
       .setButtonAccessory(
         new ButtonBuilder()

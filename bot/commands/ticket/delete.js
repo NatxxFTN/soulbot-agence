@@ -3,6 +3,7 @@
 const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
 const { getTicketByChannel, markDeleted, getConfig, logAction } = require('../../core/ticket-helper');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'delete',
@@ -31,7 +32,7 @@ module.exports = {
       return message.reply({ embeds: [E.error('Accès refusé', 'Seul un staff ou admin peut supprimer un ticket.')] });
     }
 
-    await logAction(message.guild, config, `🗑️ Ticket #${ticket.ticket_number} supprimé par ${message.author.tag}`);
+    await logAction(message.guild, config, `${e('btn_trash')} Ticket #${ticket.ticket_number} supprimé par ${message.author.tag}`);
 
     markDeleted(ticket.id);
     await message.channel.delete(`Supprimé par ${message.author.tag}`).catch(() => {});

@@ -40,6 +40,6 @@ module.exports = {
       components: [row],
     });
 
-    return message.reply({ embeds: [E.success('Panel posté', 'Le panel a été posté dans ce salon.')] });
+    await message.delete().catch(() => {});
   },
 };
