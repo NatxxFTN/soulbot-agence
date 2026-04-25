@@ -10,6 +10,10 @@ yarn-error.log*
 .env.*.local
 .env.production
 
+# Secrets (certificats, clés privées)
+*.pem
+*.key
+
 # Runtime data
 data/*.db
 data/*.db-shm
@@ -80,3 +84,17 @@ emoji_icon_bot/
 
 # Images de travail (screenshots, tests)
 image/
+
+# Wiki raw sources peuvent être gros
+# Décommenter si tu ne veux pas push les sources raw sur Git
+# wiki/raw/
+
+# Obsidian — déjà géré, ne pas toucher
+
+# Obsidian welcome files (auto-générés)
+Bienvenue.md
+Welcome.md
+
+# Dossiers temporaires (analyses jetables, extractions ad-hoc)
+.tmp-*/
+.tmp-toolbox/
