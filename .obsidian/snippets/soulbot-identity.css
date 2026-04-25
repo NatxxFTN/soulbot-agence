@@ -1,0 +1,296 @@
+/* ═══════════════════════════════════════════════════════════
+   SOULBOT IDENTITY — CSS Snippet pour Obsidian
+   Cohérent avec DESIGN.md (noir #0A0A0A + rouge #FF0000)
+   ═══════════════════════════════════════════════════════════ */
+
+/* === VARIABLES === */
+.theme-dark {
+  --background-primary: #0A0A0A;
+  --background-primary-alt: #121212;
+  --background-secondary: #1A1A1A;
+  --background-secondary-alt: #242424;
+  --background-modifier-border: #2A2A2A;
+  --background-modifier-hover: rgba(255, 0, 0, 0.08);
+
+  --text-normal: #E8E8E8;
+  --text-muted: #888888;
+  --text-faint: #555555;
+
+  --text-accent: #FF0000;
+  --text-accent-hover: #FF3333;
+  --interactive-accent: #FF0000;
+  --interactive-accent-hover: #FF3333;
+}
+
+/* === GRAPH VIEW — Style premium === */
+.graph-view.color-fill {
+  color: #FF0000;
+}
+
+.graph-view.color-fill-tag {
+  color: #FF6666;
+}
+
+.graph-view.color-fill-attachment {
+  color: #888888;
+}
+
+.graph-view.color-circle {
+  color: #FF0000;
+}
+
+.graph-view.color-line {
+  color: rgba(255, 0, 0, 0.2);
+}
+
+.graph-view.color-text {
+  color: #E8E8E8;
+}
+
+.graph-view.color-fill-highlight {
+  color: #FF3333;
+}
+
+.graph-view.color-line-highlight {
+  color: #FF0000;
+}
+
+/* === LIENS INTERNES === */
+.internal-link {
+  color: #FF0000 !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid rgba(255, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.internal-link:hover {
+  color: #FF3333 !important;
+  border-bottom-color: #FF0000;
+  background: rgba(255, 0, 0, 0.05);
+}
+
+/* === TITRES === */
+.markdown-preview-view h1,
+.markdown-source-view.mod-cm6 .cm-header-1 {
+  color: #FFFFFF;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
+  font-size: 2.4em;
+  letter-spacing: -0.02em;
+  border-bottom: 2px solid rgba(255, 0, 0, 0.3);
+  padding-bottom: 0.3em;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.markdown-preview-view h2,
+.markdown-source-view.mod-cm6 .cm-header-2 {
+  color: #FF0000;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
+  font-size: 1.8em;
+  margin-top: 1.5em;
+}
+
+.markdown-preview-view h3,
+.markdown-source-view.mod-cm6 .cm-header-3 {
+  color: #FF6666;
+  font-weight: 600;
+  font-size: 1.3em;
+  font-family: "Inter", sans-serif;
+}
+
+/* === TAGS === */
+.tag {
+  background: rgba(255, 0, 0, 0.1) !important;
+  color: #FF6666 !important;
+  border: 1px solid rgba(255, 0, 0, 0.3) !important;
+  border-radius: 12px !important;
+  padding: 2px 10px !important;
+  font-size: 0.8em !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease;
+}
+
+.tag:hover {
+  background: rgba(255, 0, 0, 0.2) !important;
+  color: #FF0000 !important;
+  transform: translateY(-1px);
+}
+
+/* === CODE === */
+code {
+  background: rgba(255, 0, 0, 0.08) !important;
+  color: #FF6666 !important;
+  border: 1px solid rgba(255, 0, 0, 0.2) !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  font-family: "JetBrains Mono", Consolas, monospace !important;
+}
+
+pre {
+  background: #0F0F0F !important;
+  border: 1px solid rgba(255, 0, 0, 0.2) !important;
+  border-left: 3px solid #FF0000 !important;
+  border-radius: 6px !important;
+}
+
+pre code {
+  background: transparent !important;
+  border: none !important;
+  color: #E8E8E8 !important;
+}
+
+/* === BLOCKQUOTES === */
+blockquote {
+  border-left: 3px solid #FF0000 !important;
+  background: rgba(255, 0, 0, 0.03) !important;
+  padding: 10px 20px !important;
+  margin: 1em 0 !important;
+  color: #CCCCCC !important;
+  font-style: italic;
+  border-radius: 0 6px 6px 0;
+}
+
+/* === FRONTMATTER YAML === */
+.frontmatter-container {
+  background: rgba(255, 0, 0, 0.05) !important;
+  border: 1px solid rgba(255, 0, 0, 0.2) !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  margin-bottom: 20px !important;
+}
+
+.frontmatter-container .tag {
+  margin: 2px !important;
+}
+
+/* === SIDEBAR / FILE EXPLORER === */
+.nav-file-title:hover,
+.nav-folder-title:hover {
+  background: rgba(255, 0, 0, 0.08) !important;
+}
+
+.nav-file-title.is-active,
+.nav-folder-title.is-active {
+  background: rgba(255, 0, 0, 0.15) !important;
+  color: #FF0000 !important;
+  border-left: 3px solid #FF0000;
+}
+
+/* === SEARCH RESULTS === */
+.search-result-file-title {
+  color: #FF0000 !important;
+  font-weight: 600;
+}
+
+.search-result-file-matched-text {
+  background: rgba(255, 0, 0, 0.25) !important;
+  color: #FFFFFF !important;
+  padding: 1px 3px;
+  border-radius: 3px;
+}
+
+/* === STATUS BAR === */
+.status-bar {
+  background: #0F0F0F !important;
+  border-top: 1px solid rgba(255, 0, 0, 0.2) !important;
+  color: #888 !important;
+}
+
+/* === TABS === */
+.workspace-tab-header.is-active {
+  background: #1A1A1A !important;
+  border-top: 2px solid #FF0000 !important;
+}
+
+.workspace-tab-header.is-active .workspace-tab-header-inner-title {
+  color: #FF0000 !important;
+}
+
+/* === CURSOR === */
+.cm-editor .cm-cursor,
+.cm-editor .cm-dropCursor {
+  border-left-color: #FF0000 !important;
+  border-left-width: 2px !important;
+}
+
+/* === SELECTION === */
+.cm-editor .cm-selectionBackground,
+.cm-editor ::selection,
+.markdown-preview-view ::selection {
+  background: rgba(255, 0, 0, 0.25) !important;
+}
+
+/* === BOUTONS === */
+button.mod-cta,
+.mod-cta {
+  background: #FF0000 !important;
+  color: #FFFFFF !important;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+button.mod-cta:hover,
+.mod-cta:hover {
+  background: #FF3333 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+}
+
+/* === CHECKBOXES === */
+input[type="checkbox"]:checked {
+  accent-color: #FF0000 !important;
+}
+
+/* === SCROLLBAR === */
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 0, 0, 0.3) !important;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 0, 0, 0.5) !important;
+}
+
+/* === SEPARATORS === */
+hr {
+  border: none !important;
+  height: 1px !important;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 0, 0, 0.5),
+    transparent
+  ) !important;
+  margin: 2em 0 !important;
+}
+
+/* === TABLES === */
+table {
+  border: 1px solid rgba(255, 0, 0, 0.2) !important;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+th {
+  background: rgba(255, 0, 0, 0.1) !important;
+  color: #FF0000 !important;
+  border-bottom: 2px solid #FF0000 !important;
+  font-weight: 600;
+}
+
+tr:hover {
+  background: rgba(255, 0, 0, 0.05) !important;
+}
+
+/* === PROPERTIES PANEL === */
+.metadata-container {
+  background: rgba(255, 0, 0, 0.03) !important;
+  border: 1px solid rgba(255, 0, 0, 0.15) !important;
+  border-radius: 8px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIN DU SNIPPET SOULBOT
+   ═══════════════════════════════════════════════════════════ */

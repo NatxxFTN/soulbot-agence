@@ -1,0 +1,28 @@
+[extend]
+useDefault = true
+
+[[rules]]
+id = "discord-bot-token"
+description = "Discord bot token"
+regex = '''[MN][A-Za-z\d]{23}\.[\w-]{6}\.[\w-]{27}'''
+tags = ["discord", "token"]
+
+[[rules]]
+id = "discord-webhook"
+description = "Discord webhook URL"
+regex = '''https://(ptb\.|canary\.)?discord(app)?\.com/api/webhooks/\d+/[\w-]+'''
+tags = ["discord", "webhook"]
+
+[[rules]]
+id = "twitch-client-secret"
+description = "Twitch client secret"
+regex = '''twitch[_-]?client[_-]?secret\s*=\s*['"]([a-zA-Z0-9]{30})['"]'''
+tags = ["twitch", "secret"]
+
+[allowlist]
+paths = [
+  ".backup-rollback/",
+  ".tmp-toolbox/",
+  "node_modules/",
+  ".git/"
+]

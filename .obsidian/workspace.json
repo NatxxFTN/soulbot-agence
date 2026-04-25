@@ -1,0 +1,196 @@
+{
+  "main": {
+    "id": "main-workspace",
+    "type": "split",
+    "children": [
+      {
+        "id": "0b1991a242e08a4a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "main-editor",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Vue graphique"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "903374d8f7ac2f03",
+    "type": "split",
+    "children": [
+      {
+        "id": "0c84d48437716167",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "49a369300aa8fe53",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "tag:#db",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Rechercher"
+            }
+          },
+          {
+            "id": "5b8d77fa58b4d9c8",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Signets"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "4e6cb32c97f9ee0f",
+    "type": "split",
+    "children": [
+      {
+        "id": "ef82b4b873a18567",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9f34a178ebd4363f",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Rétroliens"
+            }
+          },
+          {
+            "id": "82a020d60aaa3c73",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Liens sortants"
+            }
+          },
+          {
+            "id": "513bca70bedb3cb2",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Mots-clés"
+            }
+          },
+          {
+            "id": "dedc11b1dee7ae4f",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Toutes les propriétés"
+            }
+          },
+          {
+            "id": "f36631f8cd6185f0",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Plan"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Ouvrir le sélecteur rapide": false,
+      "graph:Ouvrir la vue graphique": false,
+      "canvas:Créer une nouvelle toile": false,
+      "daily-notes:Ouvrir la note quotidienne": false,
+      "templates:Insérer le modèle": false,
+      "command-palette:Ouvrir la palette de commandes": false,
+      "bases:Créer une nouvelle base": false
+    }
+  },
+  "active": "main-editor",
+  "lastOpenFiles": [
+    "source-toolbox-analysis.md",
+    "wiki/pages/syntheses/toolbox-qalisia-adoption.md",
+    "wiki/pages/entities/ticket-v2.md",
+    "wiki/index.md.tmp.17396.1777067167033",
+    "wiki/pages/entities/logs-v3-ultimate.md",
+    "wiki/pages/entities/logs-v3-ultimate.md.tmp.17396.1777067126011",
+    "wiki/pages/decisions/2026-04-24-logs-v3-architecture.md",
+    "wiki/pages/concepts/components-v2.md",
+    "CLAUDE.md.tmp.17396.1777066372720",
+    "docs/CHANGELOG.md.tmp.17396.1777066357073",
+    "package.json.tmp.17396.1777066324686",
+    "bot/commands/logs/logsstatus.js",
+    "bot/commands/logs/logssetup.js",
+    "bot/ui/handlers/logs-v3-handler.js",
+    "bot/ui/panels/logs-v3-panel.js",
+    "bot/core/logs-v3-helper.js",
+    "bot/assets/emojis/cat_innovation.png",
+    "bot/assets/emojis/category_innovation.png",
+    "wiki/pages/syntheses/pipeline-chantiers-en-cours.md",
+    "docs/CHANGELOG.md",
+    "node_modules/@napi-rs/canvas-win32-x64-msvc/README.md",
+    "node_modules/@napi-rs/canvas/README.md",
+    "node_modules/bl/LICENSE.md",
+    "source-2026-04-23-24-session-initiale.md",
+    "wiki/HOME.md",
+    "wiki/overview.md",
+    "wiki/index.md"
+  ]
+}

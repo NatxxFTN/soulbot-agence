@@ -1,0 +1,21 @@
+{
+  "attachmentFolderPath": "wiki/raw/assets",
+  "alwaysUpdateLinks": true,
+  "newLinkFormat": "shortest",
+  "useMarkdownLinks": false,
+  "defaultViewMode": "source",
+  "livePreview": true,
+  "showLineNumber": true,
+  "showInlineTitle": true,
+  "promptDelete": false,
+  "trashOption": "local",
+  "readableLineLength": true,
+  "strictLineBreaks": false,
+  "autoPairMarkdown": true,
+  "autoPairBrackets": true,
+  "smartIndentList": true,
+  "foldHeading": true,
+  "foldIndent": true,
+  "showFrontmatter": true,
+  "tabSize": 2
+}

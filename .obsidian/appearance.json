@@ -1,0 +1,12 @@
+{
+  "baseFontSize": 15,
+  "theme": "obsidian",
+  "enabledCssSnippets": [
+    "soulbot-identity"
+  ],
+  "accentColor": "#FF0000",
+  "interfaceFontFamily": "Inter, -apple-system, sans-serif",
+  "textFontFamily": "Inter, -apple-system, sans-serif",
+  "monospaceFontFamily": "JetBrains Mono, Consolas, monospace",
+  "cssTheme": ""
+}
