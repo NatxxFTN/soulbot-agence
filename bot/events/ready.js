@@ -584,6 +584,21 @@ module.exports = {
     startBdayScheduler(client);
     startPairupScheduler(client);
 
+    // ── Innovation Pack 1/3 — Gestion & Power Tools ──────────────────────────
+    const { register: registerInnovationHandlers } = require('../ui/handlers/innovation-handler');
+    registerInnovationHandlers(client);
+
+    const { startScheduleScheduler } = require('../core/schedule-scheduler');
+    const { startFreezeScheduler }   = require('../core/freeze-scheduler');
+    startScheduleScheduler(client);
+    startFreezeScheduler(client);
+
+    // ── Logs V3 Ultimate ─────────────────────────────────────────────────────
+    const logsV3 = require('../core/logs-v3-helper');
+    logsV3.bootstrapCache();
+    const { register: registerLogsV3Handlers } = require('../ui/handlers/logs-v3-handler');
+    registerLogsV3Handlers(client);
+
     console.log('[Bot] Prêt !');
   },
 };

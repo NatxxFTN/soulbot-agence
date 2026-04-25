@@ -489,7 +489,102 @@ db.exec(`
   );
   CREATE INDEX IF NOT EXISTS idx_warns_guild_user ON warns(guild_id, user_id);
   CREATE INDEX IF NOT EXISTS idx_warns_expires    ON warns(expires_at);
+
+  /* ---- Logs système — config globale par serveur ---- */
+  CREATE TABLE IF NOT EXISTS guild_log_config (
+    guild_id    TEXT    PRIMARY KEY,
+    channel_id  TEXT,
+    created_at  INTEGER NOT NULL DEFAULT (unixepoch()),
+    updated_at  INTEGER,
+    updated_by  TEXT
+  );
+
+  /* ---- Logs système — toggles par event type ---- */
+  CREATE TABLE IF NOT EXISTS guild_log_events (
+    guild_id    TEXT    NOT NULL,
+    event_type  TEXT    NOT NULL,
+    enabled     INTEGER NOT NULL DEFAULT 1,
+    PRIMARY KEY (guild_id, event_type)
+  );
+  CREATE INDEX IF NOT EXISTS idx_guild_log_events_guild ON guild_log_events(guild_id);
+
+  /* ═══ LOGS V3 ULTIMATE — schéma 2026-04-24 ═════════════════════════ */
+
+  /* Routing par event → channel. Permet un salon par type. */
+  CREATE TABLE IF NOT EXISTS guild_log_routing (
+    guild_id    TEXT NOT NULL,
+    event_type  TEXT NOT NULL,
+    channel_id  TEXT NOT NULL,
+    PRIMARY KEY (guild_id, event_type)
+  );
+  CREATE INDEX IF NOT EXISTS idx_log_routing_guild ON guild_log_routing(guild_id);
+
+  /* Format personnalisé par event : template + couleur + icon. */
+  CREATE TABLE IF NOT EXISTS guild_log_formats (
+    guild_id    TEXT NOT NULL,
+    event_type  TEXT NOT NULL,
+    template    TEXT,
+    color_hex   TEXT,
+    icon_emoji  TEXT,
+    enabled     INTEGER DEFAULT 1,
+    PRIMARY KEY (guild_id, event_type)
+  );
+
+  /* Filtres (ignore user, bot, channel, role). */
+  CREATE TABLE IF NOT EXISTS guild_log_filters (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id      TEXT NOT NULL,
+    event_type    TEXT NOT NULL,
+    filter_type   TEXT NOT NULL,
+    filter_value  TEXT NOT NULL,
+    created_at    INTEGER DEFAULT (unixepoch())
+  );
+  CREATE INDEX IF NOT EXISTS idx_log_filters_guild_event ON guild_log_filters(guild_id, event_type);
+
+  /* Historique persistant — support search / stats. */
+  CREATE TABLE IF NOT EXISTS guild_log_history (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id    TEXT NOT NULL,
+    event_type  TEXT NOT NULL,
+    actor_id    TEXT,
+    target_id   TEXT,
+    channel_id  TEXT,
+    data_json   TEXT,
+    created_at  INTEGER DEFAULT (unixepoch())
+  );
+  CREATE INDEX IF NOT EXISTS idx_log_history_guild_date ON guild_log_history(guild_id, created_at DESC);
+  CREATE INDEX IF NOT EXISTS idx_log_history_event     ON guild_log_history(guild_id, event_type);
+
+  /* Stats journalières pré-calculées. */
+  CREATE TABLE IF NOT EXISTS guild_log_stats_daily (
+    guild_id    TEXT NOT NULL,
+    date        TEXT NOT NULL,
+    event_type  TEXT NOT NULL,
+    count       INTEGER DEFAULT 0,
+    PRIMARY KEY (guild_id, date, event_type)
+  );
 `);
+
+// ── ALTER TABLE guild_log_config — colonnes V3 (idempotent) ──────────────────
+const LOGS_V3_CONFIG_COLS = {
+  default_channel_id: 'TEXT',
+  theme             : "TEXT DEFAULT 'premium'",
+  global_enabled    : 'INTEGER DEFAULT 1',
+  category_id       : 'TEXT',
+  version           : "TEXT DEFAULT 'v2'",
+};
+for (const [col, type] of Object.entries(LOGS_V3_CONFIG_COLS)) {
+  try { db.exec(`ALTER TABLE guild_log_config ADD COLUMN ${col} ${type}`); } catch { /* déjà présent */ }
+}
+
+// Backfill : les guildes V2 héritent de channel_id → default_channel_id.
+try {
+  db.prepare(`
+    UPDATE guild_log_config
+    SET default_channel_id = channel_id
+    WHERE default_channel_id IS NULL AND channel_id IS NOT NULL
+  `).run();
+} catch { /* ignore */ }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 

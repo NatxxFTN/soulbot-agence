@@ -36,6 +36,7 @@ const FALLBACK_EMOJIS = {
   cat_level:         '🎓',
   cat_economy:       '💰',
   cat_ticket:        '🎫',
+  cat_innovation:    '✨',
   // Boutons
   btn_home:     '🏠',
   btn_search:   '🔍',
@@ -75,6 +76,8 @@ const FALLBACK_EMOJIS = {
   ui_lock:                   '🔒',
   ui_unlock:                 '🔓',
   ui_diamond:                '💎',
+  // Catégorie Innovation — atome Unicode en fallback si cat_innovation.png pas uploadé
+  cat_innovation:            '⚛️',
   // Animés (ani_world = globe animé dans les assets)
   ani_world:   '🌍',
   ani_globe:   '🌍',
@@ -145,6 +148,8 @@ const CATEGORY_TO_EMOJI = {
   'Logs': 'cat_information', 'logs': 'cat_information',
   'Custom': 'cat_configuration', 'custom': 'cat_configuration',
   'Automod': 'cat_protection', 'automod': 'cat_protection',
+  // Innovation (cat_innovation.png = atome rouge Soulbot ; fallback Unicode ⚛️)
+  'Innovation': 'cat_innovation', 'innovation': 'cat_innovation',
 };
 
 // ─── Fonctions publiques ──────────────────────────────────────────────────────

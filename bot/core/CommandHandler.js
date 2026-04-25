@@ -33,6 +33,8 @@ const CATEGORY_TARGETS = {
   invitation   :  6,
   level        :  6,
   role         :  7,
+  innovation   : 11,
+  logs         :  6,
 };
 const GLOBAL_TARGET = Object.values(CATEGORY_TARGETS).reduce((a, b) => a + b, 0);
 
