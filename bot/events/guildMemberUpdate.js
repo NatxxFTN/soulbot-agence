@@ -1,12 +1,18 @@
 'use strict';
 
 const { db, getGuildSettings } = require('../database');
+const { logChange: logNickChange } = require('../core/nickname-history-storage');
 
 module.exports = {
   name : 'guildMemberUpdate',
 
   async execute(oldMember, newMember, client) {
     const guildId = newMember.guild.id;
+
+    // ── Nickname history (Innovation Pack ;nickrestore) ──────────────────────
+    if (oldMember.nickname !== newMember.nickname) {
+      logNickChange(guildId, newMember.id, oldMember.nickname, newMember.nickname, null);
+    }
 
     // ── Rôle Boost ────────────────────────────────────────────────────────────
     const wasBooster = oldMember.premiumSince !== null;
