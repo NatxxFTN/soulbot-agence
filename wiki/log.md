@@ -139,3 +139,21 @@ Cross-links ajoutés dans les 2 pages :
 Index mis à jour :
 - Systèmes en prod : 6 → 7 (ajout logs-v3-ultimate)
 - Décisions ADR : 7 → 8 (ajout 2026-04-24-logs-v3-architecture)
+
+## [2026-04-29] decision | ADR 3-packs naming mapping (Option A)
+
+Audit du PROMPT 1/5 → conflit majeur détecté entre la spec
+(13 tables `guild_*`) et l'infra existante non-commitée du 28 avril
+(30 commandes + handlers + schedulers utilisant des noms historiques
+sans préfixe).
+
+**Décision Nathan : Option A — Adopter l'existant.**
+
+- Page créée : [[2026-04-29-3-packs-naming-mapping]]
+- Index mis à jour : ADR 8 → 9
+- Helpers infra livrés malgré tout :
+  - `bot/core/api-helper.js` (fetch global + cache LRU + rate-limit)
+  - `bot/core/duration-parser.js` (grammaire stricte FR)
+- Aucune dépendance npm ajoutée (`fetch` global dispo dès Node ≥ 18)
+- Validation au boot : `power-admin: 10/10 ✅ engagement: 10/10 ✅
+  utility-pro: 10/10 ✅` — bot tourne, 0 erreur

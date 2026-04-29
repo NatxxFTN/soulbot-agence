@@ -57,7 +57,7 @@ Dernière mise à jour : 2026-04-24 (amorce massive second cerveau)
 - [[power-admin-pack]] — ~30 commandes (draft)
 - [[innovation-pack]] — 25 commandes inventives (draft)
 
-## 📜 Décisions (ADR) (8)
+## 📜 Décisions (ADR) (9)
 - [[2026-04-24-pivot-identite-rouge]] — Pivot orange → rouge
 - [[2026-04-24-adoption-design-md]] — Format Google Labs DESIGN.md
 - [[2026-04-24-squad-14-agents]] — Polyphonie 14 agents
@@ -66,6 +66,7 @@ Dernière mise à jour : 2026-04-24 (amorce massive second cerveau)
 - [[2026-04-24-components-v2-vs-embeds]] — Components V2 exclusivement
 - [[2026-04-24-better-sqlite3-choix]] — Driver SQLite
 - [[2026-04-24-logs-v3-architecture]] — Architecture Logs V3 + saut 1.0 → 2.0
+- [[2026-04-29-3-packs-naming-mapping]] — Mapping SQL adopté pour les 3 packs (anti-doublons)
 
 ## 🔗 Synthèses (5)
 - [[etat-projet-avril-2026]] — Snapshot projet
