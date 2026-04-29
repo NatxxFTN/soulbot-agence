@@ -599,6 +599,12 @@ module.exports = {
     const { register: registerLogsV3Handlers } = require('../ui/handlers/logs-v3-handler');
     registerLogsV3Handlers(client);
 
+    // ── 3-Packs Premium (Power Admin + Engagement + Utility Pro) ────────────
+    const packs3Handlers = require('../core/3packs-handlers');
+    packs3Handlers.register(client);
+    const packs3Schedulers = require('../core/3packs-schedulers');
+    packs3Schedulers.start(client);
+
     console.log('[Bot] Prêt !');
   },
 };

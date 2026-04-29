@@ -586,6 +586,92 @@ try {
   `).run();
 } catch { /* ignore */ }
 
+// ═══ 3-PACKS PREMIUM — schéma 2026-04-28 ════════════════════════════════════
+
+db.exec(`
+  /* ---- Anti-raid extension (utilise raidmode_config existant + columns extras) ---- */
+  CREATE TABLE IF NOT EXISTS antiraid_recent_joins (
+    guild_id TEXT NOT NULL,
+    user_id  TEXT NOT NULL,
+    joined_at INTEGER NOT NULL,
+    PRIMARY KEY (guild_id, user_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_antiraid_joins_ts ON antiraid_recent_joins(guild_id, joined_at DESC);
+
+  /* ---- Lockdowns à durée (auto-unlock) ---- */
+  CREATE TABLE IF NOT EXISTS lockdown_timed (
+    guild_id   TEXT NOT NULL,
+    channel_id TEXT NOT NULL,
+    expires_at INTEGER NOT NULL,
+    locked_by  TEXT,
+    PRIMARY KEY (guild_id, channel_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_lockdown_timed_exp ON lockdown_timed(expires_at);
+
+  /* ---- Reaction roles ---- */
+  CREATE TABLE IF NOT EXISTS guild_reaction_roles (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id    TEXT NOT NULL,
+    channel_id  TEXT NOT NULL,
+    message_id  TEXT NOT NULL,
+    emoji       TEXT NOT NULL,
+    role_id     TEXT NOT NULL,
+    created_at  INTEGER NOT NULL DEFAULT (unixepoch()),
+    UNIQUE(guild_id, message_id, emoji)
+  );
+  CREATE INDEX IF NOT EXISTS idx_rr_msg ON guild_reaction_roles(message_id);
+
+  /* ---- Autoroles ---- */
+  CREATE TABLE IF NOT EXISTS guild_autoroles (
+    guild_id   TEXT NOT NULL,
+    role_id    TEXT NOT NULL,
+    added_by   TEXT,
+    added_at   INTEGER NOT NULL DEFAULT (unixepoch()),
+    PRIMARY KEY (guild_id, role_id)
+  );
+
+  /* ---- XP / Level (système simple) ---- */
+  CREATE TABLE IF NOT EXISTS guild_xp (
+    guild_id  TEXT NOT NULL,
+    user_id   TEXT NOT NULL,
+    xp        INTEGER NOT NULL DEFAULT 0,
+    level     INTEGER NOT NULL DEFAULT 0,
+    last_msg  INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (guild_id, user_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_xp_guild ON guild_xp(guild_id, xp DESC);
+
+  /* ---- Suggestion advanced (votes par bouton, séparé du suggestion existant) ---- */
+  CREATE TABLE IF NOT EXISTS suggestionv2 (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id     TEXT NOT NULL,
+    channel_id   TEXT NOT NULL,
+    message_id   TEXT NOT NULL UNIQUE,
+    author_id    TEXT NOT NULL,
+    text         TEXT NOT NULL,
+    upvotes      INTEGER NOT NULL DEFAULT 0,
+    downvotes    INTEGER NOT NULL DEFAULT 0,
+    status       TEXT NOT NULL DEFAULT 'open',
+    created_at   INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+  CREATE TABLE IF NOT EXISTS suggestionv2_votes (
+    suggestion_id INTEGER NOT NULL,
+    user_id       TEXT NOT NULL,
+    vote          INTEGER NOT NULL,
+    PRIMARY KEY (suggestion_id, user_id)
+  );
+`);
+
+// Add columns to raidmode_config for antiraid pack (idempotent)
+const ANTIRAID_COLS = {
+  detection_window_sec: 'INTEGER DEFAULT 30',
+  detection_threshold : 'INTEGER DEFAULT 10',
+  lockdown_on_raid    : 'INTEGER DEFAULT 0',
+};
+for (const [col, type] of Object.entries(ANTIRAID_COLS)) {
+  try { db.exec(`ALTER TABLE raidmode_config ADD COLUMN ${col} ${type}`); } catch { /* déjà présent */ }
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** S'assure qu'une guilde est présente dans guild_settings */
