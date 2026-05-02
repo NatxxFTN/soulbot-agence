@@ -22,7 +22,8 @@
     "emojis:upload": "node bot/scripts/upload-emojis.js",
     "start:full": "bash scripts/start-all.sh",
     "start:full:win": "scripts\\start-all.bat",
-    "security:secrets": "bash bot/scripts/check-secrets.sh"
+    "security:secrets": "bash bot/scripts/check-secrets.sh",
+    "audit:duplicates": "node bot/scripts/audit-duplicates.js"
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.99",
