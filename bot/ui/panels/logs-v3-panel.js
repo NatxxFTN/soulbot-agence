@@ -152,6 +152,35 @@ function renderLogsV3Panel(guild) {
   container.addActionRowComponents(row1);
   container.addActionRowComponents(row2);
 
+  container.addSeparatorComponents(separator('Small'));
+
+  // ── COMMANDES ────────────────────────────────────────────────────────
+  container.addTextDisplayComponents(
+    text(
+      `## 📚 COMMANDES\n` +
+      `\`;logs\` — Ce panel\n` +
+      `\`;logssetup\` — Créer salons + config auto\n` +
+      `\`;logsstatus\` — Aperçu compact\n` +
+      `\`;logstoggle <event>\` — Activer/désactiver un event\n` +
+      `\`;logsset <#salon>\` — Changer salon par défaut\n` +
+      `\`;logsview\` — Voir derniers logs (ring buffer)\n` +
+      `\`;logstest <event>\` — Simuler un event pour tester\n` +
+      `\`;logsreset\` — Reset complet (avec confirmation)\n` +
+      `\`;logshelp\` — Guide complet`,
+    ),
+  );
+  container.addSeparatorComponents(separator('Small'));
+
+  // ── NOTES ────────────────────────────────────────────────────────────
+  container.addTextDisplayComponents(
+    text(
+      `## ℹ️ NOTES\n` +
+      `• **${Object.keys(V3.EVENT_TYPES).length} events** au total\n` +
+      `• Tous actifs par défaut sauf 💬 \`message_create\` (anti-spam)\n` +
+      `• Pour activer message_create : \`;logstoggle message_create\``,
+    ),
+  );
+
   // ── FOOTER ──────────────────────────────────────────────────────────
   const pkg = require('../../../package.json');
   container.addTextDisplayComponents(

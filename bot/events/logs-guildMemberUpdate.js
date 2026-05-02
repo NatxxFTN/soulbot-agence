@@ -1,25 +1,33 @@
 'use strict';
 
-const L = require('../core/logs-helper');
+const L = require('../core/logs-v3-helper');
 
 module.exports = {
   name : 'guildMemberUpdate',
 
   async execute(oldMember, newMember) {
     if (!newMember.guild) return;
-    if (oldMember.nickname === newMember.nickname) return;
 
-    const before = oldMember.nickname || oldMember.user.username;
-    const after  = newMember.nickname || newMember.user.username;
+    // ── Pseudo modifié ───────────────────────────────────────────────
+    if (oldMember.nickname !== newMember.nickname) {
+      L.log(newMember.guild, 'member_nickname_change', {
+        user        : newMember.user,
+        member      : newMember,
+        oldNickname : oldMember.nickname,
+        newNickname : newMember.nickname,
+        summary     : `${newMember.user.tag} : ${oldMember.nickname || oldMember.user.username} → ${newMember.nickname || newMember.user.username}`,
+        actorId     : newMember.id,
+      });
+    }
 
-    await L.log(newMember.guild, 'member_nickname_change', {
-      description: `${newMember} a changé de pseudo.`,
-      fields: [
-        { name: 'Utilisateur', value: `${newMember.user.tag} (\`${newMember.id}\`)`, inline: true },
-        { name: 'Avant',       value: `\`${before}\``,                               inline: true },
-        { name: 'Après',       value: `\`${after}\``,                                inline: true },
-      ],
-      summary: `${newMember.user.tag} : ${before} → ${after}`,
-    });
+    // ── Boost ajouté ────────────────────────────────────────────────
+    if (!oldMember.premiumSince && newMember.premiumSince) {
+      L.log(newMember.guild, 'boost_add', {
+        user   : newMember.user,
+        member : newMember,
+        summary: `${newMember.user.tag} a boost le serveur`,
+        actorId: newMember.id,
+      });
+    }
   },
 };

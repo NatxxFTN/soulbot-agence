@@ -1,6 +1,6 @@
 'use strict';
 
-const L = require('../core/logs-helper');
+const L = require('../core/logs-v3-helper');
 
 module.exports = {
   name : 'voiceStateUpdate',
@@ -15,42 +15,40 @@ module.exports = {
     const wasIn = oldState.channelId !== null;
     const isIn  = newState.channelId !== null;
 
-    // ── Entrée vocal ─────────────────────────────────────────────────────────
     if (!wasIn && isIn) {
-      await L.log(guild, 'voice_join', {
-        description: `${member} a rejoint un salon vocal.`,
-        fields: [
-          { name: 'Membre', value: `${member.user.tag} (\`${member.id}\`)`,                      inline: true },
-          { name: 'Salon',  value: `<#${newState.channelId}>`,                                  inline: true },
-        ],
-        summary: `${member.user.tag} → #${newState.channel?.name ?? '?'}`,
+      L.log(guild, 'voice_join', {
+        user        : member.user,
+        member,
+        channelId   : newState.channelId,
+        channelName : newState.channel?.name,
+        summary     : `${member.user.tag} → #${newState.channel?.name ?? '?'}`,
+        actorId     : member.id,
       });
       return;
     }
 
-    // ── Sortie vocal ─────────────────────────────────────────────────────────
     if (wasIn && !isIn) {
-      await L.log(guild, 'voice_leave', {
-        description: `${member} a quitté le vocal.`,
-        fields: [
-          { name: 'Membre', value: `${member.user.tag} (\`${member.id}\`)`,                      inline: true },
-          { name: 'Salon',  value: `<#${oldState.channelId}>`,                                  inline: true },
-        ],
-        summary: `${member.user.tag} a quitté #${oldState.channel?.name ?? '?'}`,
+      L.log(guild, 'voice_leave', {
+        user        : member.user,
+        member,
+        channelId   : oldState.channelId,
+        channelName : oldState.channel?.name,
+        summary     : `${member.user.tag} a quitté #${oldState.channel?.name ?? '?'}`,
+        actorId     : member.id,
       });
       return;
     }
 
-    // ── Déplacement vocal ────────────────────────────────────────────────────
     if (wasIn && isIn && oldState.channelId !== newState.channelId) {
-      await L.log(guild, 'voice_move', {
-        description: `${member} a changé de salon vocal.`,
-        fields: [
-          { name: 'Membre', value: `${member.user.tag} (\`${member.id}\`)`, inline: true },
-          { name: 'De',     value: `<#${oldState.channelId}>`,              inline: true },
-          { name: 'Vers',   value: `<#${newState.channelId}>`,              inline: true },
-        ],
-        summary: `${member.user.tag} : #${oldState.channel?.name ?? '?'} → #${newState.channel?.name ?? '?'}`,
+      L.log(guild, 'voice_move', {
+        user          : member.user,
+        member,
+        fromChannelId : oldState.channelId,
+        fromName      : oldState.channel?.name,
+        toChannelId   : newState.channelId,
+        toName        : newState.channel?.name,
+        summary       : `${member.user.tag} : #${oldState.channel?.name ?? '?'} → #${newState.channel?.name ?? '?'}`,
+        actorId       : member.id,
       });
     }
   },

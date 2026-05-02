@@ -1,22 +1,31 @@
 'use strict';
 
-const L = require('../core/logs-helper');
+const { AuditLogEvent } = require('discord.js');
+const L = require('../core/logs-v3-helper');
 
 module.exports = {
   name : 'roleDelete',
 
   async execute(role) {
-    const hex = role.color ? `#${role.color.toString(16).padStart(6, '0').toUpperCase()}` : '—';
+    let executor = null;
+    try {
+      const audit = await role.guild.fetchAuditLogs({ type: AuditLogEvent.RoleDelete, limit: 1 });
+      const entry = audit.entries.first();
+      if (entry && entry.target?.id === role.id && Date.now() - entry.createdTimestamp < 10_000) {
+        executor = entry.executor;
+      }
+    } catch { /* perms */ }
 
-    await L.log(role.guild, 'role_delete', {
-      description: `Le rôle **${role.name}** a été supprimé.`,
-      fields: [
-        { name: 'Nom',      value: `\`${role.name}\``, inline: true },
-        { name: 'ID',       value: `\`${role.id}\``,   inline: true },
-        { name: 'Couleur',  value: hex,                inline: true },
-        { name: 'Membres',  value: `${role.members.size}`, inline: true },
-      ],
-      summary: `Rôle supprimé : ${role.name}`,
+    L.log(role.guild, 'role_delete', {
+      roleId     : role.id,
+      name       : role.name,
+      color      : role.color,
+      position   : role.position,
+      memberCount: role.members?.size || 0,
+      executor,
+      summary    : `Rôle supprimé : ${role.name}`,
+      targetId   : role.id,
+      actorId    : executor?.id || null,
     });
   },
 };
