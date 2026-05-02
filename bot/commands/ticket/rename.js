@@ -4,10 +4,10 @@ const E = require('../../utils/embeds');
 const { getTicketByChannel, getConfig } = require('../../core/ticket-helper');
 
 module.exports = {
-  name       : 'rename',
-  aliases    : ['trename', 'ticketrename'],
+  name       : 'ticketrename',
+  aliases    : ['trename', 'tcr'],
   description: 'Renommer le ticket courant.',
-  usage      : ';rename <nouveau nom>',
+  usage      : ';ticketrename <nouveau nom>',
   cooldown   : 5,
   guildOnly  : true,
   ownerOnly  : false,

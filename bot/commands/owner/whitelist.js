@@ -17,10 +17,10 @@ const STMT_CHECK  = db.prepare('SELECT 1 FROM bot_whitelist WHERE user_id = ?');
 const STMT_LIST   = db.prepare('SELECT * FROM bot_whitelist ORDER BY created_at DESC LIMIT 20');
 
 module.exports = {
-  name       : 'whitelist',
-  aliases    : ['wl'],
+  name       : 'globalwhitelist',
+  aliases    : ['gwl'],
   description: 'Gère la whitelist globale du bot (bypass des restrictions).',
-  usage      : ';whitelist <add|remove|list> [@membre/id]',
+  usage      : ';globalwhitelist <add|remove|list> [@membre/id]',
   cooldown   : 3,
   guildOnly  : false,
   ownerOnly  : true,

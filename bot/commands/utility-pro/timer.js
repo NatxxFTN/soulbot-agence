@@ -9,7 +9,7 @@ const MAX_TIMER_MS = 60 * 60 * 1000; // 1h max
 
 module.exports = {
   name       : 'timer',
-  aliases    : ['minuteur', 'compteur'],
+  aliases    : ['minuteur'],
   description: 'Minuteur visuel avec décompte (max 1h).',
   usage      : ';timer <durée> [titre]',
   cooldown   : 5,

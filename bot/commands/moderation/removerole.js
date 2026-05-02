@@ -10,7 +10,7 @@ const STMT_LOG = db.prepare(
 
 module.exports = {
   name       : 'removerole',
-  aliases    : ['rr', 'rmrole'],
+  aliases    : ['rmrole'],
   description: 'Retirer un rôle à un membre du serveur.',
   usage      : ';removerole @membre @rôle [raison]',
   cooldown   : 3,

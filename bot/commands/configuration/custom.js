@@ -10,7 +10,7 @@ const { renderCustomPanel } = require('../../ui/panels/custom-panel');
 
 module.exports = {
   name       : 'custom',
-  aliases    : ['customs', 'customcmd'],
+  aliases    : ['customcmd'],
   category   : 'configuration',
   description: 'Panel central de gestion des commandes custom.',
   usage      : ';custom',

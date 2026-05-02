@@ -7,7 +7,7 @@ const { withLoading } = require('../../core/loading');
 
 module.exports = {
   name       : 'raidmode',
-  aliases    : ['antiraid', 'raid'],
+  aliases    : ['raid'],
   description: 'Ouvre le panel de protection anti-raid automatique.',
   usage      : ';raidmode',
   cooldown   : 3,

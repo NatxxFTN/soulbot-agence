@@ -18,10 +18,10 @@ const STMT_GET    = db.prepare('SELECT * FROM bot_blacklist WHERE user_id = ?');
 const STMT_LIST   = db.prepare('SELECT * FROM bot_blacklist ORDER BY created_at DESC LIMIT 20');
 
 module.exports = {
-  name       : 'blacklist',
-  aliases    : ['bl'],
+  name       : 'globalblacklist',
+  aliases    : ['gbl'],
   description: 'Ajoute ou retire un utilisateur de la blacklist globale du bot.',
-  usage      : ';blacklist <add|remove|list> [@user] [raison]',
+  usage      : ';globalblacklist <add|remove|list> [@user] [raison]',
   cooldown   : 3,
   guildOnly  : false,
   ownerOnly  : true,

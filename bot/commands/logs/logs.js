@@ -9,7 +9,7 @@ const { renderLogsV3Panel } = require('../../ui/panels/logs-v3-panel');
 
 module.exports = {
   name       : 'logs',
-  aliases    : ['logconfig', 'logsstatus', 'logspanel'],
+  aliases    : ['logconfig', 'logspanel'],
   description: 'Panel central V3 des logs serveur (status, activité 24h, groupes, actions)',
   usage      : ';logs',
   cooldown   : 3,
