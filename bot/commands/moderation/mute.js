@@ -3,6 +3,7 @@
 const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
 const { db } = require('../../database');
+const L = require('../../core/logs-v3-helper');
 
 const STMT = db.prepare(
   'INSERT OR IGNORE INTO mod_logs (guild_id, action, user_id, user_tag, moderator_id, moderator_tag, reason, duration) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
@@ -41,6 +42,18 @@ module.exports = {
     await target.timeout(duration, reason);
 
     STMT.run(message.guild.id, 'MUTE', target.id, target.user.tag, message.author.id, message.author.tag, reason, durationLabel);
+
+    // ── Hook Logs V3 ──────────────────────────────────────────────
+    L.log(message.guild, 'mod_mute', {
+      user    : target.user,
+      member  : target,
+      executor: message.author,
+      reason,
+      duration: durationLabel,
+      summary : `${target.user.tag} muté par ${message.author.tag} (${durationLabel})`,
+      actorId : message.author.id,
+      targetId: target.id,
+    });
 
     return message.channel.send({
       embeds: [

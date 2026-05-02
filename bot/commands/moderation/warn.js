@@ -3,6 +3,7 @@
 const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
 const { db } = require('../../database');
+const L = require('../../core/logs-v3-helper');
 
 const STMT_MOD_LOG = db.prepare(
   'INSERT OR IGNORE INTO mod_logs (guild_id, action, user_id, user_tag, moderator_id, moderator_tag, reason) VALUES (?, ?, ?, ?, ?, ?, ?)'
@@ -40,6 +41,18 @@ module.exports = {
     STMT_MOD_LOG.run(message.guild.id, 'WARN', target.id, target.user.tag, message.author.id, message.author.tag, reason);
 
     target.send(`⚠️ Tu as reçu un avertissement sur **${message.guild.name}**.\nRaison : ${reason}\nTotal : **${count}** avertissement(s)`).catch(() => {});
+
+    // ── Hook Logs V3 ──────────────────────────────────────────────
+    L.log(message.guild, 'mod_warn', {
+      user    : target.user,
+      member  : target,
+      executor: message.author,
+      reason,
+      warnCount: count,
+      summary : `${target.user.tag} averti par ${message.author.tag} (#${count})`,
+      actorId : message.author.id,
+      targetId: target.id,
+    });
 
     return message.channel.send({
       embeds: [

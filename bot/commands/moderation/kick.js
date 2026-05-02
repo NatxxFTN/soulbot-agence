@@ -3,7 +3,7 @@
 const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
 const { db } = require('../../database');
-const L = require('../../core/logs-helper');
+const L = require('../../core/logs-v3-helper');
 
 const STMT = db.prepare(
   'INSERT OR IGNORE INTO mod_logs (guild_id, action, user_id, user_tag, moderator_id, moderator_tag, reason) VALUES (?, ?, ?, ?, ?, ?, ?)'
@@ -34,16 +34,16 @@ module.exports = {
 
     STMT.run(message.guild.id, 'KICK', target.id, target.user.tag, message.author.id, message.author.tag, reason);
 
-    // ── Hook Logs V2 — emit member_kick (ne bloque pas la commande) ──────────
+    // ── Hook Logs V3 — emit member_kick (fire-and-forget) ──
     L.log(message.guild, 'member_kick', {
-      description: `${target.user.tag} a été expulsé du serveur.`,
-      fields: [
-        { name: 'Membre',     value: `${target.user.tag} (\`${target.id}\`)`, inline: true },
-        { name: 'Modérateur', value: message.author.tag,                       inline: true },
-        { name: 'Raison',     value: reason,                                   inline: false },
-      ],
-      summary: `${target.user.tag} expulsé par ${message.author.tag}`,
-    }).catch(() => {});
+      user    : target.user,
+      member  : target,
+      executor: message.author,
+      reason,
+      summary : `${target.user.tag} expulsé par ${message.author.tag}`,
+      actorId : message.author.id,
+      targetId: target.id,
+    });
 
     return message.channel.send({
       embeds: [
