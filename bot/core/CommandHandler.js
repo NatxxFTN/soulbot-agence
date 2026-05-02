@@ -34,6 +34,7 @@ const CATEGORY_TARGETS = {
   'power-admin':  4,
   engagement   :  4,
   'utility-pro': 10,
+  'audit-mod'  : 12,
 };
 const GLOBAL_TARGET = Object.values(CATEGORY_TARGETS).reduce((a, b) => a + b, 0);
 

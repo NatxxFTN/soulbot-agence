@@ -827,4 +827,39 @@ db.exec('CREATE INDEX IF NOT EXISTS idx_welcome_fields_guild ON welcome_fields(g
 db.exec('CREATE INDEX IF NOT EXISTS idx_welcome_auto_roles_guild ON welcome_auto_roles(guild_id)');
 db.exec('CREATE INDEX IF NOT EXISTS idx_welcome_stats_guild ON welcome_stats(guild_id)');
 
+// ─── Pack Audit & Modération avancée ────────────────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS guild_quarantine (
+    guild_id            TEXT    NOT NULL,
+    user_id             TEXT    NOT NULL,
+    quarantined_by      TEXT    NOT NULL,
+    reason              TEXT,
+    original_roles_json TEXT    NOT NULL,
+    quarantined_at      INTEGER NOT NULL DEFAULT (unixepoch()),
+    PRIMARY KEY (guild_id, user_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS guild_role_locks (
+    guild_id   TEXT    NOT NULL,
+    role_id    TEXT    NOT NULL,
+    locked_by  TEXT    NOT NULL,
+    locked_at  INTEGER NOT NULL DEFAULT (unixepoch()),
+    PRIMARY KEY (guild_id, role_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS guild_mod_actions (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id     TEXT    NOT NULL,
+    user_id      TEXT    NOT NULL,
+    moderator_id TEXT    NOT NULL,
+    action_type  TEXT    NOT NULL,
+    reason       TEXT,
+    duration_ms  INTEGER,
+    created_at   INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+`);
+db.exec('CREATE INDEX IF NOT EXISTS idx_modactions_guild_user      ON guild_mod_actions(guild_id, user_id)');
+db.exec('CREATE INDEX IF NOT EXISTS idx_modactions_guild_moderator ON guild_mod_actions(guild_id, moderator_id)');
+db.exec('CREATE INDEX IF NOT EXISTS idx_modactions_created         ON guild_mod_actions(created_at DESC)');
+
 module.exports = { db, ensureGuild, getGuildSettings, setGuildSetting };
