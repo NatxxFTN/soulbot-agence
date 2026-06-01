@@ -149,7 +149,7 @@ module.exports = {
 
     // ── Guard ownerOnly ───────────────────────────────────────────────────────
     if (cmd.ownerOnly) {
-      const owners = (process.env.BOT_OWNERS ?? '')
+      const owners = (process.env.BOT_OWNER_IDS || process.env.BOT_OWNERS || '')
         .split(',')
         .map(s => s.trim())
         .filter(s => /^\d{17,19}$/.test(s));

@@ -170,7 +170,7 @@ async function dispatch(message, client, db, logger) {
   // ── Système de permissions hiérarchique ──────────────────────────────────
   const userLevel = getUserLevel(author.id, guild?.id ?? null);
 
-  // Owner bot (BOT_OWNERS) : bypass total de tous les guards ci-dessous
+  // Owner bot (BOT_OWNER_IDS) : bypass total de tous les guards ci-dessous
   if (userLevel < LEVELS.OWNER) {
     // Blacklist globale (table bot_blacklist)
     if (isGloballyBlacklisted(author.id)) {

@@ -32,9 +32,8 @@ const STMT_DELETE = db.prepare('DELETE FROM user_permissions WHERE guild_id = ? 
 const STMT_LIST   = db.prepare('SELECT * FROM user_permissions WHERE guild_id = ? ORDER BY permission_level DESC');
 const STMT_BL     = db.prepare('SELECT 1 FROM bot_blacklist WHERE user_id = ?');
 
-// Lit OWNER_IDS en priorité, puis BOT_OWNERS en fallback (compat historique)
 function _ownerIds() {
-  const raw = process.env.OWNER_IDS || process.env.BOT_OWNERS || '';
+  const raw = process.env.BOT_OWNER_IDS || process.env.BOT_OWNERS || '';
   return raw
     .split(',')
     .map(s => s.trim())
@@ -42,7 +41,7 @@ function _ownerIds() {
 }
 
 /**
- * Vérifie si un userId est owner du bot (via OWNER_IDS ou BOT_OWNERS dans .env).
+ * Vérifie si un userId est owner du bot (via BOT_OWNER_IDS dans .env).
  */
 function isOwner(userId) {
   if (!userId) return false;

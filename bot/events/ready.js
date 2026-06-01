@@ -140,7 +140,7 @@ module.exports = {
     const { loadTemplate, applyTemplate, logAction: logTplAction } = require('../core/template-helper');
 
     const isOwner = (userId) => {
-      const ids = (process.env.BOT_OWNERS || '').split(',').map(s => s.trim()).filter(Boolean);
+      const ids = (process.env.BOT_OWNER_IDS || process.env.BOT_OWNERS || '').split(',').map(s => s.trim()).filter(Boolean);
       return ids.includes(userId);
     };
 
