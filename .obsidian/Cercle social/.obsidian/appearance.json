@@ -1,0 +1,13 @@
+{
+  "theme": "obsidian",
+  "cssTheme": "",
+  "baseFontSize": 15,
+  "interfaceFontFamily": "Inter",
+  "textFontFamily": "Inter",
+  "monospaceFontFamily": "JetBrains Mono",
+  "enabledCssSnippets": [
+    "notion-dark-theme"
+  ],
+  "nativeMenus": false,
+  "accentColor": "#4c00ff"
+}

@@ -1,0 +1,386 @@
+/* ============================================
+   HACKER TERMINAL — Obsidian Custom Theme
+   By Nathan / Generated for Cercle Social vault
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --font-monospace: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-interface: 'JetBrains Mono', monospace;
+  --font-text: 'JetBrains Mono', monospace;
+
+  --color-base-00: #080808;
+  --color-base-05: #0d0d0d;
+  --color-base-10: #111111;
+  --color-base-20: #161616;
+  --color-base-25: #1a1a1a;
+  --color-base-30: #1f1f1f;
+  --color-base-35: #242424;
+  --color-base-40: #2a2a2a;
+  --color-base-50: #3a3a3a;
+  --color-base-60: #555555;
+  --color-base-70: #777777;
+  --color-base-100: #c8ffc8;
+
+  --color-accent-hsl: 145, 100%, 50%;
+  --color-accent: #00ff80;
+  --color-accent-1: #00e873;
+  --color-accent-2: #00cc60;
+
+  --text-normal: #b8ffb8;
+  --text-muted: #5a9a5a;
+  --text-faint: #2d5c2d;
+  --text-on-accent: #000000;
+  --text-success: #00ff80;
+  --text-warning: #ffd700;
+  --text-error: #ff4444;
+  --text-accent: #00ffcc;
+  --text-accent-hover: #00e8b8;
+
+  --background-primary: #080808;
+  --background-primary-alt: #0d0d0d;
+  --background-secondary: #0d0d0d;
+  --background-secondary-alt: #111111;
+  --background-modifier-border: #1a3a1a;
+  --background-modifier-form-field: #0d1a0d;
+  --background-modifier-form-field-highlighted: #111f11;
+  --background-modifier-box-shadow: rgba(0, 255, 80, 0.05);
+  --background-modifier-success: rgba(0, 255, 80, 0.1);
+  --background-modifier-error: rgba(255, 68, 68, 0.15);
+  --background-modifier-error-rgb: 255, 68, 68;
+  --background-modifier-cover: rgba(0, 0, 0, 0.85);
+
+  --interactive-normal: #0d1a0d;
+  --interactive-hover: #111f11;
+  --interactive-accent: #00ff80;
+  --interactive-accent-rgb: 0, 255, 128;
+  --interactive-accent-hover: #00cc60;
+  --interactive-success: #00ff80;
+
+  --scrollbar-active-thumb-bg: #1a3a1a;
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb-bg: #111f11;
+
+  --border-color: #1a3a1a;
+  --border-width: 1px;
+}
+
+/* ── Body & Layout ── */
+body {
+  font-family: var(--font-monospace) !important;
+  background: var(--background-primary);
+}
+
+.workspace {
+  background: #080808;
+}
+
+.workspace-split.mod-root .workspace-leaf-content {
+  background: #080808;
+}
+
+/* ── Sidebar ── */
+.nav-folder-title,
+.nav-file-title {
+  font-family: var(--font-monospace);
+  font-size: 12px;
+  color: #5a9a5a;
+  border-radius: 3px;
+}
+
+.nav-file-title:hover,
+.nav-folder-title:hover {
+  color: #00ff80;
+  background: rgba(0, 255, 80, 0.05);
+}
+
+.nav-file-title.is-active {
+  color: #00ff80;
+  background: rgba(0, 255, 80, 0.08);
+  border-left: 2px solid #00ff80;
+}
+
+.nav-folder-title-content::before {
+  content: '> ';
+  color: #00ff80;
+  opacity: 0.5;
+}
+
+/* ── Editor & Text ── */
+.cm-s-obsidian,
+.markdown-source-view {
+  font-family: var(--font-monospace) !important;
+  font-size: 14px;
+  line-height: 1.8;
+  caret-color: #00ff80;
+}
+
+.markdown-rendered {
+  font-family: var(--font-monospace);
+  font-size: 14px;
+  line-height: 1.8;
+  color: #b8ffb8;
+}
+
+/* Cursor blink */
+.cm-cursor {
+  border-left: 2px solid #00ff80 !important;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ── Headings ── */
+.markdown-rendered h1,
+.cm-header-1 {
+  font-family: var(--font-monospace);
+  font-size: 1.6em;
+  font-weight: 700;
+  color: #00ff80;
+  border-bottom: 1px solid #1a3a1a;
+  padding-bottom: 6px;
+  margin-bottom: 1em;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 20px rgba(0, 255, 80, 0.3);
+}
+
+.markdown-rendered h1::before { content: '# '; color: #2d5c2d; }
+.markdown-rendered h2::before { content: '## '; color: #2d5c2d; }
+.markdown-rendered h3::before { content: '### '; color: #2d5c2d; }
+
+.markdown-rendered h2,
+.cm-header-2 {
+  font-size: 1.3em;
+  font-weight: 500;
+  color: #00ffcc;
+  border-bottom: 1px solid #0d1a0d;
+  padding-bottom: 4px;
+}
+
+.markdown-rendered h3,
+.cm-header-3 {
+  font-size: 1.1em;
+  font-weight: 500;
+  color: #00e8a0;
+}
+
+/* ── Links ── */
+a,
+.cm-s-obsidian .cm-link,
+.cm-s-obsidian .cm-hmd-internal-link {
+  color: #00ffcc;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #00ff80;
+  text-shadow: 0 0 8px rgba(0, 255, 128, 0.4);
+}
+
+/* ── Code blocks ── */
+code,
+.cm-s-obsidian .cm-inline-code {
+  font-family: var(--font-monospace);
+  background: #0d1a0d;
+  color: #00ff80;
+  border: 1px solid #1a3a1a;
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 0.9em;
+}
+
+pre,
+.markdown-rendered pre {
+  background: #0a0f0a;
+  border: 1px solid #1a3a1a;
+  border-left: 3px solid #00ff80;
+  border-radius: 4px;
+  padding: 14px 16px;
+  font-family: var(--font-monospace);
+  font-size: 13px;
+  color: #b8ffb8;
+  position: relative;
+}
+
+pre::before {
+  content: '$ ';
+  color: #00ff80;
+  opacity: 0.5;
+  font-size: 11px;
+  position: absolute;
+  top: 6px;
+  left: 10px;
+}
+
+/* ── Blockquote ── */
+blockquote {
+  border-left: 3px solid #00ff80;
+  background: rgba(0, 255, 80, 0.03);
+  margin: 1em 0;
+  padding: 10px 16px;
+  color: #5a9a5a;
+  font-style: normal;
+}
+
+blockquote::before {
+  content: '// ';
+  color: #2d5c2d;
+}
+
+/* ── Tables ── */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+
+th {
+  background: #0d1a0d;
+  color: #00ff80;
+  border: 1px solid #1a3a1a;
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+td {
+  border: 1px solid #111f11;
+  padding: 7px 12px;
+  color: #8acc8a;
+}
+
+tr:hover td {
+  background: rgba(0, 255, 80, 0.03);
+  color: #b8ffb8;
+}
+
+/* ── Tags ── */
+.tag {
+  font-family: var(--font-monospace);
+  font-size: 11px;
+  background: #0d1a0d;
+  color: #00ff80;
+  border: 1px solid #1a3a1a;
+  border-radius: 3px;
+  padding: 1px 7px;
+}
+
+/* ── Checkboxes ── */
+.markdown-rendered .task-list-item-checkbox {
+  accent-color: #00ff80;
+}
+
+input[type='checkbox']:checked + span {
+  color: #2d5c2d;
+  text-decoration: line-through;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: #1a3a1a;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover { background: #00ff80; }
+
+/* ── Title bar & tabs ── */
+.workspace-tab-header {
+  font-family: var(--font-monospace);
+  font-size: 12px;
+  color: #5a9a5a;
+  background: #0d0d0d;
+  border-bottom: 1px solid #111f11;
+}
+
+.workspace-tab-header.is-active {
+  color: #00ff80;
+  background: #080808;
+  border-top: 1px solid #00ff80;
+}
+
+/* ── Search ── */
+.search-result-file-match {
+  font-family: var(--font-monospace);
+  font-size: 12px;
+  color: #5a9a5a;
+}
+
+.search-result-file-matched-text {
+  background: rgba(0, 255, 80, 0.15);
+  color: #00ff80;
+}
+
+/* ── Status bar ── */
+.status-bar {
+  font-family: var(--font-monospace);
+  font-size: 11px;
+  color: #2d5c2d;
+  background: #0d0d0d;
+  border-top: 1px solid #111f11;
+}
+
+/* ── Prompt / modal ── */
+.prompt {
+  background: #0d0d0d;
+  border: 1px solid #1a3a1a;
+  border-radius: 4px;
+  box-shadow: 0 0 40px rgba(0, 255, 80, 0.1);
+}
+
+.prompt-input {
+  font-family: var(--font-monospace);
+  font-size: 14px;
+  color: #b8ffb8;
+  background: transparent;
+  border-bottom: 1px solid #1a3a1a;
+}
+
+.suggestion-item.is-selected {
+  background: rgba(0, 255, 80, 0.08);
+  color: #00ff80;
+}
+
+/* ── Horizontal rule ── */
+hr {
+  border: none;
+  border-top: 1px solid #1a3a1a;
+  margin: 2em 0;
+}
+
+hr::after {
+  content: '──────────────────────────────';
+  color: #1a3a1a;
+  font-size: 10px;
+  display: block;
+  text-align: center;
+  margin-top: -10px;
+  background: #080808;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 8px;
+}
+
+/* ── Bold & italic ── */
+strong, .cm-strong { color: #00ff80; font-weight: 700; }
+em, .cm-em { color: #00ffcc; font-style: italic; }
+
+/* ── Selection ── */
+::selection {
+  background: rgba(0, 255, 80, 0.2);
+  color: #ffffff;
+}
+
+/* ── Frontmatter / YAML ── */
+.cm-s-obsidian .cm-hmd-frontmatter {
+  color: #2d5c2d;
+  font-size: 12px;
+}

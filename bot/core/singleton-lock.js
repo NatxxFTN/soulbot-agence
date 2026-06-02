@@ -32,14 +32,15 @@ function acquireLock() {
 
     if (oldPid && oldPid !== process.pid) {
       if (isPidAlive(oldPid)) {
-        console.error(`\n❌ CONFLIT SINGLETON : une instance du bot est déjà active (PID ${oldPid}).`);
-        console.error('   Pour la tuer :');
-        console.error(`     Windows : taskkill /F /PID ${oldPid}`);
-        console.error(`     Unix    : kill ${oldPid}`);
-        console.error('   Ou utilise : npm run dev:bot (kill automatique)\n');
-        process.exit(1);
+        console.log(`   ⚔️ Ancienne instance détectée (PID ${oldPid}) — kill...`);
+        try {
+          process.kill(oldPid, 'SIGTERM');
+        } catch {
+          try {
+            execSync(`kill -9 ${oldPid} 2>/dev/null || taskkill /F /PID ${oldPid} 2>nul`, { timeout: 3000 });
+          } catch { /* déjà mort */ }
+        }
       }
-      // Process mort → lock obsolète, on nettoie
       try { fs.unlinkSync(LOCK_FILE); } catch { /* ignoré */ }
       console.log(`   🧹 Lock obsolète supprimé (ancien PID ${oldPid})`);
     }

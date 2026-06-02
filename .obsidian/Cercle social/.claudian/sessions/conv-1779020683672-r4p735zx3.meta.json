@@ -1,0 +1,22 @@
+{
+  "id": "conv-1779020683672-r4p735zx3",
+  "providerId": "claude",
+  "title": "# PROMPT MAÎTRE — Cercle Social Obsidian",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1779020683675,
+  "updatedAt": 1779020728348,
+  "lastResponseAt": 1779020728348,
+  "sessionId": "d91dd2fd-dd71-4923-9767-4dc04e96a527",
+  "providerState": {
+    "providerSessionId": "d91dd2fd-dd71-4923-9767-4dc04e96a527"
+  },
+  "usage": {
+    "model": "haiku",
+    "inputTokens": 0,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 0,
+    "contextWindow": 200000,
+    "contextTokens": 0,
+    "percentage": 0
+  }
+}

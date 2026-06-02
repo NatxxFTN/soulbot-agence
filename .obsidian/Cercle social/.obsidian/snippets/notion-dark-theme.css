@@ -1,0 +1,341 @@
+/* ============================================
+   NOTION PREMIUM DARK — Obsidian Custom Theme
+   Violet / Mauve sombre
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+:root {
+  --font-interface: 'Inter', -apple-system, sans-serif;
+  --font-text: 'Inter', -apple-system, sans-serif;
+  --font-monospace: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --bg-00: #0f0e13;
+  --bg-01: #141219;
+  --bg-02: #19171f;
+  --bg-03: #1e1b26;
+  --bg-04: #252230;
+
+  --accent: #9b72f5;
+  --accent-soft: #7c5ce4;
+  --accent-faint: rgba(155, 114, 245, 0.12);
+  --accent-faint2: rgba(155, 114, 245, 0.06);
+
+  --text-primary: #e8e6f0;
+  --text-secondary: #9990b5;
+  --text-faint: #4d4666;
+  --text-accent: #b49eff;
+  --text-cyan: #72d5f5;
+  --text-pink: #f472b6;
+  --text-green: #6ee7b7;
+  --text-gold: #f5c842;
+
+  --border: rgba(155, 114, 245, 0.12);
+  --border-hover: rgba(155, 114, 245, 0.25);
+
+  --background-primary: #0f0e13;
+  --background-primary-alt: #141219;
+  --background-secondary: #141219;
+  --background-secondary-alt: #19171f;
+  --background-modifier-border: rgba(155, 114, 245, 0.1);
+  --background-modifier-form-field: #19171f;
+  --background-modifier-form-field-highlighted: #1e1b26;
+  --background-modifier-cover: rgba(0, 0, 0, 0.75);
+  --background-modifier-success: rgba(110, 231, 183, 0.1);
+  --background-modifier-error: rgba(244, 114, 182, 0.12);
+
+  --text-normal: #e8e6f0;
+  --text-muted: #9990b5;
+  --text-faint: #4d4666;
+  --text-on-accent: #ffffff;
+  --text-success: #6ee7b7;
+  --text-warning: #f5c842;
+  --text-error: #f472b6;
+  --text-accent: #b49eff;
+  --text-accent-hover: #9b72f5;
+
+  --interactive-normal: #19171f;
+  --interactive-hover: #1e1b26;
+  --interactive-accent: #9b72f5;
+  --interactive-accent-rgb: 155, 114, 245;
+  --interactive-accent-hover: #7c5ce4;
+
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb-bg: rgba(155, 114, 245, 0.15);
+  --scrollbar-active-thumb-bg: rgba(155, 114, 245, 0.3);
+}
+
+/* ── Base ── */
+body {
+  font-family: var(--font-interface) !important;
+  background: var(--bg-00);
+  -webkit-font-smoothing: antialiased;
+}
+
+.workspace { background: var(--bg-00); }
+
+.workspace-split.mod-root .workspace-leaf-content {
+  background: var(--bg-00);
+}
+
+/* ── Left sidebar ── */
+.nav-folder-title,
+.nav-file-title {
+  font-family: var(--font-interface);
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+
+.nav-file-title:hover,
+.nav-folder-title:hover {
+  color: var(--text-primary);
+  background: var(--accent-faint2);
+}
+
+.nav-file-title.is-active {
+  color: #b49eff;
+  background: var(--accent-faint);
+  border-left: 2px solid var(--accent);
+}
+
+.nav-folder-icon { color: var(--accent); opacity: 0.6; }
+
+/* ── Editor ── */
+.cm-s-obsidian,
+.markdown-source-view {
+  font-family: var(--font-text) !important;
+  font-size: 15px;
+  line-height: 1.85;
+  caret-color: var(--accent);
+}
+
+.markdown-rendered {
+  font-family: var(--font-text);
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--text-primary);
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 8px;
+}
+
+/* ── Headings ── */
+.markdown-rendered h1, .cm-header-1 {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 2em;
+  font-weight: 600;
+  color: #ffffff;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+  margin: 1.4em 0 0.8em;
+  letter-spacing: -0.01em;
+}
+
+.markdown-rendered h2, .cm-header-2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.25em;
+  font-weight: 600;
+  color: #d4c8ff;
+  margin: 1.4em 0 0.6em;
+}
+
+.markdown-rendered h3, .cm-header-3 {
+  font-size: 1.05em;
+  font-weight: 500;
+  color: #b49eff;
+  margin: 1.2em 0 0.5em;
+}
+
+.markdown-rendered h4,
+.markdown-rendered h5,
+.markdown-rendered h6 {
+  font-size: 0.95em;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* ── Links ── */
+a, .cm-s-obsidian .cm-link {
+  color: #9b72f5;
+  text-decoration: none;
+}
+a:hover { color: #b49eff; text-decoration: underline; text-underline-offset: 2px; }
+
+.cm-s-obsidian .cm-hmd-internal-link { color: #9b72f5; }
+
+/* ── Code ── */
+code, .cm-s-obsidian .cm-inline-code {
+  font-family: var(--font-monospace);
+  font-size: 0.875em;
+  background: #1e1b26;
+  color: #c4b5fd;
+  border: 1px solid rgba(155, 114, 245, 0.2);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+pre, .markdown-rendered pre {
+  background: #141219;
+  border: 1px solid rgba(155, 114, 245, 0.15);
+  border-radius: 8px;
+  padding: 16px 18px;
+  font-family: var(--font-monospace);
+  font-size: 13px;
+  color: #c4b5fd;
+  overflow-x: auto;
+}
+
+/* ── Blockquote ── */
+blockquote {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-faint2);
+  margin: 1.2em 0;
+  padding: 12px 18px;
+  border-radius: 0 6px 6px 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* ── Tables ── */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th {
+  background: #19171f;
+  color: #b49eff;
+  border: 1px solid rgba(155, 114, 245, 0.15);
+  padding: 10px 14px;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+td {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 9px 14px;
+  color: var(--text-secondary);
+}
+
+tr:hover td {
+  background: var(--accent-faint2);
+  color: var(--text-primary);
+}
+
+/* ── Tags ── */
+.tag {
+  font-family: var(--font-interface);
+  font-size: 11px;
+  background: var(--accent-faint);
+  color: #b49eff;
+  border: 1px solid rgba(155, 114, 245, 0.2);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-weight: 500;
+}
+
+/* ── Checkboxes ── */
+.markdown-rendered .task-list-item-checkbox {
+  accent-color: var(--accent);
+}
+
+/* ── Bold / italic ── */
+strong, .cm-strong { color: #ffffff; font-weight: 600; }
+em, .cm-em { color: #c4b5fd; }
+
+/* ── HR ── */
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5em 0;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(155, 114, 245, 0.2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(155, 114, 245, 0.4); }
+
+/* ── Tabs ── */
+.workspace-tab-header {
+  font-family: var(--font-interface);
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: var(--bg-01);
+}
+
+.workspace-tab-header.is-active {
+  color: var(--text-primary);
+  background: var(--bg-00);
+  border-top: 2px solid var(--accent);
+}
+
+/* ── Status bar ── */
+.status-bar {
+  font-family: var(--font-interface);
+  font-size: 11px;
+  color: var(--text-faint);
+  background: var(--bg-01);
+  border-top: 1px solid var(--border);
+}
+
+/* ── Modal / prompt ── */
+.prompt {
+  background: var(--bg-01);
+  border: 1px solid var(--border-hover);
+  border-radius: 10px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(155, 114, 245, 0.1);
+}
+
+.prompt-input {
+  font-family: var(--font-interface);
+  font-size: 15px;
+  color: var(--text-primary);
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+}
+
+.suggestion-item.is-selected {
+  background: var(--accent-faint);
+  color: #b49eff;
+  border-radius: 6px;
+}
+
+/* ── Selection ── */
+::selection {
+  background: rgba(155, 114, 245, 0.25);
+}
+
+/* ── Frontmatter ── */
+.cm-s-obsidian .cm-hmd-frontmatter {
+  color: var(--text-faint);
+  font-size: 12px;
+  font-family: var(--font-monospace);
+}
+
+/* ── Callouts (Notion-style) ── */
+.callout {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--accent-faint2);
+  padding: 14px 16px;
+}
+
+.callout-title { color: #b49eff; font-weight: 500; }
+
+/* ── Search highlight ── */
+.search-result-file-matched-text {
+  background: rgba(155, 114, 245, 0.2);
+  color: #b49eff;
+  border-radius: 2px;
+}

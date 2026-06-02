@@ -1,7 +1,8 @@
 'use strict';
 
-const { db }     = require('../database');
-const { LEVELS } = require('./permissions-levels');
+const { db }      = require('../database');
+const { LEVELS }  = require('./permissions-levels');
+const permStorage = require('./access-storage');
 
 // ── Table user_permissions ────────────────────────────────────────────────────
 // Stocke le niveau hiérarchique custom d'un user sur un guild spécifique.
@@ -57,6 +58,8 @@ function isOwner(userId) {
 function getUserLevel(userId, guildId) {
   if (isOwner(userId)) return LEVELS.OWNER;
   if (!guildId) return LEVELS.USER;
+
+  if (permStorage.isBuyer(guildId, userId)) return LEVELS.OWNER;
 
   const row = STMT_GET.get(guildId, userId);
   return row ? row.permission_level : LEVELS.USER;

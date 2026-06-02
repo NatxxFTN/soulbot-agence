@@ -1,0 +1,22 @@
+{
+  "id": "conv-1779020780866-dgph4d0ts",
+  "providerId": "claude",
+  "title": "Configure Cercle Social Obsidian vault",
+  "titleGenerationStatus": "success",
+  "createdAt": 1779020780866,
+  "updatedAt": 1779020789892,
+  "lastResponseAt": 1779020781899,
+  "sessionId": "b3de6ec6-14bb-47dd-966f-8246521f2793",
+  "providerState": {
+    "providerSessionId": "b3de6ec6-14bb-47dd-966f-8246521f2793"
+  },
+  "usage": {
+    "model": "haiku",
+    "inputTokens": 0,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 0,
+    "contextWindow": 200000,
+    "contextTokens": 0,
+    "percentage": 0
+  }
+}

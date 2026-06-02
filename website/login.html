@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soulbot — Connexion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Variables ─────────────────────────────────────────────── */
+    :root {
+      --primary: #FF0000;
+      --neutral: #0A0A0A;
+      --surface: #0C1412;
+      --text-primary: #FFFFFF;
+      --text-secondary: #AAAAAA;
+      --text-tertiary: #666666;
+      --text-muted: #555555;
+      --border-subtle: #2A2A2A;
+      --emerald: #00FF94;
+      --emerald-dark: #00CC77;
+      --turquoise: #00E5CC;
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      color: var(--text-primary);
+      height: 100%;
+      overflow: hidden;
+      transition: opacity 0.6s ease;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── Animations ────────────────────────────────────────────── */
+    @keyframes fadeRise {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(32px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes drift {
+      0%   { transform: translate(0, 0) scale(1); }
+      25%  { transform: translate(30px, -20px) scale(1.05); }
+      50%  { transform: translate(-20px, 30px) scale(0.95); }
+      75%  { transform: translate(20px, 20px) scale(1.02); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+    @keyframes dividerPulse {
+      0%, 100% { opacity: 0.4; }
+      50%      { opacity: 1; }
+    }
+    @keyframes pulseDot {
+      from { transform: scale(0.8); opacity: 0.5; }
+      to   { transform: scale(1.2); opacity: 1; }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25%      { transform: translateX(-8px); }
+      75%      { transform: translateX(8px); }
+    }
+
+    .logo-block     { animation: scaleIn 0.9s var(--ease-out-expo) forwards; animation-delay: 0.1s; opacity: 0; }
+    .stats-block    { animation: fadeRise 0.8s var(--ease-out-expo) forwards; animation-delay: 0.4s; opacity: 0; }
+    .quote-text     { animation: fadeIn 1.2s ease forwards; animation-delay: 0.8s; opacity: 0; }
+    .right-panel       { animation: slideInRight 1s var(--ease-out-expo) forwards; animation-delay: 0.2s; opacity: 0; }
+    .right-heading     { animation: fadeRise 0.7s var(--ease-out-expo) forwards; animation-delay: 0.5s; opacity: 0; }
+    .right-desc        { animation: fadeRise 0.7s var(--ease-out-expo) forwards; animation-delay: 0.65s; opacity: 0; }
+    .stepper-card      { opacity: 0; animation: fadeRise 0.7s var(--ease-out-expo) forwards; }
+    .stepper-card:nth-child(1) { animation-delay: 0.9s; }
+    .stepper-card:nth-child(2) { animation-delay: 1.1s; }
+    .stepper-card:nth-child(3) { animation-delay: 1.3s; }
+
+    /* ─── Split Layout ──────────────────────────────────────────── */
+    .split {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* ─── Left Panel ────────────────────────────────────────────── */
+    .split-left {
+      flex: 1;
+      background: var(--neutral);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 40px;
+      overflow: hidden;
+    }
+
+    /* ─── Orbs ──────────────────────────────────────────────────── */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      animation: drift linear infinite;
+      pointer-events: none;
+    }
+    .orb-1 {
+      width: 300px; height: 300px;
+      background: #FF0000;
+      top: 20%; left: 10%;
+      animation-duration: 12s;
+    }
+    .orb-2 {
+      width: 200px; height: 200px;
+      background: #CC0000;
+      top: 60%; left: 40%;
+      animation-duration: 18s;
+      animation-delay: -6s;
+    }
+    .orb-3 {
+      width: 150px; height: 150px;
+      background: #FF3333;
+      top: 10%; left: 60%;
+      animation-duration: 15s;
+      animation-delay: -3s;
+    }
+
+    /* ─── Left Content ──────────────────────────────────────────── */
+    .split-left .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .split-left .logo-square {
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .split-left .logo-text {
+      font-family: var(--font-display);
+      font-size: 42px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+    }
+    .split-left .tagline {
+      margin-top: 12px;
+      font-size: 15px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.03em;
+    }
+
+    /* ─── Left Stats ────────────────────────────────────────────── */
+    .left-stats {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-top: 36px;
+    }
+    .left-stat {
+      text-align: center;
+      padding: 0 24px;
+    }
+    .left-stat:not(:last-child) {
+      border-right: 1px solid rgba(255,255,255,0.08);
+    }
+    .left-stat .num {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+    .left-stat .desc {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    /* ─── Left Quote ────────────────────────────────────────────── */
+    .left-quote {
+      position: absolute;
+      bottom: 60px;
+      font-size: 13px;
+      font-style: italic;
+      color: #444;
+      letter-spacing: 0.02em;
+    }
+
+    .split-left .copyright {
+      position: absolute;
+      bottom: 24px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.05em;
+      opacity: 0.6;
+    }
+
+    /* ─── Separator ─────────────────────────────────────────────── */
+    .divider {
+      width: 1px;
+      height: 100vh;
+      flex-shrink: 0;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(255, 0, 0, 0.3) 30%,
+        rgba(255, 0, 0, 0.6) 50%,
+        rgba(255, 0, 0, 0.3) 70%,
+        transparent 100%
+      );
+      animation: dividerPulse 3s ease-in-out infinite;
+    }
+
+    /* ─── Right Panel ───────────────────────────────────────────── */
+    .split-right {
+      flex: 1;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ─── Right Orbs (aurora) ──────────────────────────────────── */
+    .right-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      animation: drift linear infinite;
+    }
+    .right-orb-1 {
+      width: 350px; height: 350px;
+      background: var(--emerald);
+      opacity: 0.12;
+      top: -10%; right: -10%;
+      animation-duration: 14s;
+    }
+    .right-orb-2 {
+      width: 250px; height: 250px;
+      background: var(--turquoise);
+      opacity: 0.1;
+      bottom: 20%; right: 30%;
+      animation-duration: 20s;
+      animation-delay: -7s;
+    }
+    .right-orb-3 {
+      width: 200px; height: 200px;
+      background: var(--emerald-dark);
+      opacity: 0.08;
+      top: 40%; left: -5%;
+      animation-duration: 16s;
+      animation-delay: -4s;
+    }
+
+    .split-right .top-link {
+      position: absolute;
+      top: 28px;
+      right: 36px;
+      font-size: 13px;
+      color: var(--text-tertiary);
+      transition: color 0.25s ease;
+      z-index: 2;
+    }
+    .split-right .top-link:hover { color: var(--primary); }
+
+    /* ─── Right Content ────────────────────────────────────────── */
+    .right-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .right-heading {
+      font-family: var(--font-display);
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .right-desc {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.6;
+      max-width: 440px;
+    }
+
+    /* ─── Stepper Cards ────────────────────────────────────────── */
+    .stepper {
+      display: flex;
+      gap: 16px;
+    }
+    .stepper-card {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 20px;
+      border-radius: 16px;
+    }
+    .stepper-card.active {
+      background: #FFFFFF;
+    }
+    .stepper-card.active .step-badge {
+      background: #0A0A0A;
+      color: #FFFFFF;
+    }
+    .stepper-card.active .step-text { color: #0A0A0A; }
+    .stepper-card.active .step-label { color: rgba(10, 10, 10, 0.5); }
+
+    .stepper-card.glass {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .stepper-card.glass .step-badge {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.4);
+    }
+    .stepper-card.glass .step-text { color: rgba(255, 255, 255, 0.4); }
+    .stepper-card.glass .step-label { color: rgba(255, 255, 255, 0.25); }
+
+    .step-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step-info { display: flex; flex-direction: column; }
+    .step-text {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .step-label {
+      font-size: 12px;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
+    /* ─── Custom Cursor ─────────────────────────────────────────── */
+    * { cursor: none; }
+    .cursor {
+      position: fixed;
+      width: 8px; height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 32px; height: 32px;
+      border: 1px solid rgba(255, 0, 0, 0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.4s var(--ease-out-expo), width 0.3s ease, height 0.3s ease;
+    }
+
+    /* ─── Responsive ────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .split { flex-direction: column; }
+      .divider { width: 100%; height: 1px; }
+      .split-left { flex: 0 0 220px; padding: 24px; }
+      .split-left .logo-text { font-size: 32px; }
+      .split-left .logo-square { width: 32px; height: 32px; }
+      .left-stat:not(:last-child) { border-right: none; }
+      .left-quote { bottom: 44px; }
+      .split-right { padding: 32px 24px; overflow-y: auto; }
+      .right-heading { font-size: 28px; }
+      .stepper { flex-direction: column; }
+      .split-right .top-link { top: 16px; right: 20px; }
+      * { cursor: auto; }
+      .cursor, .cursor-ring { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <div class="split">
+
+    <!-- ════════════════════════════════════════════ -->
+    <!-- LEFT PANEL                                    -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div class="split-left">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+
+      <div class="logo-block logo">
+        <div class="logo-square"></div>
+        <span class="logo-text">Soulbot</span>
+      </div>
+      <p class="tagline stats-block">Bot Discord Premium</p>
+
+      <div class="stats-block left-stats">
+        <div class="left-stat">
+          <div class="num">300+</div>
+          <div class="desc">Commandes</div>
+        </div>
+        <div class="left-stat">
+          <div class="num">27</div>
+          <div class="desc">Events logués</div>
+        </div>
+        <div class="left-stat">
+          <div class="num">100%</div>
+          <div class="desc">Premium</div>
+        </div>
+      </div>
+
+      <p class="quote-text left-quote">"Le bot qui a tout. Vraiment tout."</p>
+      <div class="copyright">© 2026 Soulbot. All rights reserved.</div>
+    </div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!-- SEPARATOR                                    -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div class="divider"></div>
+
+    <!-- ════════════════════════════════════════════ -->
+    <!-- RIGHT PANEL                                   -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div class="split-right right-panel">
+      <div class="right-orb right-orb-1"></div>
+      <div class="right-orb right-orb-2"></div>
+      <div class="right-orb right-orb-3"></div>
+
+      <a href="index.html" class="top-link">
+        ← Créer un compte
+      </a>
+
+      <div class="right-content">
+        <div>
+          <h1 class="right-heading">Get Started<br>with Us</h1>
+          <p class="right-desc">Créez votre compte en quelques secondes et découvrez une nouvelle façon de gérer votre serveur Discord.</p>
+        </div>
+
+        <div class="stepper">
+          <div class="stepper-card active">
+            <div class="step-badge">1</div>
+            <div class="step-info">
+              <span class="step-text">Informations</span>
+              <span class="step-label">Vos identifiants</span>
+            </div>
+          </div>
+          <div class="stepper-card glass">
+            <div class="step-badge">2</div>
+            <div class="step-info">
+              <span class="step-text">Configuration</span>
+              <span class="step-label">Préférences serveur</span>
+            </div>
+          </div>
+          <div class="stepper-card glass">
+            <div class="step-badge">3</div>
+            <div class="step-info">
+              <span class="step-text">Connexion</span>
+              <span class="step-label">Ajouter Soulbot</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─── Custom Cursor ──────────────────────────────────────────────
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX - 4 + 'px';
+      cursor.style.top = e.clientY - 4 + 'px';
+      ring.style.left = e.clientX - 16 + 'px';
+      ring.style.top = e.clientY - 16 + 'px';
+    });
+
+    document.querySelectorAll('a, button, input').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        ring.style.width = '48px';
+        ring.style.height = '48px';
+        const left = parseFloat(ring.style.left) || 0;
+        const top = parseFloat(ring.style.top) || 0;
+        ring.style.left = left - 8 + 'px';
+        ring.style.top = top - 8 + 'px';
+      });
+      el.addEventListener('mouseleave', () => {
+        ring.style.width = '32px';
+        ring.style.height = '32px';
+      });
+    });
+  </script>
+</body>
+</html>
