@@ -30,20 +30,11 @@ function acquireLock() {
     let oldPid = 0;
     try { oldPid = parseInt(fs.readFileSync(LOCK_FILE, 'utf-8').trim(), 10); } catch { /* ignoré */ }
 
-    if (oldPid && oldPid !== process.pid) {
-      if (isPidAlive(oldPid)) {
-        console.log(`   ⚔️ Ancienne instance détectée (PID ${oldPid}) — kill...`);
-        try {
-          process.kill(oldPid, 'SIGTERM');
-        } catch {
-          try {
-            execSync(`kill -9 ${oldPid} 2>/dev/null || taskkill /F /PID ${oldPid} 2>nul`, { timeout: 3000 });
-          } catch { /* déjà mort */ }
-        }
-      }
-      try { fs.unlinkSync(LOCK_FILE); } catch { /* ignoré */ }
-      console.log(`   🧹 Lock obsolète supprimé (ancien PID ${oldPid})`);
+    if (oldPid && oldPid !== process.pid && isPidAlive(oldPid)) {
+      console.log(`   ⚠️ Lock existant (PID ${oldPid}) — remplacement...`);
     }
+
+    try { fs.unlinkSync(LOCK_FILE); } catch { /* ignoré */ }
   }
 
   fs.writeFileSync(LOCK_FILE, String(process.pid), 'utf-8');
