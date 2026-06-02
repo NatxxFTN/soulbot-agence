@@ -149,11 +149,9 @@ module.exports = {
 
     // ── Guard ownerOnly ───────────────────────────────────────────────────────
     if (cmd.ownerOnly) {
-      const owners = (process.env.BOT_OWNER_IDS || process.env.BOT_OWNERS || '')
-        .split(',')
-        .map(s => s.trim())
-        .filter(s => /^\d{17,19}$/.test(s));
-      if (!owners.includes(message.author.id)) {
+      const isOwner = ac.isBotOwner(message.author.id)
+        || (message.guild && ac.isAuthorizedOwner(message.guild.id, message.author.id));
+      if (!isOwner) {
         return message.reply({ embeds: [E.error('Accès refusé', 'Commande réservée au propriétaire du bot.')] });
       }
     }
