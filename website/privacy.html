@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Politique de Confidentialité — Soulbot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #FF0000;
+      --primary-dark: #8B0000;
+      --primary-glow: #FF3333;
+      --neutral: #0A0A0A;
+      --surface: #141414;
+      --surface-elevated: #1A1A1A;
+      --on-primary: #FFFFFF;
+      --text-primary: #FFFFFF;
+      --text-secondary: #AAAAAA;
+      --text-tertiary: #666666;
+      --border-subtle: #2A2A2A;
+      --border-glow: rgba(255, 0, 0, 0.3);
+      --font-display: 'Instrument Serif', serif;
+      --font-body: 'Inter', sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+      --rounded-sm: 4px;
+      --rounded-md: 8px;
+      --rounded-lg: 12px;
+      --rounded-xl: 16px;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-xxl: 48px;
+      --space-xxxl: 64px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--text-primary);
+      background: var(--neutral);
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: var(--primary-glow); text-decoration: underline; }
+
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) var(--space-xl);
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .navbar-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-style: italic;
+      color: var(--text-primary);
+    }
+    .navbar-logo .logo-dot {
+      width: 10px; height: 10px;
+      background: var(--primary);
+      border-radius: 2px;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
+    }
+    .navbar-links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+    .navbar-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+    }
+    .navbar-links a:hover { color: var(--text-primary); text-decoration: none; }
+
+    .page-header {
+      padding: 120px 0 var(--space-xxl);
+      text-align: center;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .page-header h1 {
+      font-family: var(--font-display);
+      font-size: 56px;
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-md);
+    }
+    .page-header h1 .accent { color: var(--primary); }
+    .page-header p {
+      font-size: 18px;
+      color: var(--text-secondary);
+    }
+    .page-header .last-updated {
+      display: inline-block;
+      margin-top: var(--space-md);
+      padding: 6px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--rounded-full);
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: var(--space-xxl) var(--space-lg) var(--space-xxxl);
+    }
+    .content h2 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 400;
+      margin-top: var(--space-xxxl);
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .content h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-top: var(--space-xl);
+      margin-bottom: var(--space-md);
+      color: var(--primary);
+    }
+    .content p {
+      margin-bottom: var(--space-md);
+      color: var(--text-secondary);
+    }
+    .content ul {
+      margin-bottom: var(--space-md);
+      padding-left: var(--space-xl);
+      list-style: disc;
+    }
+    .content ul li {
+      margin-bottom: var(--space-sm);
+      color: var(--text-secondary);
+    }
+    .content strong { color: var(--text-primary); }
+    .content .highlight-box {
+      padding: var(--space-lg);
+      background: var(--surface);
+      border-left: 3px solid var(--primary);
+      border-radius: var(--rounded-md);
+      margin-bottom: var(--space-lg);
+    }
+    .content .highlight-box p { margin-bottom: 0; }
+    .content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: var(--space-lg);
+    }
+    .content table th, .content table td {
+      padding: var(--space-sm) var(--space-md);
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 14px;
+    }
+    .content table th {
+      background: var(--surface);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    .content table td { color: var(--text-secondary); }
+
+    .footer {
+      padding: var(--space-xxl) 0;
+      border-top: 1px solid var(--border-subtle);
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-md);
+    }
+    .footer-links a {
+      font-size: 14px;
+      color: var(--text-tertiary);
+    }
+    .footer-links a:hover { color: var(--text-primary); text-decoration: none; }
+    .footer-copy { font-size: 13px; color: var(--text-tertiary); }
+
+    @media (max-width: 768px) {
+      .page-header h1 { font-size: 36px; }
+      .content h2 { font-size: 26px; }
+      .navbar-links { display: none; }
+      .content { padding: var(--space-xl) var(--space-md) var(--space-xxl); }
+      .content table { font-size: 13px; }
+      .content table th, .content table td { padding: var(--space-xs) var(--space-sm); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-logo">
+      <span class="logo-dot"></span>
+      Soulbot
+    </a>
+    <div class="navbar-links">
+      <a href="index.html">Accueil</a>
+      <a href="terms.html">Conditions</a>
+      <a href="privacy.html" style="color: var(--text-primary);">Confidentialité</a>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <section class="page-header">
+    <div class="container">
+      <h1>Politique de <span class="accent">Confidentialité</span></h1>
+      <p>Comment nous collectons, utilisons et protégeons vos données</p>
+      <span class="last-updated">Dernière mise à jour : 7 juin 2026</span>
+    </div>
+  </section>
+
+  <!-- Content -->
+  <section class="content">
+
+    <div class="highlight-box">
+      <p><strong>🔒 Soulbot prend la protection de vos données au sérieux.</strong> Cette politique explique quelles données sont collectées, pourquoi, et comment vous pouvez exercer vos droits.</p>
+    </div>
+
+    <h2>1. Responsable du traitement</h2>
+    <p>
+      Le responsable du traitement des données est l'exploitant de Soulbot (ci-après "le développeur"). 
+      Pour toute question relative à vos données, contactez-nous via le serveur Discord de support 
+      ou les canaux prévus à cet effet.
+    </p>
+
+    <h2>2. Données collectées</h2>
+    <p>Soulbot collecte et stocke les catégories de données suivantes :</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Catégorie</th>
+          <th>Données</th>
+          <th>Finalité</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Identifiants Discord</strong></td>
+          <td>ID utilisateur, ID du serveur, ID des salons, ID des rôles</td>
+          <td>Fonctionnement du bot, configuration, logs de modération</td>
+        </tr>
+        <tr>
+          <td><strong>Messages</strong></td>
+          <td>Contenu des messages (uniquement dans le cadre des logs et des systèmes de modération/anti-spam/anti-insultes)</td>
+          <td>Détection des infractions, logs d'activité, modération automatique</td>
+        </tr>
+        <tr>
+          <td><strong>Actions de modération</strong></td>
+          <td>Avertissements, bannissements, expulsions, mute, suppression de messages</td>
+          <td>Traçage des actions de modération, historique</td>
+        </tr>
+        <tr>
+          <td><strong>Données de progression</strong></td>
+          <td>XP, niveaux, temps en vocal</td>
+          <td>Système d'engagement et de classement</td>
+        </tr>
+        <tr>
+          <td><strong>Données de participation</strong></td>
+          <td>Participations aux giveaways, sondages, suggestions, confessions anonymes</td>
+          <td>Animation communautaire</td>
+        </tr>
+        <tr>
+          <td><strong>Configuration</strong></td>
+          <td>Préférences du serveur (prefixe, salons de logs, rôles auto, protections activées)</td>
+          <td>Personnalisation du bot par serveur</td>
+        </tr>
+        <tr>
+          <td><strong>Données de diagnostic</strong></td>
+          <td>Logs d'erreurs, temps de réponse, utilisation des commandes</td>
+          <td>Débogage, amélioration des performances</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Ce que nous NE collectons PAS</h3>
+    <ul>
+      <li>❌ Adresses email (sauf si fournies via OAuth2 Discord pour le tableau de bord)</li>
+      <li>❌ Messages privés (sauf ceux envoyés volontairement au bot via commande)</li>
+      <li>❌ Informations bancaires ou de paiement</li>
+      <li>❌ Adresses IP</li>
+      <li>❌ Données de localisation</li>
+      <li>❌ Contenu des fichiers audio, vidéo ou images</li>
+    </ul>
+
+    <h2>3. Base légale du traitement</h2>
+    <p>
+      Le traitement des données est basé sur :
+    </p>
+    <ul>
+      <li><strong>L'intérêt légitime</strong> : Fournir les fonctionnalités demandées par les utilisateurs (modération, logs, automatisations)</li>
+      <li><strong>Le consentement</strong> : En invitant Soulbot sur un serveur et en utilisant ses commandes, vous consentez au traitement décrit dans cette politique</li>
+      <li><strong>L'exécution du contrat</strong> : Les données sont nécessaires au fonctionnement du service</li>
+    </ul>
+
+    <h2>4. Stockage et sécurité</h2>
+    <p>
+      Les données sont stockées de la manière suivante :
+    </p>
+    <ul>
+      <li><strong>Base de données locale</strong> (SQLite) sur le serveur hébergeant le bot</li>
+      <li><strong>Fichiers JSON</strong> pour certaines configurations</li>
+      <li><strong>Aucun stockage cloud externe</strong> : les données ne sont pas transmises à des tiers</li>
+    </ul>
+    <p>
+      Des mesures de sécurité sont mises en place pour protéger les données :
+    </p>
+    <ul>
+      <li>🔐 Accès restreint aux fichiers de base de données</li>
+      <li>🔄 Sauvegardes régulières</li>
+      <li>🔑 Authentification requise pour le tableau de bord</li>
+    </ul>
+
+    <h2>5. Conservation des données</h2>
+    <p>Les données sont conservées pour les durées suivantes :</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Type de données</th>
+          <th>Durée de conservation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Logs de modération (warns, bans, kicks)</td>
+          <td>Durée de vie du serveur + 30 jours après retrait du bot</td>
+        </tr>
+        <tr>
+          <td>Logs d'activité (messages, commandes)</td>
+          <td>7 jours (rotation automatique)</td>
+        </tr>
+        <tr>
+          <td>Données de progression (XP, niveaux)</td>
+          <td>Durée de vie du serveur</td>
+        </tr>
+        <tr>
+          <td>Configuration du serveur</td>
+          <td>Durée de vie du serveur</td>
+        </tr>
+        <tr>
+          <td>Données de giveaways/sondages</td>
+          <td>Jusqu'à la fin de l'événement + 30 jours</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      Lorsque Soulbot est retiré d'un serveur, toutes les données associées à ce serveur 
+      sont supprimées dans un délai de 30 jours.
+    </p>
+
+    <h2>6. Droits des utilisateurs (RGPD)</h2>
+    <p>
+      Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez des droits suivants :
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Droit</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Droit d'accès</strong></td>
+          <td>Vous pouvez demander quelles données sont stockées à votre sujet</td>
+        </tr>
+        <tr>
+          <td><strong>Droit de rectification</strong></td>
+          <td>Vous pouvez demander la correction de données inexactes</td>
+        </tr>
+        <tr>
+          <td><strong>Droit à l'effacement</strong></td>
+          <td>Vous pouvez demander la suppression de vos données</td>
+        </tr>
+        <tr>
+          <td><strong>Droit à la limitation</strong></td>
+          <td>Vous pouvez demander la restriction du traitement</td>
+        </tr>
+        <tr>
+          <td><strong>Droit à la portabilité</strong></td>
+          <td>Vous pouvez recevoir vos données dans un format structuré</td>
+        </tr>
+        <tr>
+          <td><strong>Droit d'opposition</strong></td>
+          <td>Vous pouvez vous opposer au traitement de vos données</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      Pour exercer ces droits, contactez-nous via le serveur Discord de support. 
+      Nous répondrons à votre demande dans un délai de 30 jours.
+    </p>
+
+    <h2>7. Partage des données avec des tiers</h2>
+    <p>
+      Soulbot <strong>ne vend pas, ne loue pas et ne partage pas</strong> vos données personnelles avec des tiers.
+    </p>
+    <p>Les seuls cas de partage sont :</p>
+    <ul>
+      <li><strong>Discord Inc.</strong> : via l'API Discord, dont les conditions s'appliquent</li>
+      <li><strong>Obligation légale</strong> : si requis par la loi ou une autorité compétente</li>
+    </ul>
+
+    <h2>8. Services tiers intégrés</h2>
+    <p>Soulbot peut faire appel à des services tiers pour certaines fonctionnalités :</p>
+    <ul>
+      <li><strong>APIFlash</strong> : pour les captures d'écran de sites web (commande <code>;screenshot</code>)</li>
+      <li><strong>TinyURL</strong> : pour le raccourcissement d'URL (commande <code>;shorten</code>)</li>
+      <li><strong>OpenWeatherMap</strong> : pour la météo (commande <code>;weather</code>)</li>
+      <li><strong>Google Translate API</strong> : pour les traductions (commande <code>;translate</code>)</li>
+    </ul>
+    <p>
+      Ces services ont leurs propres politiques de confidentialité. Les données qui leur sont transmises 
+      se limitent au strict nécessaire à la fourniture du service (ex: URL à raccourcir, ville pour la météo).
+    </p>
+
+    <h2>9. Sécurité des données</h2>
+    <p>
+      Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour garantir 
+      un niveau de sécurité adapté au risque, notamment :
+    </p>
+    <ul>
+      <li>🔒 Stockage local des données (pas de cloud externe)</li>
+      <li>🛡️ Restrictions d'accès à la base de données</li>
+      <li>🔄 Sauvegardes automatiques régulières</li>
+      <li>📋 Logs d'accès et de modifications</li>
+      <li>🔑 Authentification forte pour le tableau de bord</li>
+    </ul>
+
+    <h2>10. Mineurs</h2>
+    <p>
+      Soulbot est destiné aux utilisateurs âgés d'au moins 13 ans, conformément aux 
+      Conditions d'Utilisation de Discord. Nous ne collectons pas sciemment de données 
+      personnelles de mineurs de moins de 13 ans. Si vous avez connaissance d'une telle 
+      collecte, veuillez nous contacter.
+    </p>
+
+    <h2>11. Modifications de cette politique</h2>
+    <p>
+      Cette politique de confidentialité peut être mise à jour périodiquement. 
+      La date de "Dernière mise à jour" en haut de cette page indique la date de la 
+      dernière révision. Les modifications prennent effet dès leur publication.
+    </p>
+
+    <h2>12. Contact et réclamation</h2>
+    <p>
+      Pour toute question concernant cette politique de confidentialité ou pour exercer 
+      vos droits, vous pouvez :
+    </p>
+    <ul>
+      <li>Nous contacter via le serveur Discord de support</li>
+      <li>Envoyer un message direct au développeur</li>
+    </ul>
+    <p>
+      Vous avez également le droit d'introduire une réclamation auprès de la 
+      <strong>CNIL</strong> (Commission Nationale de l'Informatique et des Libertés), 
+      l'autorité de contrôle française en matière de protection des données.
+    </p>
+
+    <div class="highlight-box" style="margin-top: var(--space-xxl);">
+      <p>
+        <strong>Version :</strong> 1.0 — Dernière mise à jour : 7 juin 2026<br>
+        <strong>Bot :</strong> Soulbot v2.0.0 — Développé par <strong>Natxx</strong>
+      </p>
+    </div>
+
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Accueil</a>
+      <a href="terms.html">Conditions d'Utilisation</a>
+    </div>
+    <div class="footer-copy">© 2026 Soulbot. All rights reserved.</div>
+  </footer>
+
+</body>
+</html>

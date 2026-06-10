@@ -267,6 +267,15 @@ io.on('connection', socket => {
   } catch { /* DB pas encore prête */ }
 });
 
+// ── Routes légales (ToS / Privacy) ────────────────────────────────────────────
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'website', 'terms.html'));
+});
+
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'website', 'privacy.html'));
+});
+
 // ── Fallback SPA ──────────────────────────────────────────────────────────────
 app.get('/', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

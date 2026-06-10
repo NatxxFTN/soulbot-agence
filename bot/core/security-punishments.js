@@ -30,7 +30,7 @@ const FEATURE_LABELS = {
   antiwords     : 'Filtre de mots',
   anticaps      : 'Anti-Caps',
   antiemojispam : 'Anti-Emoji spam',
-  antinsfw      : 'Anti-NSFW',
+  antinsfw      : 'Anti-Explicit',
   antinewaccount: 'Anti-Nouveau compte',
   antiraid      : 'Anti-Raid',
 };

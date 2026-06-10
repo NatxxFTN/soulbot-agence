@@ -19,7 +19,7 @@ Features prévues (Tiers 1 et 2) — créées par les prompts 2/3 du Pack Forter
 | 2    | `antiwords`      | Filtre de mots interdits (`custom_data` JSON array) |
 | 2    | `anticaps`       | Anti-majuscules excessives (seuil en %) |
 | 2    | `antiemojispam`  | Anti-spam d'emojis (seuil quantité) |
-| 2    | `antinsfw`       | Détection NSFW basique (regex / labels) |
+| 2    | `antinsfw`       | Détection contenu explicite (regex / labels) |
 | 2    | `antinewaccount` | Kick/limite comptes trop récents |
 | 2    | `antiraid`       | Détection raid avancée (seuil de joins/s) |
 

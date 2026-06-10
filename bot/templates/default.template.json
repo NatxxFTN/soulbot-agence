@@ -1,0 +1,308 @@
+{
+  "meta": {
+    "name": "Mon Serveur",
+    "description": "Un serveur Discord premium généré par ServerForge",
+    "color_primary": "#8B5CF6",
+    "color_secondary": "#1a1a2e"
+  },
+
+  "roles": [
+    {
+      "name": "{{CROWN}} Fondateur",
+      "color": "#8B5CF6",
+      "hoist": true,
+      "mentionable": false,
+      "permissions": ["Administrator"],
+      "position": 10,
+      "separator": false,
+      "icon_url": null,
+      "icon_local": "assets/icons/fondateur.png"
+    },
+    {
+      "name": "{{BOLT}} Admin",
+      "color": "#6D28D9",
+      "hoist": true,
+      "mentionable": true,
+      "permissions": ["ManageGuild", "ManageChannels", "ManageRoles", "KickMembers", "BanMembers"],
+      "position": 9,
+      "separator": false,
+      "icon_url": null,
+      "icon_local": "assets/icons/admin.png"
+    },
+    {
+      "name": "──────────",
+      "color": "#2C2F33",
+      "hoist": false,
+      "mentionable": false,
+      "permissions": [],
+      "position": 8,
+      "separator": true,
+      "icon_url": null,
+      "icon_local": null
+    },
+    {
+      "name": "{{HAMMER}} Moderateurs",
+      "color": "#F59E0B",
+      "hoist": true,
+      "mentionable": true,
+      "permissions": ["ManageMessages", "KickMembers", "ModerateMembers"],
+      "position": 7,
+      "separator": false,
+      "icon_url": null,
+      "icon_local": "assets/icons/moderateur.png"
+    },
+    {
+      "name": "──────────",
+      "color": "#2C2F33",
+      "hoist": false,
+      "mentionable": false,
+      "permissions": [],
+      "position": 6,
+      "separator": true,
+      "icon_url": null,
+      "icon_local": null
+    },
+    {
+      "name": "{{GEM}} VIP",
+      "color": "#EC4899",
+      "hoist": true,
+      "mentionable": false,
+      "permissions": [],
+      "position": 5,
+      "separator": false,
+      "icon_url": null,
+      "icon_local": "assets/icons/vip.png"
+    },
+    {
+      "name": "──────────",
+      "color": "#2C2F33",
+      "hoist": false,
+      "mentionable": false,
+      "permissions": [],
+      "position": 4,
+      "separator": true,
+      "icon_url": null,
+      "icon_local": null
+    },
+    {
+      "name": "{{CHECK}} Membres",
+      "color": "#10B981",
+      "hoist": false,
+      "mentionable": false,
+      "permissions": [],
+      "position": 2,
+      "separator": false,
+      "icon_url": null,
+      "icon_local": "assets/icons/membre.png"
+    },
+    {
+      "name": "{{BOT}} BOTS",
+      "color": "#3B82F6",
+      "hoist": true,
+      "mentionable": false,
+      "permissions": [],
+      "position": 3,
+      "separator": false,
+      "icon_url": null,
+      "icon_local": "assets/icons/bots.png"
+    }
+  ],
+
+  "categories": [
+    {
+      "name": "-·{{BELL}}·- Important",
+      "position": 0,
+      "channels": [
+        {
+          "name": "{{ANNOUNCE}} · annonce",
+          "type": "text",
+          "topic": "Annonces officielles du serveur — Restez informes",
+          "slowmode": 0,
+          "nsfw": false,
+          "bitrate": null,
+          "userLimit": null,
+          "permissions": {
+            "everyone": ["ViewChannel", "ReadMessageHistory"],
+            "{{CROWN}} Fondateur": ["ViewChannel", "SendMessages", "ManageMessages"],
+            "{{BOLT}} Admin": ["ViewChannel", "SendMessages", "ManageMessages"],
+            "{{HAMMER}} Moderateurs": ["ViewChannel", "SendMessages", "ManageMessages"]
+          },
+          "rules_message": false,
+          "welcome_message": false
+        },
+        {
+          "name": "{{RULES}} · reglement",
+          "type": "text",
+          "topic": "Reglement du serveur — Merci de le lire attentivement",
+          "slowmode": 0,
+          "nsfw": false,
+          "bitrate": null,
+          "userLimit": null,
+          "permissions": {
+            "everyone": ["ViewChannel", "ReadMessageHistory"],
+            "{{CHECK}} Membres": ["ViewChannel", "ReadMessageHistory"]
+          },
+          "rules_message": true,
+          "welcome_message": false
+        },
+        {
+          "name": "{{ANNOUNCE}} · recrutement",
+          "type": "text",
+          "topic": "Candidatures et recrutement du staff",
+          "slowmode": 30,
+          "nsfw": false,
+          "bitrate": null,
+          "userLimit": null,
+          "permissions": {
+            "everyone": [],
+            "{{CHECK}} Membres": ["ViewChannel", "SendMessages"],
+            "{{HAMMER}} Moderateurs": ["ViewChannel", "SendMessages", "ManageMessages"]
+          },
+          "rules_message": false,
+          "welcome_message": false
+        }
+      ]
+    },
+    {
+      "name": "-·{{CHAT}}·- General",
+      "position": 1,
+      "channels": [
+        {
+          "name": "{{WELCOME}} · bienvenue",
+          "type": "text",
+          "topic": "Bienvenue sur le serveur ! Presente-toi",
+          "slowmode": 0,
+          "nsfw": false,
+          "bitrate": null,
+          "userLimit": null,
+          "permissions": {
+            "everyone": ["ViewChannel", "ReadMessageHistory"],
+            "{{CHECK}} Membres": ["ViewChannel", "SendMessages", "AddReactions"]
+          },
+          "rules_message": false,
+          "welcome_message": true
+        },
+        {
+          "name": "{{CHAT}} · general",
+          "type": "text",
+          "topic": "Discussion generale — Restez respectueux",
+          "slowmode": 3,
+          "nsfw": false,
+          "bitrate": null,
+          "userLimit": null,
+          "permissions": {
+            "everyone": [],
+            "{{CHECK}} Membres": ["ViewChannel", "SendMessages", "AttachFiles", "AddReactions", "UseExternalEmojis", "UseExternalStickers"]
+          },
+          "rules_message": false,
+          "welcome_message": false
+        },
+        {
+          "name": "{{MEDIA}} · medias",
+          "type": "text",
+          "topic": "Photos, videos et creations originales",
+          "slowmode": 10,
+          "nsfw": false,
+          "bitrate": null,
+          "userLimit": null,
+          "permissions": {
+            "everyone": [],
+            "{{CHECK}} Membres": ["ViewChannel", "SendMessages", "AttachFiles"]
+          },
+          "rules_message": false,
+          "welcome_message": false
+        },
+        {
+          "name": "{{MUSIC}} · musique",
+          "type": "voice",
+          "topic": null,
+          "slowmode": 0,
+          "nsfw": false,
+          "bitrate": 64000,
+          "userLimit": 10,
+          "permissions": {
+            "everyone": [],
+            "{{CHECK}} Membres": ["ViewChannel", "Connect", "Speak"]
+          },
+          "rules_message": false,
+          "welcome_message": false
+        },
+        {
+          "name": "{{MUSIC}} · gaming",
+          "type": "voice",
+          "topic": null,
+          "slowmode": 0,
+          "nsfw": false,
+          "bitrate": 96000,
+          "userLimit": 8,
+          "permissions": {
+            "everyone": [],
+            "{{CHECK}} Membres": ["ViewChannel", "Connect", "Speak", "Stream"]
+          },
+          "rules_message": false,
+          "welcome_message": false
+        }
+      ]
+    }
+  ],
+
+  "logs": {
+    "enabled": true,
+    "inherit_soulbot": true,
+    "category_name": "-·{{STATS}}·- Logs",
+    "position": 10,
+    "channels": [
+      {
+        "name": "{{LOG_JOIN}} · arrives-departs",
+        "events": ["guildMemberAdd", "guildMemberRemove"],
+        "topic": "Mouvements des membres"
+      },
+      {
+        "name": "{{LOG_EDIT}} · messages",
+        "events": ["messageUpdate", "messageDelete", "messageDeleteBulk"],
+        "topic": "Activite des messages"
+      },
+      {
+        "name": "{{LOG_MOD}} · moderation",
+        "events": ["guildBanAdd", "guildBanRemove"],
+        "topic": "Actions de moderation"
+      },
+      {
+        "name": "{{LOG_SETTINGS}} · serveur",
+        "events": ["channelCreate", "channelDelete", "roleCreate", "roleDelete", "emojiCreate", "emojiDelete"],
+        "topic": "Modifications du serveur"
+      },
+      {
+        "name": "{{LOG_VOICE}} · vocal",
+        "events": ["voiceStateUpdate"],
+        "topic": "Activite vocale"
+      }
+    ]
+  },
+
+  "welcome": {
+    "enabled": true,
+    "title": "Bienvenue sur **{server}** !",
+    "description": "Content(e) de t'avoir parmi nous.\nLis le reglement et profite du serveur !\n\nN'hesite pas a te presenter dans {welcome_channel}",
+    "color": "#8B5CF6",
+    "thumbnail": true,
+    "image": null,
+    "footer": "Serveur genere par Soulbot x ServerForge"
+  },
+
+  "rules": {
+    "enabled": true,
+    "title": "Reglement de {server}",
+    "description": null,
+    "rules": [
+      "Respecte tous les membres sans exception — zero tolerance pour le harcelement",
+      "Pas de spam, flood, ou publicite non autorisee en dehors des salons prevus",
+      "Contenu NSFW strictement interdit — sanction immediate",
+      "Respecte les directives officielles de Discord (Conditions d'Utilisation)",
+      "Ecoute et respecte les decisions du staff en toutes circonstances",
+      "Utilise les salons appropries pour chaque type de discussion"
+    ],
+    "color": "#8B5CF6",
+    "footer": "En restant sur ce serveur, tu acceptes ces regles automatiquement"
+  }
+}

@@ -19,7 +19,7 @@ const META = {
   antiwords     : { label: 'Filtre de mots',      emoji: 'btn_edit',       description: 'Bloque les mots interdits custom.',            supportsThreshold: false, defaultThreshold: 1 },
   anticaps      : { label: 'Anti-Caps',           emoji: 'btn_edit',       description: 'Bloque les messages avec trop de majuscules.', supportsThreshold: true,  defaultThreshold: 70 },
   antiemojispam : { label: 'Anti-Emoji spam',     emoji: 'ui_smiley',      description: "Bloque l'abus d'emojis.",                     supportsThreshold: true,  defaultThreshold: 10 },
-  antinsfw      : { label: 'Anti-NSFW',           emoji: 'btn_error',      description: 'Détecte les mots NSFW.',                       supportsThreshold: false, defaultThreshold: 1 },
+  antinsfw      : { label: 'Anti-Explicit',        emoji: 'btn_error',      description: 'Détecte le contenu explicite.',                supportsThreshold: false, defaultThreshold: 1 },
   antinewaccount: { label: 'Anti-Nouveau compte', emoji: 'ui_pin',         description: 'Refuse les comptes récents.',                  supportsThreshold: true,  defaultThreshold: 7 },
   antiraid      : { label: 'Anti-Raid',           emoji: 'cat_protection', description: 'Détecte les raids (join flood).',              supportsThreshold: true,  defaultThreshold: 10 },
 };

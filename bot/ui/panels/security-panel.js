@@ -19,7 +19,7 @@ const FEATURES_META = [
   { key: 'antiwords',      label: 'Filtre de mots',  emoji: 'btn_edit',       tier: 2, desc: 'Mots interdits custom' },
   { key: 'anticaps',       label: 'Anti-Caps',       emoji: 'btn_edit',       tier: 2, desc: 'Anti-majuscules excessives' },
   { key: 'antiemojispam',  label: 'Anti-Emoji',      emoji: 'ui_smiley',      tier: 2, desc: 'Anti-spam emojis' },
-  { key: 'antinsfw',       label: 'Anti-NSFW',       emoji: 'btn_error',      tier: 2, desc: 'Détection NSFW basique' },
+  { key: 'antinsfw',       label: 'Anti-Explicit',   emoji: 'btn_error',      tier: 2, desc: 'Détection contenu explicite' },
   { key: 'antinewaccount', label: 'Anti-Newaccount', emoji: 'ui_pin',         tier: 2, desc: 'Refuse comptes récents' },
   { key: 'antiraid',       label: 'Anti-Raid',       emoji: 'cat_protection', tier: 2, desc: 'Détection raid avancée' },
 ];

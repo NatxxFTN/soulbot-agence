@@ -8,13 +8,15 @@ const {
 const { e } = require('../../core/emojis');
 const storage = require('../../core/security-storage');
 const { renderFeaturePanel } = require('../../ui/panels/security-feature-panel');
-const { DEFAULT_NSFW_WORDS } = require('../../core/security-detectors/antinsfw');
+const { DEFAULT_EXPLICIT_WORDS } = require('../../core/security-detectors/antiexplicit');
 
+// La clé interne reste 'antinsfw' pour compatibilité base de données.
+// Seuls le nom de la commande et les labels changent pour conformité Discord.
 const FEATURE = 'antinsfw';
 const META = {
-  label: 'Anti-NSFW',
+  label: 'Anti-Explicit',
   emoji: 'btn_error',
-  description: 'Détecte les mots NSFW (liste defaults + custom serveur).',
+  description: 'Détecte le contenu explicite (liste defaults + custom serveur).',
   supportsThreshold: false,
   defaultThreshold : 1,
 };
@@ -35,11 +37,11 @@ function parseData(raw) {
 }
 
 module.exports = {
-  name       : FEATURE,
-  aliases    : ['ansfw'],
+  name       : 'antiexplicit',
+  aliases    : ['ansfw', 'antinsfw'],
   category   : 'protection',
   description: META.description,
-  usage      : ';antinsfw [on|off|add|remove|list|clear] [mot]',
+  usage      : ';antiexplicit [on|off|add|remove|list|clear] [mot]',
   cooldown   : 3,
   guildOnly  : true,
   permissions: [PermissionFlagsBits.ManageGuild],
@@ -55,7 +57,7 @@ module.exports = {
 
     if (['on', 'enable', 'activer'].includes(sub)) {
       storage.setConfig(message.guild.id, FEATURE, { enabled: 1 });
-      return plain(message, `${e('btn_success')} **${META.label}** activé (defaults : ${DEFAULT_NSFW_WORDS.length} · custom : ${data.words.length}).`);
+      return plain(message, `${e('btn_success')} **${META.label}** activé (defaults : ${DEFAULT_EXPLICIT_WORDS.length} · custom : ${data.words.length}).`);
     }
     if (['off', 'disable', 'desactiver', 'désactiver'].includes(sub)) {
       storage.setConfig(message.guild.id, FEATURE, { enabled: 0 });
@@ -85,11 +87,11 @@ module.exports = {
     if (sub === 'list') {
       const container = new ContainerBuilder().setAccentColor(0xFF0000);
       container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `${e('btn_error')} **Liste NSFW** · defaults: ${DEFAULT_NSFW_WORDS.length} · custom: ${data.words.length}/${MAX_WORDS}`,
+        `${e('btn_error')} **Liste NSFW** · defaults: ${DEFAULT_EXPLICIT_WORDS.length} · custom: ${data.words.length}/${MAX_WORDS}`,
       ));
       container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
       container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `${e('cat_information')} **Defaults** : ${DEFAULT_NSFW_WORDS.map(w => `\`${w}\``).join(', ')}`,
+        `${e('cat_information')} **Defaults** : ${DEFAULT_EXPLICIT_WORDS.map(w => `\`${w}\``).join(', ')}`,
       ));
       if (data.words.length > 0) {
         container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));

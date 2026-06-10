@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conditions d'Utilisation — Soulbot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #FF0000;
+      --primary-dark: #8B0000;
+      --primary-glow: #FF3333;
+      --neutral: #0A0A0A;
+      --surface: #141414;
+      --surface-elevated: #1A1A1A;
+      --on-primary: #FFFFFF;
+      --text-primary: #FFFFFF;
+      --text-secondary: #AAAAAA;
+      --text-tertiary: #666666;
+      --border-subtle: #2A2A2A;
+      --border-glow: rgba(255, 0, 0, 0.3);
+      --font-display: 'Instrument Serif', serif;
+      --font-body: 'Inter', sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+      --rounded-sm: 4px;
+      --rounded-md: 8px;
+      --rounded-lg: 12px;
+      --rounded-xl: 16px;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-xxl: 48px;
+      --space-xxxl: 64px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--text-primary);
+      background: var(--neutral);
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: var(--primary-glow); text-decoration: underline; }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) var(--space-xl);
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .navbar-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-style: italic;
+      color: var(--text-primary);
+    }
+    .navbar-logo .logo-dot {
+      width: 10px; height: 10px;
+      background: var(--primary);
+      border-radius: 2px;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
+    }
+    .navbar-links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+    .navbar-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+    }
+    .navbar-links a:hover { color: var(--text-primary); text-decoration: none; }
+
+    /* Hero */
+    .page-header {
+      padding: 120px 0 var(--space-xxl);
+      text-align: center;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .page-header h1 {
+      font-family: var(--font-display);
+      font-size: 56px;
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-md);
+    }
+    .page-header h1 .accent { color: var(--primary); }
+    .page-header p {
+      font-size: 18px;
+      color: var(--text-secondary);
+    }
+    .page-header .last-updated {
+      display: inline-block;
+      margin-top: var(--space-md);
+      padding: 6px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--rounded-full);
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+
+    /* Content */
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: var(--space-xxl) var(--space-lg) var(--space-xxxl);
+    }
+    .content h2 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 400;
+      margin-top: var(--space-xxxl);
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .content h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-top: var(--space-xl);
+      margin-bottom: var(--space-md);
+      color: var(--primary);
+    }
+    .content p {
+      margin-bottom: var(--space-md);
+      color: var(--text-secondary);
+    }
+    .content ul {
+      margin-bottom: var(--space-md);
+      padding-left: var(--space-xl);
+      list-style: disc;
+    }
+    .content ul li {
+      margin-bottom: var(--space-sm);
+      color: var(--text-secondary);
+    }
+    .content strong {
+      color: var(--text-primary);
+    }
+    .content .highlight-box {
+      padding: var(--space-lg);
+      background: var(--surface);
+      border-left: 3px solid var(--primary);
+      border-radius: var(--rounded-md);
+      margin-bottom: var(--space-lg);
+    }
+    .content .highlight-box p {
+      margin-bottom: 0;
+    }
+
+    /* Footer */
+    .footer {
+      padding: var(--space-xxl) 0;
+      border-top: 1px solid var(--border-subtle);
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-md);
+    }
+    .footer-links a {
+      font-size: 14px;
+      color: var(--text-tertiary);
+    }
+    .footer-links a:hover { color: var(--text-primary); text-decoration: none; }
+    .footer-copy {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+
+    @media (max-width: 768px) {
+      .page-header h1 { font-size: 36px; }
+      .content h2 { font-size: 26px; }
+      .navbar-links { display: none; }
+      .content { padding: var(--space-xl) var(--space-md) var(--space-xxl); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-logo">
+      <span class="logo-dot"></span>
+      Soulbot
+    </a>
+    <div class="navbar-links">
+      <a href="index.html">Accueil</a>
+      <a href="terms.html" style="color: var(--text-primary);">Conditions</a>
+      <a href="privacy.html">Confidentialité</a>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <section class="page-header">
+    <div class="container">
+      <h1>Conditions d'<span class="accent">Utilisation</span></h1>
+      <p>Les règles qui régissent l'utilisation de Soulbot</p>
+      <span class="last-updated">Dernière mise à jour : 7 juin 2026</span>
+    </div>
+  </section>
+
+  <!-- Content -->
+  <section class="content">
+
+    <div class="highlight-box">
+      <p><strong>⚠️ En utilisant Soulbot, vous acceptez les présentes conditions dans leur intégralité.</strong> Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser le bot.</p>
+    </div>
+
+    <h2>1. Définitions</h2>
+    <p>
+      <strong>"Soulbot"</strong> désigne l'application Discord (le "Bot") exploitée sous le nom Soulbot, 
+      y compris ses commandes, son tableau de bord web et ses fonctionnalités associées.
+    </p>
+    <p>
+      <strong>"Utilisateur"</strong> désigne toute personne physique ou morale qui interagit avec Soulbot, 
+      que ce soit via des commandes Discord, le tableau de bord, ou toute autre interface.
+    </p>
+    <p>
+      <strong>"Serveur"</strong> désigne un serveur Discord sur lequel Soulbot est présent.
+    </p>
+    <p>
+      <strong>"Propriétaire du serveur"</strong> désigne la personne disposant des permissions 
+      "Administrateur" ou ayant invité Soulbot sur le serveur.
+    </p>
+
+    <h2>2. Acceptation des conditions</h2>
+    <p>
+      En invitant Soulbot sur un serveur Discord ou en utilisant ses commandes, vous reconnaissez 
+      avoir lu, compris et accepté les présentes conditions d'utilisation. Si vous utilisez Soulbot 
+      au nom d'une organisation, vous déclarez avoir l'autorité nécessaire pour lier cette 
+      organisation aux présentes conditions.
+    </p>
+
+    <h2>3. Description du service</h2>
+    <p>Soulbot est un bot Discord multi-fonctionnalités offrant notamment :</p>
+    <ul>
+      <li>Des outils de <strong>modération</strong> (avertissements, bannissements, expulsion, nettoyage de messages)</li>
+      <li>Un système de <strong>logs</strong> (traçage des événements du serveur)</li>
+      <li>Des <strong>systèmes communautaires</strong> (suggestions, confessions anonymes, giveaways, sondages)</li>
+      <li>Des <strong>systèmes de protection</strong> (anti-raid, anti-spam, anti-liens, anti-insultes)</li>
+      <li>Un système de <strong>tickets</strong> pour le support utilisateur</li>
+      <li>Des <strong>outils de productivité</strong> (raccourcisseur d'URL, QR code, météo, traduction)</li>
+      <li>Un tableau de bord <strong>web</strong> pour la gestion avancée</li>
+    </ul>
+    <p>
+      Soulbot est fourni <strong>"en l'état"</strong> et son fonctionnement peut être modifié, 
+      suspendu ou interrompu à tout moment sans préavis.
+    </p>
+
+    <h2>4. Utilisation responsable</h2>
+    <p>En tant qu'utilisateur de Soulbot, vous vous engagez à :</p>
+    <ul>
+      <li>Ne pas utiliser le bot pour <strong>harceler, intimider ou nuire</strong> à d'autres utilisateurs</li>
+      <li>Ne pas tenter de <strong>contourner les restrictions</strong> de sécurité ou de permissions</li>
+      <li>Ne pas exploiter des <strong>bugs ou failles</strong> du bot à des fins malveillantes</li>
+      <li>Ne pas utiliser le bot pour <strong>envoyer du spam</strong> ou des messages non sollicités</li>
+      <li>Ne pas utiliser le bot pour <strong>enfreindre les Conditions d'Utilisation de Discord</strong></li>
+      <li>Ne pas utiliser le bot pour <strong>stocker ou partager du contenu illégal</strong></li>
+    </ul>
+
+    <h2>5. Rôles et responsabilités du propriétaire du serveur</h2>
+    <p>
+      Le propriétaire du serveur sur lequel Soulbot est invité est responsable :
+    </p>
+    <ul>
+      <li>Des <strong>actions effectuées</strong> via le bot par les membres de son serveur</li>
+      <li>De la <strong>configuration</strong> des fonctionnalités du bot (logs, modération, protections)</li>
+      <li>Du <strong>respect des règles Discord</strong> par les membres de son serveur</li>
+      <li>De la <strong>gestion des permissions</strong> accordées aux membres via le bot</li>
+    </ul>
+
+    <h2>6. Collecte et traitement des données</h2>
+    <p>
+      L'utilisation de Soulbot implique le traitement de certaines données. 
+      Veuillez consulter notre <a href="privacy.html">Politique de Confidentialité</a> 
+      pour une description détaillée des données collectées et de leur traitement.
+    </p>
+
+    <h2>7. Limitations de responsabilité</h2>
+    <div class="highlight-box">
+      <p>
+        <strong>Soulbot est fourni "en l'état" et "selon disponibilité", sans garantie d'aucune sorte, 
+        explicite ou implicite.</strong> L'exploitant de Soulbot ne saurait être tenu responsable :
+      </p>
+    </div>
+    <ul>
+      <li>Des <strong>dommages directs ou indirects</strong> résultant de l'utilisation ou de l'incapacité à utiliser le bot</li>
+      <li>De la <strong>perte de données</strong> résultant d'un dysfonctionnement du bot ou d'une erreur humaine</li>
+      <li>Des <strong>actions des utilisateurs</strong> ayant accès aux commandes du bot</li>
+      <li>Des <strong>pertes financières</strong> découlant de l'utilisation du bot</li>
+      <li>Des <strong>interruptions de service</strong> liées à Discord, à l'hébergement ou à toute autre cause externe</li>
+    </ul>
+
+    <h2>8. Propriété intellectuelle</h2>
+    <p>
+      Soulbot, son nom, son logo, son code source et tous les éléments qui le composent sont la 
+      propriété exclusive de son exploitant. Toute reproduction, distribution ou modification 
+      non autorisée est interdite.
+    </p>
+    <p>
+      Les emojis et icônes utilisés par Soulbot peuvent être soumis à des licences distinctes 
+      et ne peuvent être réutilisés sans autorisation.
+    </p>
+
+    <h2>9. Modification des conditions</h2>
+    <p>
+      Les présentes conditions d'utilisation peuvent être modifiées à tout moment. 
+      Les utilisateurs seront informés des modifications via :
+    </p>
+    <ul>
+      <li>Une annonce dans le serveur de support</li>
+      <li>La date de "Dernière mise à jour" en haut de cette page</li>
+    </ul>
+    <p>
+      L'utilisation continue de Soulbot après toute modification constitue l'acceptation 
+      des nouvelles conditions.
+    </p>
+
+    <h2>10. Suspension et résiliation</h2>
+    <p>
+      L'exploitant de Soulbot se réserve le droit de :
+    </p>
+    <ul>
+      <li><strong>Suspendre ou révoquer</strong> l'accès au bot pour tout utilisateur ou serveur 
+        enfreignant ces conditions</li>
+      <li><strong>Limiter</strong> l'utilisation du bot en cas d'abus ou de charge excessive</li>
+      <li><strong>Interrompre</strong> définitivement le service à tout moment, sans préavis</li>
+    </ul>
+    <p>
+      En cas de résiliation, les données associées au serveur pourront être supprimées 
+      conformément à la Politique de Confidentialité.
+    </p>
+
+    <h2>11. Conformité Discord</h2>
+    <p>
+      Soulbot respecte les <a href="https://discord.com/terms" target="_blank">Conditions d'Utilisation de Discord</a> 
+      et les <a href="https://discord.com/guidelines" target="_blank">Lignes directrices de la communauté Discord</a>. 
+      Tout utilisateur est tenu de les respecter également.
+    </p>
+    <p>
+      Soulbot n'enfreint pas les règles suivantes de Discord :
+    </p>
+    <ul>
+      <li>❌ Aucun DM de masse (spam)</li>
+      <li>❌ Aucune collecte de données excessive ou non déclarée</li>
+      <li>❌ Aucun contournement des restrictions Discord</li>
+      <li>❌ Aucun partage de contenu illégal ou protégé</li>
+    </ul>
+
+    <h2>12. Loi applicable</h2>
+    <p>
+      Les présentes conditions sont régies par le droit français. Tout litige relatif à 
+      l'utilisation de Soulbot sera soumis à la compétence exclusive des tribunaux français.
+    </p>
+
+    <h2>13. Contact</h2>
+    <p>
+      Pour toute question concernant ces conditions d'utilisation, vous pouvez nous contacter :
+    </p>
+    <ul>
+      <li>Sur le serveur Discord de support</li>
+      <li>Par message direct au développeur</li>
+    </ul>
+
+    <div class="highlight-box" style="margin-top: var(--space-xxl);">
+      <p>
+        <strong>Version :</strong> 1.0 — Dernière mise à jour : 7 juin 2026<br>
+        <strong>Bot :</strong> Soulbot v2.0.0 — Développé par <strong>Natxx</strong>
+      </p>
+    </div>
+
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Accueil</a>
+      <a href="privacy.html">Politique de Confidentialité</a>
+    </div>
+    <div class="footer-copy">© 2026 Soulbot. All rights reserved.</div>
+  </footer>
+
+</body>
+</html>

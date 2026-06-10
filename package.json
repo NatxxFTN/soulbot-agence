@@ -23,7 +23,10 @@
     "start:full": "bash scripts/start-all.sh",
     "start:full:win": "scripts\\start-all.bat",
     "security:secrets": "bash bot/scripts/check-secrets.sh",
-    "audit:duplicates": "node bot/scripts/audit-duplicates.js"
+    "audit:duplicates": "node bot/scripts/audit-duplicates.js",
+    "forge": "node forge-index.js",
+    "forge:deploy": "node deploy-commands.js",
+    "forge:emojis": "node bot/scripts/forge-upload-emojis.js"
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.99",

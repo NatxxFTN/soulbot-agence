@@ -862,4 +862,23 @@ db.exec('CREATE INDEX IF NOT EXISTS idx_modactions_guild_user      ON guild_mod_
 db.exec('CREATE INDEX IF NOT EXISTS idx_modactions_guild_moderator ON guild_mod_actions(guild_id, moderator_id)');
 db.exec('CREATE INDEX IF NOT EXISTS idx_modactions_created         ON guild_mod_actions(created_at DESC)');
 
+/* ═══ ServerForge — Générations ───────────────────────────────────────────── */
+db.exec(`
+  CREATE TABLE IF NOT EXISTS serverforge_generations (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id        TEXT    NOT NULL,
+    guild_name      TEXT    NOT NULL,
+    template_used   TEXT    NOT NULL,
+    generated_by    TEXT    NOT NULL,
+    generated_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    roles_created   INTEGER DEFAULT 0,
+    channels_created INTEGER DEFAULT 0,
+    logs_created    INTEGER DEFAULT 0,
+    success         INTEGER DEFAULT 1,
+    error_details   TEXT
+  )
+`);
+db.exec('CREATE INDEX IF NOT EXISTS idx_sf_gen_guild ON serverforge_generations(guild_id)');
+db.exec('CREATE INDEX IF NOT EXISTS idx_sf_gen_date ON serverforge_generations(generated_at DESC)');
+
 module.exports = { db, ensureGuild, getGuildSettings, setGuildSetting };
