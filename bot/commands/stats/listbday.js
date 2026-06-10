@@ -4,6 +4,7 @@ const { EmbedBuilder } = require('discord.js');
 const { db }           = require('../../database');
 const { formatBirthday } = require('../../utils/format');
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 /*
  * ;list bday [mois]
@@ -58,7 +59,7 @@ module.exports = {
       const name = user ? `**${user.username}**` : `<@${row.user_id}>`;
       const date = formatBirthday(row.day, row.month);
       const isBday = row.day === todayDay && row.month === todayMonth;
-      return `${isBday ? '🎂' : '📅'}  ${name} — ${date}${row.year ? ` ${today.getFullYear() - row.year} ans` : ''}`;
+      return `${isBday ? e('cat_giveaway') : e('btn_calendar')}  ${name} — ${date}${row.year ? ` ${today.getFullYear() - row.year} ans` : ''}`;
     }));
 
     const monthNames = ['', 'Janvier','Février','Mars','Avril','Mai','Juin',
@@ -66,7 +67,7 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor(E.COLORS.PRIMARY)
-      .setTitle(`🎂  Anniversaires${hasFilter ? ` — ${monthNames[monthFilter]}` : ''}`)
+      .setTitle(`${e('btn_calendar')}  Anniversaires${hasFilter ? ` — ${monthNames[monthFilter]}` : ''}`)
       .setDescription(lines.join('\n'))
       .setFooter({ text: `${total} anniversaire(s) enregistré(s) • Page ${page + 1}/${Math.ceil(total / PAGE_SIZE)}` })
       .setTimestamp();

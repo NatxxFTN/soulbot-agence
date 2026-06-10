@@ -2,6 +2,7 @@
 
 const P = require('../../core/audit-mod-panels');
 const audit = require('../../core/audit-mod-storage');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'rolelock',
@@ -33,7 +34,7 @@ module.exports = {
         const r = message.guild.roles.cache.get(l.role_id);
         return `• ${r ? `<@&${r.id}> (\`${r.name}\`)` : `\`${l.role_id}\` (rôle introuvable)`} — locké par <@${l.locked_by}> <t:${l.locked_at}:R>`;
       });
-      return message.reply(P.infoPanel('🔐 Rôles lockés', items.join('\n')));
+      return message.reply(P.infoPanel(`${e('ui_lock')} Rôles lockés`, items.join('\n')));
     }
 
     if (role.id === message.guild.roles.everyone.id) {
@@ -47,14 +48,14 @@ module.exports = {
     if (wasLocked) {
       audit.unlockRole(message.guild.id, role.id);
       return message.reply(P.successPanel(
-        '🔓 Rôle déverrouillé',
+        `${e('ui_unlock')} Rôle déverrouillé`,
         `Le rôle **${role.name}** peut désormais être ajouté/retiré normalement.`,
       ));
     }
 
     audit.lockRole(message.guild.id, role.id, message.author.id);
     return message.reply(P.successPanel(
-      '🔐 Rôle verrouillé',
+      `${e('ui_lock')} Rôle verrouillé`,
       `Le rôle **${role.name}** est maintenant locké.\n` +
       'Les ajouts/retraits par non-Admins seront automatiquement annulés.',
     ));

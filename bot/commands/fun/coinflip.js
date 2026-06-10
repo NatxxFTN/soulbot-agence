@@ -14,7 +14,7 @@ module.exports = {
   async execute(message) {
     const msg = await message.channel.send(`${e('ani_coin')} **La pièce tourne...**`);
     await new Promise(r => setTimeout(r, 2000));
-    const result = Math.random() < 0.5 ? '🪙 Pile' : '🟡 Face';
+    const result = Math.random() < 0.5 ? 'Pile' : 'Face';
     await msg.edit(`${e('ani_coin')} Résultat : **${result}** !`);
   },
 };

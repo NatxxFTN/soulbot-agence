@@ -1,6 +1,7 @@
 'use strict';
 
 const { PermissionFlagsBits } = require('discord.js');
+const { e } = require('../../core/emojis');
 const {
   successEmbed, errorEmbed, warningEmbed, toEmbedReply,
 } = require('../../ui/panels/_premium-helpers');
@@ -112,12 +113,12 @@ module.exports = {
       title       : 'Rôle créé',
       description : `${role.toString()} — créé avec succès.`,
       fields      : [
-        { name: '🆔 ID',        value: `\`${role.id}\``,                                                       inline: true },
-        { name: '🎨 Couleur',   value: color ? `\`#${color.toString(16).padStart(6, '0').toUpperCase()}\`` : '*Aucune*', inline: true },
-        { name: '📊 Position',  value: `\`${role.position}\``,                                                 inline: true },
-        { name: '📌 Épinglé',   value: flags.has('hoist') ? '✅' : '❌',                                       inline: true },
-        { name: '💬 Mentionnable', value: flags.has('mentionable') || flags.has('mention') ? '✅' : '❌',     inline: true },
-        { name: '👤 Par',       value: message.author.tag,                                                     inline: true },
+        { name: 'ID',        value: `\`${role.id}\``,                                                       inline: true },
+        { name: 'Couleur',   value: color ? `\`#${color.toString(16).padStart(6, '0').toUpperCase()}\`` : '*Aucune*', inline: true },
+        { name: 'Position',  value: `\`${role.position}\``,                                                 inline: true },
+        { name: `${e('ui_pin')} Épinglé`,   value: flags.has('hoist') ? 'Oui' : 'Non',                      inline: true },
+        { name: `${e('ui_chat')} Mentionnable`, value: flags.has('mentionable') || flags.has('mention') ? 'Oui' : 'Non', inline: true },
+        { name: `${e('ui_user')} Par`,      value: message.author.tag,                                      inline: true },
       ],
       user        : message.author,
       category    : 'Admin',

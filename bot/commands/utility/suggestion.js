@@ -36,20 +36,18 @@ function buildSuggestionPanel(sugg, author) {
     implemented: `${e('ui_diamond')} Implémentée`,
   };
   ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-    `${statusLabels[sugg.status] || sugg.status} · 👍 **${sugg.upvotes}** · 👎 **${sugg.downvotes}**` +
+    `${statusLabels[sugg.status] || sugg.status} · Pour **${sugg.upvotes}** · Contre **${sugg.downvotes}**` +
     (sugg.status_reason ? `\n\n**Raison :** ${sugg.status_reason}` : ''),
   ));
 
   const voteRow = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId(`suggest:vote:up:${sugg.id}`)
-      .setLabel(`${sugg.upvotes}`)
-      .setEmoji('👍')
+      .setLabel(`Pour · ${sugg.upvotes}`)
       .setStyle(ButtonStyle.Success),
     new ButtonBuilder()
       .setCustomId(`suggest:vote:down:${sugg.id}`)
-      .setLabel(`${sugg.downvotes}`)
-      .setEmoji('👎')
+      .setLabel(`Contre · ${sugg.downvotes}`)
       .setStyle(ButtonStyle.Danger),
   );
 

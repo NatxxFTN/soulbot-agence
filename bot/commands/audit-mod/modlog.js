@@ -2,6 +2,7 @@
 
 const P = require('../../core/audit-mod-panels');
 const audit = require('../../core/audit-mod-storage');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'modlog',
@@ -54,12 +55,12 @@ module.exports = {
 
     const body = `**Membre** : ${target.user.tag} · \`${target.id}\`\n`
       + '---\n'
-      + '#### 📊 Totaux\n' + totals
+      + `#### ${e('cat_information')} Totaux\n` + totals
       + '\n---\n'
-      + `#### 📜 Historique (${total} entrée${total > 1 ? 's' : ''})\n`
+      + `#### ${e('ui_book')} Historique (${total} entrée${total > 1 ? 's' : ''})\n`
       + (slice.length ? slice.join('\n') : '*Aucune action enregistrée.*')
       + `\n---\nPage **${cur}/${pages}**\n*Page suivante : \`;modlog @${target.user.username} p${cur + 1}\`*`;
 
-    return message.reply(P.infoPanel(`📋 Historique modération`, body));
+    return message.reply(P.infoPanel(`${e('cat_moderation')} Historique modération`, body));
   },
 };

@@ -3,6 +3,7 @@
 const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
 const { getClosedTickets, markDeleted, getConfig, logAction } = require('../../core/ticket-helper');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'deleteall',
@@ -39,7 +40,7 @@ module.exports = {
       }
     }
 
-    await logAction(message.guild, config, `🗑️ Mass delete par ${message.author.tag} — ${success} ticket(s) supprimé(s)`);
+    await logAction(message.guild, config, `${e('btn_trash')} Mass delete par ${message.author.tag} — ${success} ticket(s) supprimé(s)`);
 
     return message.channel.send({
       embeds: [

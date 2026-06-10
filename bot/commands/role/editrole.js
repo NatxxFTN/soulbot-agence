@@ -1,6 +1,7 @@
 'use strict';
 
 const { PermissionFlagsBits } = require('discord.js');
+const { e } = require('../../core/emojis');
 const {
   successEmbed, errorEmbed, warningEmbed, toEmbedReply,
 } = require('../../ui/panels/_premium-helpers');
@@ -122,7 +123,7 @@ module.exports = {
           return message.reply(toEmbedReply(errorEmbed({ title: 'Valeur invalide', description: 'Utilise `true` ou `false`.', category: 'Admin' })));
         }
         changes.hoist = bool;
-        summary = { field: 'Épinglé', before: role.hoist ? '✅' : '❌', after: bool ? '✅' : '❌' };
+        summary = { field: 'Épinglé', before: role.hoist ? 'Oui' : 'Non', after: bool ? 'Oui' : 'Non' };
         break;
       }
       case 'mentionable':
@@ -132,7 +133,7 @@ module.exports = {
           return message.reply(toEmbedReply(errorEmbed({ title: 'Valeur invalide', description: 'Utilise `true` ou `false`.', category: 'Admin' })));
         }
         changes.mentionable = bool;
-        summary = { field: 'Mentionnable', before: role.mentionable ? '✅' : '❌', after: bool ? '✅' : '❌' };
+        summary = { field: 'Mentionnable', before: role.mentionable ? 'Oui' : 'Non', after: bool ? 'Oui' : 'Non' };
         break;
       }
       default:
@@ -157,10 +158,10 @@ module.exports = {
       title       : 'Rôle modifié',
       description : `${role.toString()} — modification appliquée.`,
       fields      : [
-        { name: '⚙️ Champ',   value: summary.field,  inline: true },
-        { name: '⬅️ Avant',   value: summary.before, inline: true },
-        { name: '➡️ Après',   value: summary.after,  inline: true },
-        { name: '👤 Par',     value: message.author.tag, inline: false },
+        { name: `${e('cat_configuration')} Champ`, value: summary.field,  inline: true },
+        { name: `${e('btn_prev')} Avant`,          value: summary.before, inline: true },
+        { name: `${e('btn_next')} Après`,          value: summary.after,  inline: true },
+        { name: `${e('ui_user')} Par`,             value: message.author.tag, inline: false },
       ],
       user        : message.author,
       category    : 'Admin',

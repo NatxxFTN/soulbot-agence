@@ -2,6 +2,7 @@
 
 const { ChannelType } = require('discord.js');
 const { getTemplate, listTemplateNames, summarize, TEMPLATES } = require('../../core/channel-templates');
+const { e } = require('../../core/emojis');
 const {
   newContainer, buildHeader, separator, text, toV2Payload,
   successEmbed, errorEmbed, warningEmbed, toEmbedReply,
@@ -115,10 +116,10 @@ module.exports = {
     container.addTextDisplayComponents(
       text(
         `## Résultat\n` +
-        `• 📂 **Catégories créées :** ${okCats}/${tpl.categories.length}\n` +
-        `• 💬 **Salons créés :** ${okChans}/${sum.chans}\n` +
-        (failed ? `• 🔴 **Échecs :** ${failed}\n` : '') +
-        `• ⏱ **Durée approx. :** ~${estSec}s`,
+        `• ${e('ui_folder')} **Catégories créées :** ${okCats}/${tpl.categories.length}\n` +
+        `• ${e('ui_chat')} **Salons créés :** ${okChans}/${sum.chans}\n` +
+        (failed ? `• ${e('ui_alert')} **Échecs :** ${failed}\n` : '') +
+        `• **Durée approx. :** ~${estSec}s`,
       ),
     );
 
@@ -126,8 +127,8 @@ module.exports = {
       container.addSeparatorComponents(separator('Small'));
       container.addTextDisplayComponents(
         text(
-          `## ⚠️ Erreurs (${errors.length})\n` +
-          errors.slice(0, 8).map(e => `• ${e}`).join('\n') +
+          `## ${e('ui_alert')} Erreurs (${errors.length})\n` +
+          errors.slice(0, 8).map(er => `• ${er}`).join('\n') +
           (errors.length > 8 ? `\n*…et ${errors.length - 8} autres*` : ''),
         ),
       );

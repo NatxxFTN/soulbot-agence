@@ -1,6 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 const { db } = require('../../database');
 
 const STMT_TOP = db.prepare('SELECT user_id, xp, level FROM guild_xp WHERE guild_id = ? ORDER BY xp DESC LIMIT ? OFFSET ?');
@@ -28,7 +29,8 @@ module.exports = {
 
     const lines = rows.map((r, i) => {
       const rank = offset + i + 1;
-      const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `\`#${String(rank).padStart(2, '0')}\``;
+      const tag = `\`#${String(rank).padStart(2, '0')}\``;
+      const medal = rank <= 3 ? `**${tag}**` : tag;
       return `${medal} <@${r.user_id}> · Lvl **${r.level}** · **${r.xp.toLocaleString('fr-FR')}** XP`;
     });
 
@@ -36,7 +38,7 @@ module.exports = {
 
     return message.reply({
       embeds: [E.base()
-        .setTitle(`🏆 Leaderboard XP — ${message.guild.name}`)
+        .setTitle(`${e('cat_level')} Leaderboard XP — ${message.guild.name}`)
         .setDescription(lines.join('\n'))
         .setFooter({ text: `Page ${page}/${totalPages} · ${n} membres avec XP` })
       ],

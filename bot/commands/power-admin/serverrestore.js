@@ -1,6 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'serverrestore',
@@ -43,11 +44,11 @@ module.exports = {
             `**Origine** : ${data.meta.guild_name} (\`${data.meta.guild_id}\`)\n` +
             `**Exporté le** : ${data.meta.exported_at}\n` +
             `**Par** : ${data.meta.exported_by}\n\n` +
-            `📊 **Contenu :**\n` +
+            `${e('ui_folder')} **Contenu :**\n` +
             `• ${data.rolesCount || 0} rôles\n` +
             `• ${data.channelsCount || 0} salons\n` +
             `• ${data.categoriesCount || 0} catégories\n\n` +
-            `⚠️ **Restore automatique non implémenté** (risque destructif). Utilise les templates Soulbot (\`;template apply\`) ou recrée manuellement.`,
+            `${e('ui_alert')} **Restore automatique non implémenté** (risque destructif). Utilise les templates Soulbot (\`;template apply\`) ou recrée manuellement.`,
           ),
       ],
     });

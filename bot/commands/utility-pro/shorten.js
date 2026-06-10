@@ -26,7 +26,7 @@ module.exports = {
       if (!short.startsWith('http')) throw new Error('Réponse invalide');
 
       return message.reply({
-        embeds: [E.success('🔗 URL raccourcie')
+        embeds: [E.success('URL raccourcie')
           .addFields(
             { name: 'Original', value: `\`${url.slice(0, 1000)}\`` },
             { name: 'Court',    value: short },

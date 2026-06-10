@@ -90,7 +90,7 @@ module.exports = {
       );
       container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-          `${e('btn_error')} Le système de rappel n'est pas configuré.\n` +
+          `${e('ui_alert')} Le système de rappel n'est pas configuré.\n` +
           `Un admin doit taper \`;bumpconfig\` pour activer les rappels automatiques.`,
         ),
       );

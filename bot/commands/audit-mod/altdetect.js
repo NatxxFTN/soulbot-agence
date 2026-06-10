@@ -1,6 +1,7 @@
 'use strict';
 
 const P = require('../../core/audit-mod-panels');
+const { e } = require('../../core/emojis');
 
 const ACCOUNT_AGE_THRESHOLD = 7 * 86400_000;       // 7 jours
 const JOIN_BURST_WINDOW     = 3600_000;             // 1h
@@ -113,7 +114,7 @@ module.exports = {
         + (reasons.length ? reasons.map(r => `• ${r}`).join('\n') : '*Aucun signal détecté.*');
 
       const color = score >= 70 ? P.COLORS.danger : score >= 40 ? P.COLORS.warning : P.COLORS.success;
-      return message.reply(P.infoPanel('🕵️ Analyse alt', body, color));
+      return message.reply(P.infoPanel(`${e('btn_search')} Analyse alt`, body, color));
     }
 
     let page = 1;
@@ -131,7 +132,7 @@ module.exports = {
     );
 
     return message.reply(P.paginatedList(
-      `🕵️ Top suspects alts (sur ${members.size} membres)`,
+      `${e('btn_search')} Top suspects alts (sur ${members.size} membres)`,
       items,
       page,
       5,

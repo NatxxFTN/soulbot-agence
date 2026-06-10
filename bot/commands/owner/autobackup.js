@@ -1,6 +1,7 @@
 'use strict';
 
 const E  = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 const { db } = require('../../database');
 
 db.exec(`
@@ -45,7 +46,7 @@ module.exports = {
             E.base()
               .setTitle('Sauvegarde automatique')
               .addFields(
-                { name: 'État',         value: cfg.enabled ? '✓ Activé' : '✗ Désactivé', inline: true },
+                { name: 'État',         value: cfg.enabled ? `${e('btn_success')} Activé` : 'Désactivé', inline: true },
                 { name: 'Intervalle',   value: `${cfg.interval_h}h`,                      inline: true },
                 { name: 'Copies max',   value: `${cfg.max_copies}`,                       inline: true },
                 { name: 'Dernière run', value: lastRun,                                    inline: true },

@@ -3,7 +3,9 @@
 const L = require('../../core/logs-v3-helper');
 const P = require('../../core/audit-mod-panels');
 const audit = require('../../core/audit-mod-storage');
+const { e } = require('../../core/emojis');
 
+// Nom fonctionnel — matché par r.name (quarantine + unquarantine), ne pas modifier.
 const ROLE_NAME = '🔒 Quarantine';
 
 async function ensureQuarantineRole(guild) {
@@ -74,7 +76,7 @@ module.exports = {
         .map(r => r.name).join(', ') || '*aucun*';
 
       return message.reply(P.confirmPanel(
-        '🔒 Quarantine — Confirmation',
+        `${e('ui_lock')} Quarantine — Confirmation`,
         `**Cible** : ${target.user.tag} \`${target.id}\`\n` +
         `**Rôles à retirer** : ${rolesPreview}\n` +
         `**Raison** : ${reason}`,
@@ -108,10 +110,10 @@ module.exports = {
       actorId: message.author.id, targetId: target.id,
     });
 
-    target.send(`🔒 Tu as été mis en quarantaine sur **${message.guild.name}**.\nRaison : ${reason}`).catch(() => {});
+    target.send(`${e('ui_lock')} Tu as été mis en quarantaine sur **${message.guild.name}**.\nRaison : ${reason}`).catch(() => {});
 
     return message.reply(P.successPanel(
-      '🔒 Quarantine appliquée',
+      `${e('ui_lock')} Quarantine appliquée`,
       `**${target.user.tag}** isolé. ${originalRoles.length} rôle(s) sauvegardé(s) pour restauration future.\n` +
       `Pour libérer : \`;unquarantine @${target.user.username}\`.`,
     ));

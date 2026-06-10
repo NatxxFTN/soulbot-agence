@@ -3,6 +3,7 @@
 const { EmbedBuilder } = require('discord.js');
 const { db, getGuildSettings, setGuildSetting } = require('../../database');
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 /*
  * ;settings global

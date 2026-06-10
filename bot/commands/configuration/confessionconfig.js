@@ -8,7 +8,7 @@ const {
   ChannelSelectMenuBuilder,
   ChannelType,
 } = require('discord.js');
-const { e } = require('../../core/emojis');
+const { e, forButton } = require('../../core/emojis');
 const storage = require('../../core/confession-storage');
 
 function buildPanel(guild) {
@@ -57,7 +57,7 @@ function buildPanel(guild) {
   const wordsRow = new ActionRowBuilder().addComponents(
     new ButtonBuilder().setCustomId('confessioncfg:edit_words')
       .setLabel('Mots interdits')
-      .setEmoji('🚫')
+      .setEmoji(forButton('ui_antileak'))
       .setStyle(ButtonStyle.Danger),
   );
 
@@ -82,7 +82,7 @@ module.exports = {
 
   async execute(message, _args, _client) {
     if (!message.member?.permissions?.has(PermissionFlagsBits.ManageGuild)) {
-      const ct = new ContainerBuilder().setAccentColor(0xFF0000);
+      const ct = new ContainerBuilder().setAccentColor(0xFF3333);
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `${e('btn_error')} Permission requise : **Gérer le serveur**.`,
       ));

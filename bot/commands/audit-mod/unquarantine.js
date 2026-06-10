@@ -3,7 +3,9 @@
 const L = require('../../core/logs-v3-helper');
 const P = require('../../core/audit-mod-panels');
 const audit = require('../../core/audit-mod-storage');
+const { e } = require('../../core/emojis');
 
+// Nom fonctionnel — doit matcher exactement le rôle créé par ;quarantine, ne pas modifier.
 const ROLE_NAME = '🔒 Quarantine';
 
 module.exports = {
@@ -53,11 +55,11 @@ module.exports = {
       actorId: message.author.id, targetId: target.id,
     });
 
-    target.send(`🕊️ Tu as été libéré de la quarantaine sur **${message.guild.name}**.`).catch(() => {});
+    target.send(`${e('ui_unlock')} Tu as été libéré de la quarantaine sur **${message.guild.name}**.`).catch(() => {});
 
     const lostRoles = originalRoleIds.length - validRoleIds.length;
     return message.reply(P.successPanel(
-      '🕊️ Quarantine levée',
+      `${e('ui_unlock')} Quarantine levée`,
       `**${target.user.tag}** libéré. **${validRoleIds.length}** rôle(s) restauré(s)` +
       (lostRoles > 0 ? ` · ${lostRoles} rôle(s) perdu(s) (supprimés depuis).` : '.'),
     ));

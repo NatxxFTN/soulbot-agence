@@ -36,7 +36,7 @@ module.exports = {
     STMT_UPSERT.run(message.guild.id, target.id, amount, level);
 
     return message.reply({
-      embeds: [E.success('XP mis à jour', `${target} → **${amount.toLocaleString('fr-FR')}** XP (Lvl **${level}**)`)],
+      embeds: [E.success('XP mis à jour', `${target} possède désormais **${amount.toLocaleString('fr-FR')}** XP (Lvl **${level}**)`)],
     });
   },
 };

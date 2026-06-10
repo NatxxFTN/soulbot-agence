@@ -52,7 +52,7 @@ module.exports = {
       await target.setNickname(newNick, `Nick par ${message.author.tag}`);
 
       const ts = Math.floor(Date.now() / 1000);
-      const ct = new ContainerBuilder().setAccentColor(0xFF0000);
+      const ct = new ContainerBuilder().setAccentColor(0x00C851);
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${e('ani_diamond')} **Pseudo modifié**`));
       ct.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -63,14 +63,14 @@ module.exports = {
       ct.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         newNick
-          ? `${e('btn_success')} \`${oldNick}\` → \`${newNick}\``
+          ? `${e('btn_success')} \`${oldNick}\` ${e('btn_next')} \`${newNick}\``
           : `${e('btn_success')} Pseudo de ${target.user.username} réinitialisé.`
       ));
       await loadingMsg.edit({ components: [ct], flags: MessageFlags.IsComponentsV2 });
 
     } catch {
-      const errCt = new ContainerBuilder().setAccentColor(0xFF0000);
-      errCt.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${e('btn_error')} **Erreur** — Impossible de modifier le pseudo de ce membre.`));
+      const errCt = new ContainerBuilder().setAccentColor(0xFF3333);
+      errCt.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${e('ui_alert')} **Erreur** — Impossible de modifier le pseudo de ce membre.`));
       await loadingMsg.edit({ components: [errCt], flags: MessageFlags.IsComponentsV2 });
     }
   },

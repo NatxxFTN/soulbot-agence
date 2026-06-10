@@ -4,6 +4,7 @@ const { EmbedBuilder } = require('discord.js');
 const { db, getGuildSettings, setGuildSetting } = require('../../database');
 const { formatDuration, formatNumber }           = require('../../utils/format');
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 /*
  * ;statembed                — Afficher/rafraîchir le live embed
@@ -109,17 +110,17 @@ async function buildStatEmbed(guild, client, db) {
 
   return new EmbedBuilder()
     .setColor(E.COLORS.PRIMARY)
-    .setTitle(`📊  Live Stats — ${guild.name}`)
+    .setTitle(`${e('cat_information')} Live Stats — ${guild.name}`)
     .setThumbnail(guild.iconURL({ dynamic: true }))
     .addFields(
-      { name: '👥 Membres',           value: formatNumber(guild.memberCount),   inline: true },
-      { name: '🎙️ En vocal maintenant', value: `${active}`,                     inline: true },
+      { name: `${e('ui_members')} Membres`,           value: formatNumber(guild.memberCount),   inline: true },
+      { name: `${e('ui_mic')} En vocal maintenant`, value: `${active}`,                     inline: true },
       { name: '\u200B', value: '\u200B', inline: true },
-      { name: '💬 Messages totaux',   value: formatNumber(totals.msgs),          inline: true },
-      { name: '🎙️ Vocal total',       value: formatDuration(totals.voice),       inline: true },
-      { name: '👤 Utilisateurs actifs', value: formatNumber(totals.users),       inline: true },
-      { name: '🏆 Top messages',       value: await formatTop(topMsg, 'messages', false), inline: true },
-      { name: '🏆 Top vocal',          value: await formatTop(topVoc, 'voice_seconds', true), inline: true },
+      { name: `${e('ui_chat')} Messages totaux`,   value: formatNumber(totals.msgs),          inline: true },
+      { name: `${e('ui_mic')} Vocal total`,       value: formatDuration(totals.voice),       inline: true },
+      { name: `${e('ui_user')} Utilisateurs actifs`, value: formatNumber(totals.users),       inline: true },
+      { name: 'Top messages',       value: await formatTop(topMsg, 'messages', false), inline: true },
+      { name: 'Top vocal',          value: await formatTop(topVoc, 'voice_seconds', true), inline: true },
     )
     .setFooter({ text: `Mis à jour le` })
     .setTimestamp();
@@ -144,7 +145,7 @@ async function updateStatEmbed(client, guildId, settings) {
 }
 
 // ─── Boucle de mise à jour périodique ────────────────────────────────────────
-const _liveIntervals = new Map(); // guildId → intervalId
+const _liveIntervals = new Map(); // guildId -> intervalId
 
 function startLiveUpdate(client, guildId, intervalMs = 10 * 60 * 1000) {
   // Éviter les doublons

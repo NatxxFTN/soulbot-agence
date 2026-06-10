@@ -1,6 +1,7 @@
 'use strict';
 
 const { getHistory } = require('../../core/nickname-history-storage');
+const { e } = require('../../core/emojis');
 const {
   successEmbed, errorEmbed, warningEmbed, toEmbedReply,
 } = require('../../ui/panels/_premium-helpers');
@@ -77,18 +78,18 @@ module.exports = {
     }
 
     const preview = history.slice(0, 5).map((h, i) => {
-      const arrow = (i + 1) === index ? '**→**' : '  ';
-      return `${arrow} \`${i + 1}.\` ${h.old_nick || '*(aucun)*'} → ${h.new_nick || '*(aucun)*'} · <t:${Math.floor(h.changed_at / 1000)}:R>`;
+      const arrow = (i + 1) === index ? e('btn_next') : '  ';
+      return `${arrow} \`${i + 1}.\` ${h.old_nick || '*(aucun)*'} ${e('btn_next')} ${h.new_nick || '*(aucun)*'} · <t:${Math.floor(h.changed_at / 1000)}:R>`;
     }).join('\n');
 
     return message.reply(toEmbedReply(successEmbed({
       title       : 'Pseudo restauré',
       description : `Pseudo restauré pour <@${userId}>.`,
       fields      : [
-        { name: '🎭 Pseudo',   value: nickToRestore || '*(pseudo par défaut)*', inline: true },
-        { name: '📊 Index',    value: `${index} / ${history.length}`,           inline: true },
-        { name: '👤 Par',      value: message.author.tag,                        inline: true },
-        { name: '📜 Historique', value: preview,                                inline: false },
+        { name: `${e('btn_edit')} Pseudo`,   value: nickToRestore || '*(pseudo par défaut)*', inline: true },
+        { name: 'Index',                     value: `${index} / ${history.length}`,           inline: true },
+        { name: `${e('ui_user')} Par`,       value: message.author.tag,                        inline: true },
+        { name: `${e('ui_book')} Historique`, value: preview,                                 inline: false },
       ],
       user        : message.author,
       category    : 'Innovation',

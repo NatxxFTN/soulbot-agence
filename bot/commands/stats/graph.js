@@ -89,7 +89,7 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor(E.COLORS.PRIMARY)
-      .setTitle(`📈  Graphique — ${label}`)
+      .setTitle(`Graphique — ${label}`)
       .setDescription(lines.join('\n'))
       .setImage(chartUrl)
       .setFooter({ text: `Période : ${timeLabel} • ${message.guild.name}` })

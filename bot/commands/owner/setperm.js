@@ -34,7 +34,7 @@ module.exports = {
         if (!groups.length) return message.channel.send({ embeds: [E.info('Permissions', 'Aucun groupe de permissions défini.')] });
         const lines = groups.map(({ perm_name }) => {
           const roles = STMT_LIST.all(message.guild.id, perm_name).map(r => `<@&${r.role_id}>`).join(', ') || '*aucun rôle*';
-          return `**${perm_name}** → ${roles}`;
+          return `**${perm_name}** — ${roles}`;
         }).join('\n');
         return message.channel.send({ embeds: [E.base().setTitle('Groupes de permissions').setDescription(lines)] });
       }

@@ -168,15 +168,15 @@ module.exports = {
 
     const ts = Math.floor((Date.now() + delayMs) / 1000);
     const fields = [
-      { name: '🆔 ID',       value: `\`#${id}\``,   inline: true },
-      { name: '⚙️ Action',    value: `\`${action}\``, inline: true },
-      { name: '🎯 Cible',    value: targetRaw,       inline: true },
-      { name: '🕒 Exécution', value: `<t:${ts}:F>\n<t:${ts}:R>`, inline: false },
+      { name: 'ID',       value: `\`#${id}\``,   inline: true },
+      { name: `${e('cat_configuration')} Action`,    value: `\`${action}\``, inline: true },
+      { name: `${e('ui_pin')} Cible`,    value: targetRaw,       inline: true },
+      { name: `${e('btn_calendar')} Exécution`, value: `<t:${ts}:F>\n<t:${ts}:R>`, inline: false },
     ];
     if (action === 'message' && rest) {
-      fields.push({ name: '💬 Contenu', value: rest.slice(0, 1000), inline: false });
+      fields.push({ name: `${e('ui_chat')} Contenu`, value: rest.slice(0, 1000), inline: false });
     } else if (rest) {
-      fields.push({ name: '📝 Raison', value: rest, inline: false });
+      fields.push({ name: `${e('btn_edit')} Raison`, value: rest, inline: false });
     }
 
     return message.reply(toEmbedReply(successEmbed({

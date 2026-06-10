@@ -4,6 +4,7 @@ const { EmbedBuilder } = require('discord.js');
 const { db }           = require('../../database');
 const { formatDuration, formatNumber } = require('../../utils/format');
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name        : 'compteur',
@@ -53,16 +54,16 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor(E.COLORS.PRIMARY)
-      .setTitle(`🔢  Compteur — ${message.guild.name}`)
+      .setTitle(`${e('cat_information')} Compteur — ${message.guild.name}`)
       .setThumbnail(message.guild.iconURL({ dynamic: true }))
       .addFields(
-        { name: '💬 Messages totaux',      value: formatNumber(totals.messages),        inline: true },
-        { name: '🎙️ Temps vocal total',    value: formatDuration(totals.voice),          inline: true },
-        { name: '👥 Utilisateurs actifs',  value: formatNumber(totals.users),            inline: true },
-        { name: '⚡ En vocal maintenant',  value: `${activeSessions} utilisateur(s)`,   inline: true },
-        { name: '📆 Actifs (7j)',          value: `${recentUsers} utilisateur(s)`,       inline: true },
-        { name: '👤 Membres totaux',       value: formatNumber(message.guild.memberCount), inline: true },
-        { name: '🏆 Top 5 salons',         value: chanLines || '*Aucun salon enregistré*', inline: false },
+        { name: `${e('ui_chat')} Messages totaux`,      value: formatNumber(totals.messages),        inline: true },
+        { name: `${e('ui_mic')} Temps vocal total`,     value: formatDuration(totals.voice),          inline: true },
+        { name: `${e('ui_members')} Utilisateurs actifs`, value: formatNumber(totals.users),          inline: true },
+        { name: `${e('ui_speaker')} En vocal maintenant`, value: `${activeSessions} utilisateur(s)`,  inline: true },
+        { name: `${e('btn_calendar')} Actifs (7j)`,     value: `${recentUsers} utilisateur(s)`,       inline: true },
+        { name: `${e('ui_user')} Membres totaux`,       value: formatNumber(message.guild.memberCount), inline: true },
+        { name: 'Top 5 salons',                         value: chanLines || '*Aucun salon enregistré*', inline: false },
       )
       .setFooter({ text: `Mis à jour le` })
       .setTimestamp();

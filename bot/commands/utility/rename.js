@@ -64,7 +64,7 @@ module.exports = {
       ));
       ct.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `${e('btn_success')} \`${oldName}\` → \`${newName}\``
+        `${e('btn_success')} \`${oldName}\` ${e('btn_next')} \`${newName}\``
       ));
       await loadingMsg.edit({ components: [ct], flags: MessageFlags.IsComponentsV2 });
 

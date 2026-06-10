@@ -93,11 +93,11 @@ module.exports = {
     const endsAt = durationSec ? Math.floor(Date.now() / 1000) + durationSec : null;
 
     // ── Créer l'embed du sondage ───────────────────────────────────────────────
-    const desc = options.map((opt, i) => `${EMOJI_NUMBERS[i]}  ${opt}`).join('\n');
+    const desc = options.map((opt, i) => `**${i + 1}.**  ${opt}`).join('\n');
 
     const embed = new EmbedBuilder()
       .setColor(E.COLORS.PRIMARY)
-      .setTitle(`📊  ${question}`)
+      .setTitle(question)
       .setDescription(desc)
       .setFooter({ text: `Sondage par ${message.author.tag}${endsAt ? ` • Ferme <t:${endsAt}:R>` : ''}` })
       .setTimestamp();
@@ -161,14 +161,14 @@ async function _showResults(context, poll, guildId, client) {
     const count = voteMap[i] ?? 0;
     const pct   = finalTotal ? ((count / finalTotal) * 100).toFixed(1) : '0.0';
     const bar   = progressBar(count, finalTotal || 1, 10);
-    return `${EMOJI_NUMBERS[i]}  **${opt}**\n${bar}  **${pct}%** (${count} vote(s))`;
+    return `**${i + 1}.**  **${opt}**\n${bar}  **${pct}%** (${count} vote(s))`;
   });
 
   const embed = new EmbedBuilder()
     .setColor(E.COLORS.SUCCESS)
-    .setTitle(`📊  Résultats — ${poll.question}`)
+    .setTitle(`Résultats — ${poll.question}`)
     .setDescription(lines.join('\n\n'))
-    .addFields({ name: '🗳️ Votes totaux', value: formatNumber(finalTotal), inline: true })
+    .addFields({ name: 'Votes totaux', value: formatNumber(finalTotal), inline: true })
     .setFooter({ text: `Sondage #${poll.id} • ${poll.active ? 'En cours' : 'Terminé'}` })
     .setTimestamp();
 

@@ -1,6 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 const { getTicketByChannel, closeTicket, getConfig, logAction } = require('../../core/ticket-helper');
 
 module.exports = {
@@ -40,7 +41,7 @@ module.exports = {
       await message.channel.permissionOverwrites.edit(ticket.user_id, { SendMessages: false }).catch(() => {});
     } catch { /* permissions insuffisantes — on continue */ }
 
-    await logAction(message.guild, config, `🔒 Ticket #${ticket.ticket_number} fermé par ${message.author.tag} — ${reason}`);
+    await logAction(message.guild, config, `${e('ui_lock')} Ticket #${ticket.ticket_number} fermé par ${message.author.tag} — ${reason}`);
 
     return message.channel.send({
       embeds: [

@@ -1,6 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'dice',
@@ -19,7 +20,7 @@ module.exports = {
 
     return message.reply({
       embeds: [E.base()
-        .setTitle(`🎲 ${count}d${faces}`)
+        .setTitle(`${e('ani_dice')} ${count}d${faces}`)
         .setDescription(rolls.map(r => `\`${r}\``).join(' · ') + (count > 1 ? `\n\n**Total : ${total}**` : ''))],
     });
   },

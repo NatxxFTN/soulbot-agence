@@ -8,8 +8,6 @@ const {
 const { e } = require('../../core/emojis');
 const storage = require('../../core/bump-storage');
 
-const MEDALS = ['🥇', '🥈', '🥉'];
-
 module.exports = {
   name       : 'bumplb',
   aliases    : ['bumptop', 'bumpleaderboard', 'blb'],
@@ -42,13 +40,13 @@ module.exports = {
     if (top.length === 0) {
       container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-          `${e('btn_error')} Aucun bump enregistré${mode === 'month' ? ' ce mois' : ''}.\n` +
+          `${e('ui_alert')} Aucun bump enregistré${mode === 'month' ? ' ce mois' : ''}.\n` +
           `${e('btn_tip')} Tape \`/bump\` pour démarrer !`,
         ),
       );
     } else {
       const lines = top.map((t, i) => {
-        const prefix = i < 3 ? MEDALS[i] : `**${i + 1}.**`;
+        const prefix = `**${i + 1}.**`;
         return `${prefix} <@${t.user_id}> — **${t.count}** bump${t.count > 1 ? 's' : ''}`;
       });
       container.addTextDisplayComponents(

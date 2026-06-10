@@ -31,11 +31,10 @@ module.exports = {
         `Aucune suggestion pour l'instant.`,
       ));
     } else {
-      const medals = ['🥇', '🥈', '🥉'];
       const lines = top.map((s, i) => {
-        const rank = medals[i] || `**#${i + 1}**`;
+        const rank = i < 3 ? `${e('ui_diamond')} **#${i + 1}**` : `**#${i + 1}**`;
         const content = s.content.length > 80 ? s.content.slice(0, 77) + '…' : s.content;
-        return `${rank} 👍 **${s.upvotes}** 👎 **${s.downvotes}** · ${content}`;
+        return `${rank} · Pour **${s.upvotes}** · Contre **${s.downvotes}** · ${content}`;
       });
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(lines.join('\n')));
     }

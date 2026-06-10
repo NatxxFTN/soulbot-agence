@@ -1,6 +1,7 @@
 'use strict';
 
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits } = require('discord.js');
+const { e } = require('../../core/emojis');
 const {
   newContainer, buildHeader, separator, text, toV2Payload,
   errorEmbed, warningEmbed, toEmbedReply, statusV2Panel,
@@ -77,7 +78,7 @@ module.exports = {
     });
 
     container.addTextDisplayComponents(
-      text(`> ⚠️ **Action irréversible.** La suppression est définitive.`),
+      text(`> ${e('ui_alert')} **Action irréversible.** La suppression est définitive.`),
     );
     container.addSeparatorComponents(separator('Small'));
 

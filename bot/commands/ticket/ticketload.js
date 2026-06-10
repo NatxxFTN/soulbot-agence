@@ -24,8 +24,8 @@ module.exports = {
       .setPlaceholder('Choisis le type de ticket…')
       .addOptions(
         new StringSelectMenuOptionBuilder().setLabel('Support général').setValue('support').setEmoji(forButton('ui_chat')),
-        new StringSelectMenuOptionBuilder().setLabel('Bug / problème').setValue('bug').setEmoji('🐛'),
-        new StringSelectMenuOptionBuilder().setLabel('Partenariat').setValue('partnership').setEmoji('🤝'),
+        new StringSelectMenuOptionBuilder().setLabel('Bug / problème').setValue('bug').setEmoji(forButton('ui_alert')),
+        new StringSelectMenuOptionBuilder().setLabel('Partenariat').setValue('partnership').setEmoji(forButton('ui_members')),
         new StringSelectMenuOptionBuilder().setLabel('Autre').setValue('other').setEmoji(forButton('btn_help')),
       );
 

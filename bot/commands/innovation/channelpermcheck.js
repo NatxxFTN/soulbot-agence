@@ -80,15 +80,15 @@ module.exports = {
 
     container.addTextDisplayComponents(
       text(
-        `## 🟢 ${okCount} accordée(s) · 🔴 ${koCount} refusée(s) · Total ${lines.length}`,
+        `## ${e('btn_success')} ${okCount} accordée(s) · ${e('ui_lock')} ${koCount} refusée(s) · Total ${lines.length}`,
       ),
     );
     container.addSeparatorComponents(separator('Small'));
 
     // Grille 2 colonnes
     const half = Math.ceil(lines.length / 2);
-    const col1 = lines.slice(0, half).map(l => `${l.has ? '✅' : '❌'} \`${l.perm}\``).join('\n');
-    const col2 = lines.slice(half).map(l => `${l.has ? '✅' : '❌'} \`${l.perm}\``).join('\n');
+    const col1 = lines.slice(0, half).map(l => `${l.has ? e('btn_success') : e('ui_lock')} \`${l.perm}\``).join('\n');
+    const col2 = lines.slice(half).map(l => `${l.has ? e('btn_success') : e('ui_lock')} \`${l.perm}\``).join('\n');
 
     container.addTextDisplayComponents(text(col1));
     container.addSeparatorComponents(separator('Small'));

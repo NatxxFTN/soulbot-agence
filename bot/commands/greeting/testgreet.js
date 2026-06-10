@@ -25,19 +25,19 @@ module.exports = {
     const joinPreview  = cfg?.join_message  ? formatMessage(cfg.join_message,  message.member) : '*aucun message configuré*';
     const leavePreview = cfg?.leave_message ? formatMessage(cfg.leave_message, message.member) : '*aucun message configuré*';
 
-    const joinStatus  = cfg?.join_enabled  ? `✓ <#${cfg.join_channel_id}>`  : '✗ Désactivé';
-    const leaveStatus = cfg?.leave_enabled ? `✓ <#${cfg.leave_channel_id}>` : '✗ Désactivé';
+    const joinStatus  = cfg?.join_enabled  ? `${e('btn_success')} <#${cfg.join_channel_id}>`  : 'Désactivé';
+    const leaveStatus = cfg?.leave_enabled ? `${e('btn_success')} <#${cfg.leave_channel_id}>` : 'Désactivé';
 
     return message.channel.send({
       embeds: [
         E.base()
           .setTitle(`${e('cat_greeting')} Aperçu des messages Greeting`)
           .addFields(
-            { name: '🟢 Arrivée — salon',    value: joinStatus,   inline: true },
-            { name: '🔴 Départ — salon',     value: leaveStatus,  inline: true },
+            { name: 'Arrivée — salon',       value: joinStatus,   inline: true },
+            { name: 'Départ — salon',        value: leaveStatus,  inline: true },
             { name: '\u200B',               value: '\u200B',      inline: true },
-            { name: '🟢 Aperçu arrivée',    value: joinPreview  },
-            { name: '🔴 Aperçu départ',     value: leavePreview },
+            { name: 'Aperçu arrivée',       value: joinPreview  },
+            { name: 'Aperçu départ',        value: leavePreview },
           ),
       ],
     });

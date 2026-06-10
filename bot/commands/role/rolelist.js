@@ -46,9 +46,9 @@ module.exports = {
     container.addTextDisplayComponents(
       text(
         `## Statistiques\n` +
-        `• ${e('ui_pin') || '📌'} Épinglés (hoist) : **${hoisted}**\n` +
-        `• ${e('ui_chat') || '💬'} Mentionnables : **${mentionable}**\n` +
-        `• 🔗 Managés (intégrations) : **${managed}**`,
+        `• ${e('ui_pin')} Épinglés (hoist) : **${hoisted}**\n` +
+        `• ${e('ui_chat')} Mentionnables : **${mentionable}**\n` +
+        `• ${e('ui_git')} Managés (intégrations) : **${managed}**`,
       ),
     );
     container.addSeparatorComponents(separator('Small'));
@@ -56,7 +56,7 @@ module.exports = {
     const lines = shown.map((r, i) => {
       const hex = r.color ? `\`#${r.color.toString(16).padStart(6, '0').toUpperCase()}\`` : '`—`';
       const count = r.members.size;
-      const flag = r.managed ? ' 🔗' : r.hoist ? ' 📌' : '';
+      const flag = r.managed ? ` ${e('ui_git')}` : r.hoist ? ` ${e('ui_pin')}` : '';
       return `\`${String(i + 1).padStart(2, '0')}.\` ${r.toString()} ${hex} · **${count}** membre(s)${flag}`;
     });
 

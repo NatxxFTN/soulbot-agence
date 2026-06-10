@@ -4,6 +4,7 @@ const { db } = require('../../database');
 const L = require('../../core/logs-v3-helper');
 const P = require('../../core/audit-mod-panels');
 const audit = require('../../core/audit-mod-storage');
+const { e } = require('../../core/emojis');
 
 const STMT_CLEAR = db.prepare('DELETE FROM warnings WHERE guild_id = ? AND user_id = ?');
 const STMT_COUNT = db.prepare('SELECT COUNT(*) AS count FROM warnings WHERE guild_id = ? AND user_id = ?');
@@ -59,7 +60,7 @@ module.exports = {
 
     if (!isConfirm) {
       return message.reply(P.confirmPanel(
-        '🧹 Mass-unwarn — Confirmation',
+        `${e('btn_trash')} Mass-unwarn — Confirmation`,
         `**Cibles** : ${targets.length} membres\n${previewLines.join('\n')}`,
         confirmCmd,
       ));
@@ -86,7 +87,7 @@ module.exports = {
     }
 
     return message.reply(P.successPanel(
-      '✅ Mass-unwarn exécuté',
+      `${e('btn_success')} Mass-unwarn exécuté`,
       `**${cleared} / ${targets.length}** membres traités · **${totalRemoved}** avertissement(s) supprimé(s) au total.`,
     ));
   },

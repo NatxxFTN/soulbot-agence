@@ -2,6 +2,7 @@
 
 const P = require('../../core/audit-mod-panels');
 const audit = require('../../core/audit-mod-storage');
+const { e } = require('../../core/emojis');
 
 const MIN_USERS = 2;
 const MAX_USERS = 50;
@@ -62,12 +63,12 @@ module.exports = {
       return message.reply(P.warningPanel('Trop de cibles', `Maximum **${MAX_USERS}** membres par exécution.`));
     }
 
-    const previewLines = targets.map(t => `• ${t.user.tag} → \`${applyPattern(nickPattern, t)}\``);
+    const previewLines = targets.map(t => `• ${t.user.tag} › \`${applyPattern(nickPattern, t)}\``);
     const confirmCmd = `;massnick confirm ${targets.map(t => `<@${t.id}>`).join(' ')} | ${nickPattern}`;
 
     if (!isConfirm) {
       return message.reply(P.confirmPanel(
-        '🏷️ Mass-nick — Confirmation',
+        `${e('btn_edit')} Mass-nick — Confirmation`,
         `**Cibles** : ${targets.length} membres\n**Pattern** : \`${nickPattern}\`\n\n${previewLines.join('\n')}`,
         confirmCmd,
       ));
@@ -79,7 +80,7 @@ module.exports = {
       const newNick = applyPattern(nickPattern, t);
       try {
         await t.setNickname(newNick, `Mass-nick par ${message.author.tag}`);
-        audit.recordModAction(message.guild.id, t.id, message.author.id, 'NICK', `Mass-nick → ${newNick}`);
+        audit.recordModAction(message.guild.id, t.id, message.author.id, 'NICK', `Mass-nick › ${newNick}`);
         renamed++;
       } catch {
         failed++;
@@ -87,7 +88,7 @@ module.exports = {
     }
 
     return message.reply(P.successPanel(
-      '✅ Mass-nick exécuté',
+      `${e('btn_success')} Mass-nick exécuté`,
       `**${renamed} / ${targets.length}** membres renommés` + (failed ? ` · ${failed} échec(s) (perms ?)` : '') + '.',
     ));
   },

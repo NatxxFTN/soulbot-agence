@@ -11,7 +11,7 @@ const storage = require('../../core/custom-commands-storage');
 const { isReservedName } = require('../../core/reserved-command-names');
 
 function reply(message, content) {
-  const ct = new ContainerBuilder().setAccentColor(0xFF0000);
+  const ct = new ContainerBuilder().setAccentColor(0xFF3333);
   ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(content));
   return message.reply({
     components: [ct],
@@ -34,7 +34,7 @@ module.exports = {
 
     if (!ac.hasAccess(guildId, message.author.id)) {
       return reply(message,
-        `${e('btn_error')} **Accès refusé**\n${e('ui_lock')} Niveau requis : Owner+`,
+        `${e('ui_alert')} **Accès refusé**\n${e('ui_lock')} Niveau requis : Owner+`,
       );
     }
 
@@ -43,7 +43,7 @@ module.exports = {
 
     if (!name || !response) {
       return reply(message,
-        `${e('btn_error')} **Syntaxe invalide**\n` +
+        `${e('ui_alert')} **Syntaxe invalide**\n` +
         `${e('cat_information')} Usage : \`;customadd <nom> <réponse>\`\n` +
         `${e('btn_tip')} Exemple : \`;customadd règles **Règles** :\\n1. Respect\\n2. ...\``,
       );
@@ -51,33 +51,33 @@ module.exports = {
 
     if (!storage.validateName(name)) {
       return reply(message,
-        `${e('btn_error')} **Nom invalide**\n` +
+        `${e('ui_alert')} **Nom invalide**\n` +
         `${e('cat_information')} 2-32 caractères, uniquement \`[a-z 0-9 _ -]\``,
       );
     }
 
     if (isReservedName(client, name)) {
       return reply(message,
-        `${e('btn_error')} **Nom réservé**\n` +
+        `${e('ui_alert')} **Nom réservé**\n` +
         `${e('ui_lock')} \`;${name}\` est une commande native du bot.`,
       );
     }
 
     if (storage.getCommand(guildId, name)) {
       return reply(message,
-        `${e('btn_error')} \`;${name}\` existe déjà. Utilise \`;customedit\` pour la modifier.`,
+        `${e('ui_alert')} \`;${name}\` existe déjà. Utilise \`;customedit\` pour la modifier.`,
       );
     }
 
     try {
       storage.createCommand(guildId, name, 'text', { text: response }, message.author.id);
     } catch (err) {
-      return reply(message, `${e('btn_error')} ${err.message}`);
+      return reply(message, `${e('ui_alert')} ${err.message}`);
     }
 
     const total = storage.countCommands(guildId);
 
-    const container = new ContainerBuilder().setAccentColor(0xFF0000);
+    const container = new ContainerBuilder().setAccentColor(0x00C851);
     container.addTextDisplayComponents(
       new TextDisplayBuilder().setContent(`${e('ani_diamond')} **Commande custom créée** ${e('ani_diamond')}`),
     );

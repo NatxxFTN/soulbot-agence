@@ -11,7 +11,7 @@ const activeResets = new Map();
 module.exports = {
   name       : 'nuke',
   aliases    : ['wipe'],
-  description: '💣 Panel Nuke Premium — supprime salons, rôles et emojis avec backup auto.',
+  description: 'Panel Nuke Premium — supprime salons, rôles et emojis avec backup auto.',
   usage      : ';nuke',
   ownerOnly  : true,
   guildOnly  : true,

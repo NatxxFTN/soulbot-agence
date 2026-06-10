@@ -1,6 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'setname',
@@ -22,7 +23,7 @@ module.exports = {
       await client.user.edit({ username: name });
 
       return message.channel.send({
-        embeds: [E.success('Nom mis à jour', `\`${oldName}\` → \`${name}\`\n⚠ Discord limite ce changement à 2 fois par heure.`)],
+        embeds: [E.success('Nom mis à jour', `Ancien : \`${oldName}\`\nNouveau : \`${name}\`\n${e('ui_alert')} Discord limite ce changement à 2 fois par heure.\nPour un nom propre à un serveur, utilise \`;botconfig nickname\`.`)],
       });
     } catch (err) {
       if (err.code === 50035) {

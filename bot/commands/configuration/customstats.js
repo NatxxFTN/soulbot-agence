@@ -9,8 +9,6 @@ const { e } = require('../../core/emojis');
 const ac = require('../../core/access-control');
 const storage = require('../../core/custom-commands-storage');
 
-const MEDALS = ['🥇', '🥈', '🥉'];
-
 module.exports = {
   name       : 'customstats',
   aliases    : ['cstats'],
@@ -24,7 +22,7 @@ module.exports = {
     const guildId = message.guild.id;
 
     if (!ac.hasAccess(guildId, message.author.id)) {
-      const ct = new ContainerBuilder().setAccentColor(0xFF0000);
+      const ct = new ContainerBuilder().setAccentColor(0xFF3333);
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `${e('btn_error')} **Accès refusé** — Niveau Owner+ requis.`,
       ));
@@ -81,8 +79,7 @@ module.exports = {
     if (top.length > 0) {
       container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
       const lines = top.map((c, i) => {
-        const prefix = i < 3 ? MEDALS[i] : `**${i + 1}.**`;
-        return `${prefix} \`;${c.name}\` — **${c.uses_count}** uses`;
+        return `**${i + 1}.** \`;${c.name}\` — **${c.uses_count}** uses`;
       });
       container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `${e('cat_owner')} **Top utilisées**\n${lines.join('\n')}`,

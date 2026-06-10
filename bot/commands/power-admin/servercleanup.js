@@ -2,6 +2,7 @@
 
 const { ChannelType } = require('discord.js');
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'servercleanup',
@@ -52,13 +53,13 @@ module.exports = {
     return status.edit({
       embeds: [
         E.base()
-          .setTitle('🧹 Cleanup audit')
+          .setTitle(`${e('btn_trash')} Cleanup audit`)
           .setDescription(`Audit du serveur **${guild.name}** — éléments potentiellement inactifs (suppression manuelle).`)
           .addFields(
-            { name: '📂 Catégories vides',   value: emptyCategories.size > 0 ? Array.from(emptyCategories.values()).map(c => `\`${c.name}\``).slice(0, 10).join(', ') : '_aucune_', inline: false },
-            { name: '💬 Salons inactifs >30j', value: oldChannels.length > 0 ? oldChannels.slice(0, 10).map(o => `<#${o.ch.id}> _(${o.since})_`).join('\n') : '_aucun_', inline: false },
-            { name: '🎭 Rôles non assignés',   value: unusedRoles.size > 0 ? Array.from(unusedRoles.values()).slice(0, 10).map(r => `<@&${r.id}>`).join(', ') : '_aucun_', inline: false },
-            { name: '🪝 Webhooks',             value: `${webhookCount} total (vérifier manuellement les inactifs)`, inline: false },
+            { name: `${e('ui_folder')} Catégories vides`,   value: emptyCategories.size > 0 ? Array.from(emptyCategories.values()).map(c => `\`${c.name}\``).slice(0, 10).join(', ') : '_aucune_', inline: false },
+            { name: `${e('ui_chat')} Salons inactifs >30j`, value: oldChannels.length > 0 ? oldChannels.slice(0, 10).map(o => `<#${o.ch.id}> _(${o.since})_`).join('\n') : '_aucun_', inline: false },
+            { name: `${e('ui_members')} Rôles non assignés`, value: unusedRoles.size > 0 ? Array.from(unusedRoles.values()).slice(0, 10).map(r => `<@&${r.id}>`).join(', ') : '_aucun_', inline: false },
+            { name: 'Webhooks',                              value: `${webhookCount} total (vérifier manuellement les inactifs)`, inline: false },
           )
           .setFooter({ text: 'Suppression manuelle requise — aucune action automatique' }),
       ],

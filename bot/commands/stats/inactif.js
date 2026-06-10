@@ -4,6 +4,7 @@ const { EmbedBuilder }      = require('discord.js');
 const { db }                = require('../../database');
 const { parseDays, formatDate } = require('../../utils/format');
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 /*
  * ;inactif [jours] [--export]
@@ -65,7 +66,7 @@ module.exports = {
     }
 
     if (!inactiveList.length) {
-      return message.reply({ embeds: [E.success('Résultat', `Aucun membre inactif depuis **${days} jours** ! 🎉`)] });
+      return message.reply({ embeds: [E.success('Résultat', `Aucun membre inactif depuis **${days} jours** !`)] });
     }
 
     // Pagination (max 20 par embed)
@@ -82,9 +83,9 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor(E.COLORS.WARNING)
-      .setTitle(`⚠️  Membres inactifs depuis ${days}j`)
+      .setTitle(`${e('ui_alert')}  Membres inactifs depuis ${days}j`)
       .setDescription(lines.join('\n'))
-      .addFields({ name: '📊 Total', value: `**${total}** membre(s) inactif(s)`, inline: true })
+      .addFields({ name: `${e('ui_members')} Total`, value: `**${total}** membre(s) inactif(s)`, inline: true })
       .setFooter({ text: `Page ${page + 1}/${Math.ceil(total / PAGE_SIZE)} • ${message.guild.name}` })
       .setTimestamp();
 

@@ -8,7 +8,7 @@ const {
   ChannelSelectMenuBuilder, RoleSelectMenuBuilder,
   ChannelType,
 } = require('discord.js');
-const { e } = require('../../core/emojis');
+const { e, forButton } = require('../../core/emojis');
 const storage = require('../../core/bday-storage');
 
 function buildPanel(guild) {
@@ -55,7 +55,7 @@ function buildPanel(guild) {
       .setStyle(cfg.ping_everyone ? ButtonStyle.Success : ButtonStyle.Secondary),
     new ButtonBuilder().setCustomId('bdaycfg:edit_template')
       .setLabel('Modifier le message')
-      .setEmoji('✏️')
+      .setEmoji(forButton('btn_edit'))
       .setStyle(ButtonStyle.Primary),
   );
 
@@ -80,7 +80,7 @@ module.exports = {
 
   async execute(message, _args, _client) {
     if (!message.member?.permissions?.has(PermissionFlagsBits.ManageGuild)) {
-      const ct = new ContainerBuilder().setAccentColor(0xFF0000);
+      const ct = new ContainerBuilder().setAccentColor(0xFF3333);
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `${e('btn_error')} Permission requise : **Gérer le serveur**.`,
       ));

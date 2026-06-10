@@ -30,7 +30,7 @@ module.exports = {
       setGuildSetting(message.guild.id, 'prefix', newPrefix);
 
       return message.channel.send({
-        embeds: [E.success('Préfixe mis à jour', `Nouveau préfixe : \`${newPrefix}\`\nExemple : \`${newPrefix}help\``)],
+        embeds: [E.success('Préfixe mis à jour', `Nouveau préfixe : \`${newPrefix}\`\nExemple : \`${newPrefix}help\`\nCette commande déménage : utilise \`;botconfig prefix\` à l'avenir.`)],
       });
     } catch (err) {
       return message.channel.send({ embeds: [E.error('Erreur', err.message)] });

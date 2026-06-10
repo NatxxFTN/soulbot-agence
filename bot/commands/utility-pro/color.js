@@ -78,7 +78,7 @@ module.exports = {
     return message.reply({
       embeds: [E.base()
         .setColor(colorInt)
-        .setTitle(`🎨 ${hex}`)
+        .setTitle(hex)
         .setThumbnail(previewUrl)
         .addFields(
           { name: 'HEX', value: `\`${hex}\``, inline: true },

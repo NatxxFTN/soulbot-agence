@@ -31,9 +31,9 @@ module.exports = {
     if (!botMember.permissions.has(PermissionFlagsBits.ManageGuildExpressions)) {
       return message.reply({
         embeds: [E.error(
-          '🔒 Permissions insuffisantes',
+          `${e('ui_lock')} Permissions insuffisantes`,
           'Le bot a besoin de **"Gérer les emojis et stickers"** sur ce serveur.\n\n' +
-          '**Solution :** Paramètres serveur → Rôles → Rôle du bot → active la permission.',
+          '**Solution :** Paramètres serveur > Rôles > Rôle du bot > active la permission.',
         )],
       });
     }
@@ -52,12 +52,12 @@ module.exports = {
     const files = fs.readdirSync(EMOJIS_DIR).filter(f => /\.(png|gif)$/i.test(f));
     if (!files.length) {
       return message.reply({
-        embeds: [E.error('📭 Dossier vide', 'Place tes PNG dans `data/emojis/` puis relance.')],
+        embeds: [E.error(`${e('ui_folder')} Dossier vide`, 'Place tes PNG dans `data/emojis/` puis relance.')],
       });
     }
 
     const loading = await message.reply({
-      embeds: [E.base().setColor(0x3B82F6).setTitle('⏳ Upload en cours…')
+      embeds: [E.base(E.COLORS.INFO).setTitle(`${e('ani_loading')} Upload en cours…`)
         .setDescription(`${files.length} fichier(s) détecté(s). Patiente ~${files.length * 2}s.`)],
     });
 
@@ -101,17 +101,17 @@ module.exports = {
 
     // 4. Rapport
     const lines = [];
-    if (results.success.length) lines.push(`✅ **${results.success.length} uploadés**\n${results.success.map(e => `• \`${e.name}\``).join('\n')}`);
-    if (results.skipped.length) lines.push(`⏭️ **${results.skipped.length} déjà présents**\n${results.skipped.map(n => `• \`${n}\``).join('\n')}`);
-    if (results.failed.length)  lines.push(`❌ **${results.failed.length} échoués**\n${results.failed.map(e => `• \`${e.name}\` — ${e.reason}`).join('\n')}`);
+    if (results.success.length) lines.push(`${e('btn_success')} **${results.success.length} uploadés**\n${results.success.map(r => `• \`${r.name}\``).join('\n')}`);
+    if (results.skipped.length) lines.push(`${e('btn_next')} **${results.skipped.length} déjà présents**\n${results.skipped.map(n => `• \`${n}\``).join('\n')}`);
+    if (results.failed.length)  lines.push(`${e('ui_alert')} **${results.failed.length} échoués**\n${results.failed.map(r => `• \`${r.name}\` — ${r.reason}`).join('\n')}`);
 
     const total   = results.success.length + results.skipped.length;
     const isOk    = results.failed.length === 0;
     const embed   = isOk
-      ? E.base().setColor(0x10B981).setTitle('🎨 Setup emojis complet ✓')
-      : E.base().setColor(0xF59E0B).setTitle('🎨 Setup emojis terminé (partiel)');
+      ? E.base(E.COLORS.SUCCESS).setTitle(`${e('btn_success')} Setup emojis complet`)
+      : E.base(E.COLORS.WARNING).setTitle(`${e('ui_alert')} Setup emojis terminé (partiel)`);
 
-    embed.setDescription(lines.join('\n\n') + (results.failed.length ? '\n\n💡 Pour forcer le re-upload : `;setupemojis --force`' : ''));
+    embed.setDescription(lines.join('\n\n') + (results.failed.length ? `\n\n${e('btn_tip')} Pour forcer le re-upload : \`;setupemojis --force\`` : ''));
 
     return loading.edit({ embeds: [embed] });
   },

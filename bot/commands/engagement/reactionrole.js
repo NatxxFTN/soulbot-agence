@@ -46,7 +46,7 @@ module.exports = {
     }
 
     return message.reply({
-      embeds: [E.success('Reaction role ajouté', `${emoji} sur [ce message](${target.url}) → ${role}`)],
+      embeds: [E.success('Reaction role ajouté', `${emoji} sur [ce message](${target.url}) attribue ${role}`)],
     });
   },
 };

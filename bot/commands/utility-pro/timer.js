@@ -1,6 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 let parseDuration;
 try { parseDuration = require('ms'); } catch { parseDuration = () => null; }
@@ -29,7 +30,7 @@ module.exports = {
       const filled = Math.max(0, Math.min(20, Math.round(((ms - remaining) / ms) * 20)));
       const bar = '█'.repeat(filled) + '░'.repeat(20 - filled);
       return E.base()
-        .setTitle(`⏱️ ${title}`)
+        .setTitle(`${e('ani_loading')} ${title}`)
         .setDescription(`Fin : <t:${endsAt}:R>\n\n\`${bar}\`\n\nRestant : **${Math.ceil(remaining / 1000)}s**`)
         .setFooter({ text: `Lancé par ${message.author.tag}` });
     };
@@ -43,7 +44,7 @@ module.exports = {
       if (remaining <= 0) {
         clearInterval(tick);
         return msg.edit({
-          embeds: [E.success(`⏰ ${title} — Terminé !`)
+          embeds: [E.success(`${e('btn_success')} ${title} — Terminé !`)
             .setDescription(`<@${message.author.id}> ton timer est fini !`)],
         }).catch(() => {});
       }

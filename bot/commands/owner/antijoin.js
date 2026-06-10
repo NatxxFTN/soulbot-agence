@@ -1,6 +1,7 @@
 'use strict';
 
 const E  = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 const { db } = require('../../database');
 
 db.exec(`
@@ -50,7 +51,7 @@ module.exports = {
             E.base()
               .setTitle('Anti-jointures — Configuration')
               .addFields(
-                { name: 'État',       value: cfg.enabled ? '✓ Activé' : '✗ Désactivé', inline: true },
+                { name: 'État',       value: cfg.enabled ? `${e('btn_success')} Activé` : 'Désactivé', inline: true },
                 { name: 'Seuil',      value: `${cfg.threshold} joins`,                  inline: true },
                 { name: 'Intervalle', value: `${cfg.interval_s}s`,                      inline: true },
                 { name: 'Action',     value: cfg.action,                                inline: true },
@@ -75,7 +76,7 @@ module.exports = {
           E.success(
             `Anti-jointures ${enabled ? 'activé' : 'désactivé'}`,
             enabled
-              ? `Seuil : **${threshold} joins** en **${intervalS}s** → action : **${action}**`
+              ? `Seuil : **${threshold} joins** en **${intervalS}s** — action : **${action}**`
               : 'La protection est maintenant désactivée.',
           ),
         ],

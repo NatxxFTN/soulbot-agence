@@ -2,6 +2,7 @@
 
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const E = require('../../utils/embeds');
+const { e, forButton } = require('../../core/emojis');
 const { withLoading } = require('../../core/loading');
 const {
   serializeGuild, saveTemplate, listTemplates,
@@ -39,7 +40,7 @@ function handleHelp(message) {
       '`;backup restore <nom>` — Restaure un backup sur ce serveur\n' +
       '`;backup delete <nom>` — Supprime un backup\n\n' +
       '**Flags (restore) :**\n' +
-      '`--reset` — Supprime tout avant restauration ⚠️\n' +
+      '`--reset` — Supprime tout avant restauration (irréversible)\n' +
       '`--emojis` — Inclut les emojis custom')],
   });
 }
@@ -89,7 +90,7 @@ async function handleList(message) {
 
   const lines = templates.map(t =>
     t.error
-      ? `**\`${t.name}\`** — ⚠️ ${t.error}`
+      ? `**\`${t.name}\`** — ${e('ui_alert')} ${t.error}`
       : `**\`${t.name}\`** — ${t.stats.categories} cat · ${t.stats.channels} salons · ${t.stats.roles} rôles · ${t.size_kb} Ko`
   );
 
@@ -144,25 +145,26 @@ async function handleRestore(message, args) {
   const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId(confirmId)
-      .setLabel(reset ? '⚠️ CONFIRMER — tout supprimer puis créer' : '✓ Confirmer la restauration')
+      .setLabel(reset ? 'CONFIRMER — tout supprimer puis créer' : 'Confirmer la restauration')
+      .setEmoji(forButton(reset ? 'ui_alert' : 'btn_success'))
       .setStyle(reset ? ButtonStyle.Danger : ButtonStyle.Success),
     new ButtonBuilder()
       .setCustomId('tpl_cancel')
-      .setLabel('✗ Annuler')
+      .setLabel('Annuler')
       .setStyle(ButtonStyle.Secondary)
   );
 
   const lines = [
     `**Backup :** \`${safeName}\``,
-    `**Mode :** ${reset ? '🔴 RESET — supprime tout avant restauration' : '🟢 ADD — ajoute sans supprimer'}`,
-    `**Emojis :** ${includeEmojis ? '✓ Oui' : '✗ Non'}`,
+    `**Mode :** ${reset ? `${e('ui_alert')} RESET — supprime tout avant restauration` : `${e('btn_success')} ADD — ajoute sans supprimer`}`,
+    `**Emojis :** ${includeEmojis ? 'Oui' : 'Non'}`,
     '',
     '**Va créer :**',
     `• ${template.categories?.length || 0} catégories`,
     `• ${totalCh} salons`,
     `• ${template.roles?.length || 0} rôles`,
     '',
-    ...(reset ? ['⚠️ **La structure actuelle sera SUPPRIMÉE avant restauration.**\n'] : []),
+    ...(reset ? [`${e('ui_alert')} **La structure actuelle sera SUPPRIMÉE avant restauration.**\n`] : []),
     `Durée estimée : ~${estSecs}s`,
   ];
 

@@ -2,6 +2,7 @@
 
 const E = require('../../utils/embeds');
 const math = require('mathjs');
+const { e } = require('../../core/emojis');
 
 // Limited mathjs scope (no eval/import/etc.)
 const limitedMath = math.create(math.all);
@@ -35,7 +36,7 @@ module.exports = {
       const out = typeof result === 'object' ? math.format(result, { precision: 10 }) : String(result);
       return message.reply({
         embeds: [E.base()
-          .setTitle('🧮 Calculatrice')
+          .setTitle(`${e('cat_utility')} Calculatrice`)
           .addFields(
             { name: 'Expression', value: `\`${expr}\`` },
             { name: 'Résultat',   value: `**${out}**` },

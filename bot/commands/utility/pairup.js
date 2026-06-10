@@ -43,11 +43,11 @@ module.exports = {
     // ── run ─────────────────────────────────────────────────────────────────
     if (sub === 'run') {
       if (!message.member?.permissions?.has(PermissionFlagsBits.ManageGuild)) {
-        return plain(message, `${e('btn_error')} Permission requise : **Gérer le serveur**.`);
+        return plain(message, `${e('ui_alert')} Permission requise : **Gérer le serveur**.`);
       }
       const cfg = storage.getConfig(message.guild.id);
       if (!cfg || !cfg.channel_id || !cfg.role_id) {
-        return plain(message, `${e('btn_error')} Configure d'abord le système avec \`;pairupconfig\`.`);
+        return plain(message, `${e('ui_alert')} Configure d'abord le système avec \`;pairupconfig\`.`);
       }
       await plain(message, `${e('btn_tip')} Lancement du matchmaking...`);
       await runPairup(client, cfg);
@@ -68,7 +68,7 @@ module.exports = {
       const lines = rows.map(r => {
         const other = r.user1_id === message.author.id ? r.user2_id : r.user1_id;
         const date = new Date(r.paired_at).toLocaleDateString('fr-FR');
-        return `📅 ${date} · <@${other}>`;
+        return `${e('btn_calendar')} ${date} · <@${other}>`;
       }).join('\n');
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(lines));
       return reply(message, ct);
@@ -103,7 +103,7 @@ module.exports = {
       `**Rôle cible** · ${role}\n` +
       `**Fréquence** · ${freqLabel(cfg.frequency)}\n` +
       `**Dernier tour** · ${lastRun}\n` +
-      `**Statut** · ${cfg.enabled ? `${e('btn_success')} actif` : `${e('btn_error')} désactivé`}`,
+      `**Statut** · ${cfg.enabled ? `${e('btn_success')} actif` : `${e('ui_alert')} désactivé`}`,
     ));
 
     const history = storage.getUserHistory(message.guild.id, message.author.id, 3);

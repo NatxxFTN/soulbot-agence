@@ -3,6 +3,7 @@
 const { EmbedBuilder } = require('discord.js');
 const { db, getGuildSettings, setGuildSetting } = require('../../database');
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 /*
  * ;star on                     — Activer le starboard
@@ -67,7 +68,7 @@ module.exports = {
     // ── emoji <emoji> ─────────────────────────────────────────────────────────
     if (action === 'emoji') {
       const emoji = args[1];
-      if (!emoji) return message.reply({ embeds: [E.usage(';', 'star emoji ⭐', '')] });
+      if (!emoji) return message.reply({ embeds: [E.usage(';', 'star emoji <emoji>', '')] });
       setGuildSetting(guildId, 'star_emoji', emoji);
       return message.reply({ embeds: [E.success('Emoji mis à jour', `L'emoji est maintenant : ${emoji}`)] });
     }
@@ -82,10 +83,10 @@ module.exports = {
 
       const embed = new EmbedBuilder()
         .setColor(E.COLORS.PRIMARY)
-        .setTitle('⭐  Starboard — Permissions rôles')
+        .setTitle('Starboard — Permissions rôles')
         .addFields(
-          { name: '✅ Rôles autorisés', value: allows, inline: false },
-          { name: '❌ Rôles interdits', value: denies, inline: false },
+          { name: `${e('btn_success')} Rôles autorisés`, value: allows, inline: false },
+          { name: `${e('ui_lock')} Rôles interdits`, value: denies, inline: false },
         )
         .setTimestamp();
 
@@ -136,9 +137,9 @@ function _buildInfoEmbed(guild, settings, db) {
 
   return new EmbedBuilder()
     .setColor(E.COLORS.GOLD)
-    .setTitle('⭐  Configuration Starboard')
+    .setTitle('Configuration Starboard')
     .addFields(
-      { name: 'Statut',     value: settings.star_enabled ? '✅ Actif' : '❌ Inactif', inline: true },
+      { name: 'Statut',     value: settings.star_enabled ? `${e('btn_success')} Actif` : 'Inactif', inline: true },
       { name: 'Salon',      value: starChan,                                          inline: true },
       { name: 'Emoji',      value: settings.star_emoji,                               inline: true },
       { name: 'Seuil',      value: `${settings.star_threshold} réaction(s)`,          inline: true },

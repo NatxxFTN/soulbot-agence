@@ -3,6 +3,7 @@
 const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
 const { getTicketByChannel, reopenTicket, getConfig, logAction } = require('../../core/ticket-helper');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'reopen',
@@ -45,7 +46,7 @@ module.exports = {
       }).catch(() => {});
     } catch { /* permissions — on continue */ }
 
-    await logAction(message.guild, config, `🔓 Ticket #${ticket.ticket_number} rouvert par ${message.author.tag}`);
+    await logAction(message.guild, config, `${e('ui_unlock')} Ticket #${ticket.ticket_number} rouvert par ${message.author.tag}`);
 
     return message.channel.send({
       embeds: [

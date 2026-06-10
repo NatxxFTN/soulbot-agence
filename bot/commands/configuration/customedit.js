@@ -15,7 +15,7 @@ function truncate(s, max = 120) {
 }
 
 function replyError(message, content) {
-  const ct = new ContainerBuilder().setAccentColor(0xFF0000);
+  const ct = new ContainerBuilder().setAccentColor(0xFF3333);
   ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(content));
   return message.reply({
     components: [ct],
@@ -37,7 +37,7 @@ module.exports = {
     const guildId = message.guild.id;
 
     if (!ac.hasAccess(guildId, message.author.id)) {
-      return replyError(message, `${e('btn_error')} **Accès refusé** — Niveau Owner+ requis.`);
+      return replyError(message, `${e('ui_alert')} **Accès refusé** — Niveau Owner+ requis.`);
     }
 
     const name        = (args[0] || '').toLowerCase();
@@ -45,13 +45,13 @@ module.exports = {
 
     if (!name || !newResponse) {
       return replyError(message,
-        `${e('btn_error')} **Syntaxe invalide**\n${e('cat_information')} Usage : \`;customedit <nom> <nouvelle_réponse>\``,
+        `${e('ui_alert')} **Syntaxe invalide**\n${e('cat_information')} Usage : \`;customedit <nom> <nouvelle_réponse>\``,
       );
     }
 
     const cmd = storage.getCommand(guildId, name);
     if (!cmd) {
-      return replyError(message, `${e('btn_error')} \`;${name}\` n'existe pas sur ce serveur.`);
+      return replyError(message, `${e('ui_alert')} \`;${name}\` n'existe pas sur ce serveur.`);
     }
 
     const before = cmd.response_type === 'text' ? cmd.response_text : '*(embed JSON)*';
@@ -59,18 +59,18 @@ module.exports = {
     try {
       storage.updateCommand(guildId, name, 'text', { text: newResponse });
     } catch (err) {
-      return replyError(message, `${e('btn_error')} ${err.message}`);
+      return replyError(message, `${e('ui_alert')} ${err.message}`);
     }
 
-    const container = new ContainerBuilder().setAccentColor(0xFF0000);
+    const container = new ContainerBuilder().setAccentColor(0x00C851);
     container.addTextDisplayComponents(
       new TextDisplayBuilder().setContent(`${e('btn_edit')} **Commande modifiée**`),
     );
     container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
     container.addTextDisplayComponents(
       new TextDisplayBuilder().setContent(
-        `${e('ui_edit')} \`;${name}\`\n` +
-        `${e('btn_error')} **Avant** : ${truncate(before)}\n` +
+        `${e('btn_edit')} \`;${name}\`\n` +
+        `${e('ui_alert')} **Avant** : ${truncate(before)}\n` +
         `${e('btn_success')} **Après** : ${truncate(newResponse)}`,
       ),
     );

@@ -13,6 +13,7 @@ module.exports = {
     // POURQUOI ici et nulle part ailleurs : client.user n'est disponible
     // qu'après l'event ready. Appeler init() avant = iconURL null permanent.
     E.init(client.user);
+    require('../utils/response-builder').init(client.user);
 
     console.log(`[Bot] Connecté en tant que ${client.user.tag}`);
     console.log(`[Bot] ${client.guilds.cache.size} serveur(s) | ${client.users.cache.size} utilisateur(s)`);
@@ -485,6 +486,15 @@ module.exports = {
     client.buttonHandlers.set('bumpcfg', handleBumpConfigInteraction);
     client.selectHandlers.set('bumpcfg', handleBumpConfigInteraction);
     client.modalHandlers .set('bumpcfg_modal', handleBumpConfigModal);
+
+    // ── Handlers BotConfig V4 (panel central /botconfig) ─────────────────────
+    const {
+      handleBotConfigInteraction,
+      handleBotConfigModal,
+    } = require('../ui/handlers/botconfig-handler');
+    client.buttonHandlers.set('botcfg', handleBotConfigInteraction);
+    client.selectHandlers.set('botcfg', handleBotConfigInteraction);
+    client.modalHandlers .set('botcfg_modal', handleBotConfigModal);
 
     // ── Handlers Access Control (buyers + owners panels) ─────────────────────
     const { handleBuyersInteraction } = require('../ui/handlers/buyers-handler');

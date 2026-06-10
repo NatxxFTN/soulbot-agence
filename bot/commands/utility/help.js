@@ -2,6 +2,8 @@
 
 const { renderHelpPanel } = require('../../ui/panels/help-panel');
 const { findCommand }     = require('../../core/help-helper');
+const { errorEmbed, primaryEmbed } = require('../../utils/response-builder');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'help',
@@ -17,19 +19,26 @@ module.exports = {
       const cmd   = findCommand(query);
 
       if (!cmd) {
-        return message.reply({ content: `✗ Commande \`${query}\` introuvable.` });
+        return message.reply({
+          embeds: [errorEmbed('Commande introuvable', `La commande \`${query}\` n'existe pas.`)],
+          allowedMentions: { repliedUser: false },
+        });
       }
 
-      const badges  = cmd.ownerOnly ? '\n👑 **Owner only**' : '';
+      const badges  = cmd.ownerOnly ? `\n${e('cat_owner')} **Owner only**` : '';
       const aliases = cmd.aliases.length > 0
         ? `\n**Aliases :** ${cmd.aliases.map(a => `\`${a}\``).join(', ')}`
         : '';
 
       return message.reply({
-        content:
-          `## \`${cmd.usage}\`\n` +
-          `**Catégorie :** ${cmd.category}\n` +
-          `**Description :** ${cmd.description}${aliases}${badges}`,
+        embeds: [
+          primaryEmbed(
+            `\`${cmd.usage}\``,
+            `**Catégorie :** ${cmd.category}\n` +
+            `**Description :** ${cmd.description}${aliases}${badges}`,
+          ),
+        ],
+        allowedMentions: { repliedUser: false },
       });
     }
 
@@ -39,7 +48,10 @@ module.exports = {
       return message.reply(renderHelpPanel(null, 1, botAvatarURL));
     } catch (err) {
       console.error('[help]', err);
-      return message.reply({ content: `✗ Erreur : ${err.message}` });
+      return message.reply({
+        embeds: [errorEmbed('Erreur', err.message)],
+        allowedMentions: { repliedUser: false },
+      });
     }
   },
 };

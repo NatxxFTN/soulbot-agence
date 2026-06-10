@@ -1,16 +1,15 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 // Endpoint LibreTranslate public (sans clé). Source : libretranslate.com (peut être lent / down).
 const LT_ENDPOINT = process.env.LIBRETRANSLATE_URL || 'https://translate.disroot.org/translate';
 
-const FLAG = { fr: '🇫🇷', en: '🇬🇧', es: '🇪🇸', de: '🇩🇪', it: '🇮🇹', pt: '🇵🇹', ja: '🇯🇵', zh: '🇨🇳', ru: '🇷🇺', ar: '🇸🇦', nl: '🇳🇱' };
-
 module.exports = {
   name       : 'translate',
   aliases    : ['tr', 'traduire'],
-  description: 'Traduit un texte (auto-detect → FR ou EN).',
+  description: 'Traduit un texte (auto-detect - FR ou EN).',
   usage      : ';translate <texte>',
   cooldown   : 5,
   guildOnly  : false,
@@ -49,10 +48,10 @@ module.exports = {
       const srcLang = data.detectedLanguage?.language || '?';
       return message.reply({
         embeds: [E.base()
-          .setTitle('🌍 Traduction')
+          .setTitle(`${e('ani_world')} Traduction`)
           .addFields(
-            { name: `${FLAG[srcLang] || '🏳️'} Source (${srcLang})`, value: text.slice(0, 1000) },
-            { name: `${FLAG[target] || '🏳️'} Cible (${target})`,    value: (data.translatedText || '_(vide)_').slice(0, 1000) },
+            { name: `Source (${srcLang})`, value: text.slice(0, 1000) },
+            { name: `Cible (${target})`,   value: (data.translatedText || '_(vide)_').slice(0, 1000) },
           )
           .setFooter({ text: 'LibreTranslate · gratuit' })],
       });

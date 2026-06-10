@@ -48,16 +48,16 @@ module.exports = {
       const container = newContainer();
       buildHeader(container, {
         emojiKey : 'ui_unlock',
-        title    : '🔥 Serveur DÉGELÉ',
+        title    : 'Serveur DÉGELÉ',
         subtitle : `Par **${message.author.tag}** · <t:${Math.floor(Date.now() / 1000)}:F>`,
       });
 
       container.addTextDisplayComponents(
         text(
           `## Restauration effectuée\n` +
-          `• ${e('btn_success') || '✅'} Permissions restaurées depuis le snapshot\n` +
-          `• 🕒 **Durée du gel :** ${durLabel}\n` +
-          (current.reason ? `• 📝 **Raison initiale :** ${current.reason}\n` : ''),
+          `• ${e('btn_success')} Permissions restaurées depuis le snapshot\n` +
+          `• ${e('btn_calendar')} **Durée du gel :** ${durLabel}\n` +
+          (current.reason ? `• ${e('btn_edit')} **Raison initiale :** ${current.reason}\n` : ''),
         ),
       );
 

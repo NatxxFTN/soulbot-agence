@@ -24,7 +24,7 @@ module.exports = {
 
       const lines = entries
         .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([alias, cmd]) => `\`${alias}\` → \`${cmd}\``)
+        .map(([alias, cmd]) => `\`${alias}\` -> \`${cmd}\``)
         .join('\n');
 
       return message.channel.send({

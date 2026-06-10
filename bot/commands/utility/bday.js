@@ -85,12 +85,12 @@ module.exports = {
       }
       const ct = new ContainerBuilder().setAccentColor(0xFF0000);
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `${e('cat_fun')} **🎂 Anniversaires du jour**`,
+        `${e('cat_fun')} **Anniversaires du jour**`,
       ));
       ct.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
       const lines = rows.map(r => {
         const age = r.year ? ` · **${new Date().getFullYear() - r.year} ans**` : '';
-        return `🎉 <@${r.user_id}>${age}`;
+        return `${e('cat_giveaway')} <@${r.user_id}>${age}`;
       }).join('\n');
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(lines));
       return message.reply({
@@ -109,13 +109,13 @@ module.exports = {
       }
       const ct = new ContainerBuilder().setAccentColor(0xFF0000);
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `${e('cat_fun')} **📅 Prochains anniversaires** (${rows.length})`,
+        `${e('cat_fun')} **Prochains anniversaires** (${rows.length})`,
       ));
       ct.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
       const lines = rows.map(r => {
         const d = formatDate(r.day, r.month);
         const suffix = r.delta === 0 ? ' · **AUJOURD\'HUI**' : ` · dans ${r.delta} jour(s)`;
-        return `📅 <@${r.user_id}> — ${d}${suffix}`;
+        return `${e('btn_calendar')} <@${r.user_id}> — ${d}${suffix}`;
       }).join('\n');
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(lines));
       return message.reply({
@@ -134,7 +134,7 @@ module.exports = {
       }
       const age = row.year ? ` (**${new Date().getFullYear() - row.year} ans** cette année)` : '';
       return plain(message,
-        `🎂 Anniversaire de **${mentioned.username}** : **${formatDate(row.day, row.month, row.year)}**${age}`);
+        `${e('btn_calendar')} Anniversaire de **${mentioned.username}** : **${formatDate(row.day, row.month, row.year)}**${age}`);
     }
 
     // ── No arg : ton anniv + les 5 prochains ────────────────────────────────
@@ -143,7 +143,7 @@ module.exports = {
 
     const ct = new ContainerBuilder().setAccentColor(0xFF0000);
     ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-      `${e('cat_fun')} **🎂 Anniversaires**`,
+      `${e('cat_fun')} **Anniversaires**`,
     ));
     ct.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
 
@@ -157,7 +157,7 @@ module.exports = {
       const lines = upcoming.map(r => {
         const d = formatDate(r.day, r.month);
         const suffix = r.delta === 0 ? ' · **AUJOURD\'HUI**' : ` · dans ${r.delta}j`;
-        return `📅 <@${r.user_id}> — ${d}${suffix}`;
+        return `${e('btn_calendar')} <@${r.user_id}> — ${d}${suffix}`;
       }).join('\n');
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(
         `**Prochains anniversaires :**\n${lines}`,

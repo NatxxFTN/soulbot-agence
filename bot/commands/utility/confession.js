@@ -7,7 +7,7 @@ const {
   ActionRowBuilder, ButtonBuilder, ButtonStyle,
   ModalBuilder, TextInputBuilder, TextInputStyle,
 } = require('discord.js');
-const { e } = require('../../core/emojis');
+const { e, forButton } = require('../../core/emojis');
 const storage = require('../../core/confession-storage');
 
 function plain(message, content) {
@@ -54,7 +54,7 @@ module.exports = {
       new ButtonBuilder()
         .setCustomId('confession:open')
         .setLabel('Écrire ma confession')
-        .setEmoji('✍️')
+        .setEmoji(forButton('btn_edit'))
         .setStyle(ButtonStyle.Primary),
     );
     ct.addActionRowComponents(row);
@@ -101,13 +101,11 @@ module.exports.buildConfessionPanel = function buildConfessionPanel(conf, cfg) {
     const voteRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId(`confession:vote:up:${conf.id}`)
-        .setLabel(String(conf.upvotes || 0))
-        .setEmoji('👍')
+        .setLabel(`Pour ${conf.upvotes || 0}`)
         .setStyle(ButtonStyle.Success),
       new ButtonBuilder()
         .setCustomId(`confession:vote:down:${conf.id}`)
-        .setLabel(String(conf.downvotes || 0))
-        .setEmoji('👎')
+        .setLabel(`Contre ${conf.downvotes || 0}`)
         .setStyle(ButtonStyle.Danger),
     );
     ct.addActionRowComponents(voteRow);

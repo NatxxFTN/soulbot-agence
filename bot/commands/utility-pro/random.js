@@ -1,6 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'random',
@@ -21,7 +22,7 @@ module.exports = {
     const result = Math.floor(Math.random() * (max - min + 1)) + min;
     return message.reply({
       embeds: [E.base()
-        .setTitle('🎲 Random')
+        .setTitle(`${e('ani_dice')} Random`)
         .setDescription(`Entre **${min}** et **${max}** : **${result}**`)],
     });
   },

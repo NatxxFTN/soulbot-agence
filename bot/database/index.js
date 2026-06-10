@@ -881,4 +881,41 @@ db.exec(`
 db.exec('CREATE INDEX IF NOT EXISTS idx_sf_gen_guild ON serverforge_generations(guild_id)');
 db.exec('CREATE INDEX IF NOT EXISTS idx_sf_gen_date ON serverforge_generations(generated_at DESC)');
 
+/* ═══ Bot Config par serveur — v2.1.2 (/botconfig) ────────────────────────── */
+db.exec(`
+  CREATE TABLE IF NOT EXISTS guild_bot_config (
+    guild_id      TEXT PRIMARY KEY,
+    nickname      TEXT,
+    banner_url    TEXT,
+    embed_color   TEXT DEFAULT 'B600A8',
+    updated_at    INTEGER DEFAULT (unixepoch()),
+    updated_by    TEXT
+  )
+`);
+
+/* ═══ Pricing centralisé — v2.1.2 (/botconfig) ─────────────────────────────
+   SOURCE DE VÉRITÉ unique des tiers/prix. Tout affichage de prix dans le bot
+   passe par bot/core/pricing.js — jamais de prix hardcodé en commande. */
+db.exec(`
+  CREATE TABLE IF NOT EXISTS bot_pricing (
+    id            TEXT PRIMARY KEY,
+    name          TEXT NOT NULL,
+    price_usd     REAL NOT NULL,
+    price_discord INTEGER NOT NULL,
+    description   TEXT,
+    features      TEXT,
+    is_active     INTEGER DEFAULT 1,
+    updated_at    INTEGER DEFAULT (unixepoch()),
+    updated_by    TEXT
+  )
+`);
+db.prepare(`
+  INSERT OR IGNORE INTO bot_pricing (id, name, price_usd, price_discord, description, features, is_active)
+  VALUES
+    ('fixed',        'Prix fixe',    0.00,  0,    'Accès de base',                '[]', 1),
+    ('tier_basic',   'Tier Basic',   5.99,  599,  'Fonctionnalités essentielles', '[]', 1),
+    ('tier_pro',     'Tier Pro',     9.99,  999,  'Accès avancé',                 '[]', 1),
+    ('tier_premium', 'Tier Premium', 19.99, 1999, 'Accès complet',                '["all"]', 1)
+`).run();
+
 module.exports = { db, ensureGuild, getGuildSettings, setGuildSetting };

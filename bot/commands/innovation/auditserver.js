@@ -2,7 +2,7 @@
 
 const { runAudit } = require('../../core/audit-helper');
 const { renderAuditPanel } = require('../../ui/panels/audit-panel');
-const { e } = require('../../core/emojis');
+const { errorEmbed, toEmbedReply } = require('../../ui/panels/_premium-helpers');
 
 module.exports = {
   name        : 'auditserver',
@@ -31,10 +31,11 @@ module.exports = {
       });
     } catch (err) {
       console.error('[auditserver]', err);
-      return message.reply({
-        content: `${e('btn_error')} Échec de l'audit : ${err.message}`,
-        allowedMentions: { repliedUser: false },
-      }).catch(() => {});
+      return message.reply(toEmbedReply(errorEmbed({
+        title: 'Échec de l\'audit',
+        description: err.message,
+        category: 'Innovation',
+      }))).catch(() => {});
     }
   },
 };

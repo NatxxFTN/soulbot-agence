@@ -4,6 +4,7 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentTyp
 const { db, getGuildSettings } = require('../../database');
 const { formatNumber }         = require('../../utils/format');
 const E = require('../../utils/embeds');
+const { forButton } = require('../../core/emojis');
 
 /*
  * ;starboard              — Affiche les messages les plus étoilés
@@ -62,7 +63,7 @@ module.exports = {
 
       return new EmbedBuilder()
         .setColor(E.COLORS.GOLD)
-        .setTitle(`⭐  Starboard — Top ${entries.length}`)
+        .setTitle(`Starboard — Top ${entries.length}`)
         .setDescription(lines.join('\n'))
         .setFooter({ text: `Page ${p + 1}/${maxPage + 1} • ${message.guild.name}` })
         .setTimestamp();
@@ -74,8 +75,8 @@ module.exports = {
 
     // Plusieurs pages → boutons
     const row = (p) => new ActionRowBuilder().addComponents(
-      new ButtonBuilder().setCustomId('prev').setLabel('◀').setStyle(ButtonStyle.Secondary).setDisabled(p === 0),
-      new ButtonBuilder().setCustomId('next').setLabel('▶').setStyle(ButtonStyle.Secondary).setDisabled(p >= maxPage),
+      new ButtonBuilder().setCustomId('prev').setEmoji(forButton('btn_prev')).setStyle(ButtonStyle.Secondary).setDisabled(p === 0),
+      new ButtonBuilder().setCustomId('next').setEmoji(forButton('btn_next')).setStyle(ButtonStyle.Secondary).setDisabled(p >= maxPage),
     );
 
     const reply = await message.reply({ embeds: [await buildEmbed(0)], components: [row(0)] });

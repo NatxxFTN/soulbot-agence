@@ -24,7 +24,7 @@ module.exports = {
 
     try {
       const category = await message.guild.channels.create({
-        name: '🎫 Tickets',
+        name: 'Tickets',
         type: ChannelType.GuildCategory,
       });
 

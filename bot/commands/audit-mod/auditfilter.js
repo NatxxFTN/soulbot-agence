@@ -2,6 +2,7 @@
 
 const { AuditLogEvent } = require('discord.js');
 const P = require('../../core/audit-mod-panels');
+const { e } = require('../../core/emojis');
 
 const ACTION_MAP = {
   ban                 : AuditLogEvent.MemberBanAdd,
@@ -80,11 +81,11 @@ module.exports = {
       const who = e.executor ? `<@${e.executor.id}>` : '*inconnu*';
       const target = e.target?.id ? `<@${e.target.id}>` : (e.target?.name || '—');
       const reason = e.reason ? ` — ${String(e.reason).slice(0, 80)}` : '';
-      return `• ${at} · ${who} → ${target}${reason}`;
+      return `• ${at} · ${who} › ${target}${reason}`;
     });
 
     return message.reply(P.paginatedList(
-      `📜 Audit Log : \`${action}\`${targetUser ? ` (user: ${targetUser.tag})` : ''}${periodMs ? ` · ${args.find(a => PERIOD_MAP[a])}` : ''}`,
+      `${e('ui_book')} Audit Log : \`${action}\`${targetUser ? ` (user: ${targetUser.tag})` : ''}${periodMs ? ` · ${args.find(a => PERIOD_MAP[a])}` : ''}`,
       items,
       page,
       10,

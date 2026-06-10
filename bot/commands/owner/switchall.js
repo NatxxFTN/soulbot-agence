@@ -32,7 +32,7 @@ module.exports = {
       return message.channel.send({
         embeds: [E.success(
           'Permissions déplacées',
-          `**${result.changes}** commande(s) déplacée(s) de **${source}** → **${dest}**.\n` +
+          `**${result.changes}** commande(s) déplacée(s) de **${source}** vers **${dest}**.\n` +
           rows.map(r => `• \`${r.cmd_name}\``).join('\n'),
         )],
       });

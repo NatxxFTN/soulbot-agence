@@ -27,7 +27,7 @@ module.exports = {
   name       : 'wordchain',
   aliases    : ['wc'],
   category   : 'utility',
-  description: 'Système de chaîne de mots (dernière lettre → première lettre).',
+  description: 'Système de chaîne de mots (la dernière lettre devient la première).',
   usage      : ';wordchain [setup|stats|reset]',
   cooldown   : 3,
   guildOnly  : true,
@@ -70,9 +70,8 @@ module.exports = {
         `${e('cat_fun')} **Classement · Chaîne de mots**`,
       ));
       ct.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
-      const medals = ['🥇', '🥈', '🥉'];
       const lines = top.map((r, i) => {
-        const medal = medals[i] || `**${i + 1}.**`;
+        const medal = i < 3 ? `${e('ui_diamond')} **${i + 1}.**` : `**${i + 1}.**`;
         return `${medal} <@${r.user_id}> — **${r.contributions}** contribution(s) · ${r.breaks} rupture(s)`;
       }).join('\n');
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(lines));

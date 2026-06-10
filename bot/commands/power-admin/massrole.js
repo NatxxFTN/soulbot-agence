@@ -1,6 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'massrole',
@@ -39,7 +40,7 @@ module.exports = {
         success++;
       } catch { failed++; }
       if ((i + 1) % 5 === 0 || i === users.length - 1) {
-        await status.edit({ embeds: [E.info('Massrole en cours...', `${i + 1} / ${users.length} · ✅ ${success} · ❌ ${failed}`)] }).catch(() => {});
+        await status.edit({ embeds: [E.info('Massrole en cours...', `${i + 1} / ${users.length} · ${e('btn_success')} ${success} · ${e('ui_alert')} ${failed}`)] }).catch(() => {});
       }
       await new Promise(r => setTimeout(r, 200));
     }
@@ -47,7 +48,7 @@ module.exports = {
     return status.edit({
       embeds: [
         E.success(`Massrole ${action === 'add' ? 'add' : 'remove'} terminé`)
-          .setDescription(`Rôle : ${role}\n✅ **${success}** OK · ❌ **${failed}** échec(s)`),
+          .setDescription(`Rôle : ${role}\n${e('btn_success')} **${success}** OK · ${e('ui_alert')} **${failed}** échec(s)`),
       ],
     });
   },

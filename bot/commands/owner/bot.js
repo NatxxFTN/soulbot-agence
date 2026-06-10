@@ -38,14 +38,14 @@ module.exports = {
             .setTitle('Statistiques du bot')
             .addFields(
               { name: `${e('btn_home')} Serveurs`,   value: `${client.guilds.cache.size}`,    inline: true },
-              { name: '👥 Membres',    value: `${totalMembers}`,                 inline: true },
-              { name: '⚡ Commandes',  value: `${client.commands.size}`,         inline: true },
-              { name: '📡 Ping',       value: `${ping}ms`,                       inline: true },
-              { name: '💾 RAM',        value: `${memUsage} MB`,                  inline: true },
-              { name: '⏱ Uptime',     value: uptime,                             inline: true },
+              { name: `${e('ui_members')} Membres`,    value: `${totalMembers}`,                 inline: true },
+              { name: `${e('ui_joystick')} Commandes`,  value: `${client.commands.size}`,         inline: true },
+              { name: `${e('ui_ping')} Ping`,       value: `${ping}ms`,                       inline: true },
+              { name: 'RAM',        value: `${memUsage} MB`,                  inline: true },
+              { name: 'Uptime',     value: uptime,                             inline: true },
               { name: `${e('cat_utility')} Node.js`,   value: process.version,                   inline: true },
-              { name: '📦 discord.js', value: require('discord.js').version,    inline: true },
-              { name: '🆔 ID',         value: `\`${client.user.id}\``,           inline: true },
+              { name: `${e('ui_git')} discord.js`, value: require('discord.js').version,    inline: true },
+              { name: 'ID',         value: `\`${client.user.id}\``,           inline: true },
             ),
         ],
       });

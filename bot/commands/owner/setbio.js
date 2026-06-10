@@ -16,10 +16,10 @@ module.exports = {
   async execute(message, args) {
     const bio = args.join(' ').trim();
     if (!bio || bio.length < 2) {
-      return message.reply(`${e('btn_error')} Usage : \`;setbio <texte>\``);
+      return message.reply(`${e('ui_alert')} Usage : \`;setbio <texte>\``);
     }
     if (bio.length > 400) {
-      return message.reply(`${e('btn_error')} La bio ne peut pas dépasser **400 caractères** (t'as ${bio.length}).`);
+      return message.reply(`${e('ui_alert')} La bio ne peut pas dépasser **400 caractères** (t'as ${bio.length}).`);
     }
 
     try {
@@ -28,7 +28,7 @@ module.exports = {
       return message.reply(`${e('btn_success')} Bio du bot mise à jour avec succès !\n\`\`\`${bio}\`\`\``);
     } catch (err) {
       logger.error('SetBio', err.message);
-      return message.reply(`${e('btn_error')} Erreur : \`${err.message}\``);
+      return message.reply(`${e('ui_alert')} Erreur : \`${err.message}\``);
     }
   },
 };

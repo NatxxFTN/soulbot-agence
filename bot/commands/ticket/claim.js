@@ -1,6 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 const { getTicketByChannel, claimTicket, getConfig, logAction } = require('../../core/ticket-helper');
 
 module.exports = {
@@ -35,7 +36,7 @@ module.exports = {
 
     claimTicket(ticket.id, message.author.id);
 
-    await logAction(message.guild, config, `👤 Ticket #${ticket.ticket_number} pris en charge par ${message.author.tag}`);
+    await logAction(message.guild, config, `${e('ui_user')} Ticket #${ticket.ticket_number} pris en charge par ${message.author.tag}`);
 
     return message.channel.send({
       embeds: [

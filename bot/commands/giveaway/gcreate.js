@@ -45,7 +45,7 @@ module.exports = {
     let gwMessage;
     try {
       const embed = new EmbedBuilder()
-        .setColor(0xFF0000)
+        .setColor(0xB600A8)
         .setTitle(`${e('cat_giveaway')} GIVEAWAY`)
         .setDescription(
           `**Gain :** ${prize}\n` +

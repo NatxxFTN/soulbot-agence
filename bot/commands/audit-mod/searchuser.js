@@ -1,6 +1,7 @@
 'use strict';
 
 const P = require('../../core/audit-mod-panels');
+const { e } = require('../../core/emojis');
 
 module.exports = {
   name       : 'searchuser',
@@ -84,7 +85,7 @@ module.exports = {
       });
 
     return message.reply(P.paginatedList(
-      `🔎 Recherche : \`${label}\``,
+      `${e('btn_search')} Recherche : \`${label}\``,
       items,
       page,
       10,

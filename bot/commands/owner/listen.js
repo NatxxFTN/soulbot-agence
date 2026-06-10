@@ -35,7 +35,7 @@ module.exports = {
       if (sub === 'list') {
         const rows = STMT_LIST.all(message.guild.id);
         if (!rows.length) return message.channel.send({ embeds: [E.info('Écoute', 'Aucun salon en écoute.')] });
-        const lines = rows.map(r => `<#${r.channel_id}>${r.target_id ? ` → <@${r.target_id}>` : ''}`).join('\n');
+        const lines = rows.map(r => `<#${r.channel_id}>${r.target_id ? ` — filtre <@${r.target_id}>` : ''}`).join('\n');
         return message.channel.send({ embeds: [E.base().setTitle(`Salons écoutés (${rows.length})`).setDescription(lines)] });
       }
 

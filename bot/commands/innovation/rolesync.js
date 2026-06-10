@@ -1,5 +1,6 @@
 'use strict';
 
+const { e } = require('../../core/emojis');
 const {
   successEmbed, errorEmbed, warningEmbed, toEmbedReply,
 } = require('../../ui/panels/_premium-helpers');
@@ -19,7 +20,7 @@ module.exports = {
       return message.reply(toEmbedReply(warningEmbed({
         title: 'Usage',
         description:
-          '`;rolesync <@source> <@target>` — copie rôles source → target\n' +
+          '`;rolesync <@source> <@target>` — copie les rôles de source vers target\n' +
           '`;rolesync <@target> from <guildId> <@user>` — cross-serveur par nom',
         category: 'Innovation',
       })));
@@ -72,12 +73,12 @@ module.exports = {
 
       return message.reply(toEmbedReply(successEmbed({
         title       : 'Sync terminée',
-        description : `<@${sourceId}> → <@${targetId}>`,
+        description : `<@${sourceId}> vers <@${targetId}>`,
         fields      : [
-          { name: '✅ Ajoutés',    value: `${ok}`,      inline: true },
-          { name: '❌ Échecs',     value: `${failed}`,  inline: true },
-          { name: '📊 Total tenté', value: `${toAdd.size}`, inline: true },
-          { name: '👤 Par',        value: message.author.tag, inline: true },
+          { name: `${e('btn_success')} Ajoutés`,    value: `${ok}`,      inline: true },
+          { name: `${e('ui_alert')} Échecs`,     value: `${failed}`,  inline: true },
+          { name: 'Total tenté', value: `${toAdd.size}`, inline: true },
+          { name: `${e('ui_user')} Par`,        value: message.author.tag, inline: true },
         ],
         user        : message.author,
         category    : 'Innovation',
@@ -142,12 +143,12 @@ module.exports = {
 
     return message.reply(toEmbedReply(successEmbed({
       title       : 'Cross-sync terminée',
-      description : `**${srcGuild.name}** → **${message.guild.name}**`,
+      description : `**${srcGuild.name}** vers **${message.guild.name}**`,
       fields      : [
-        { name: '✅ Ajoutés',             value: `${ok}`,      inline: true },
-        { name: '⚠️ Skippés (nom inconnu)', value: `${skipped}`, inline: true },
-        { name: '❌ Échecs',              value: `${failed}`,  inline: true },
-        { name: '👤 Par',                 value: message.author.tag, inline: false },
+        { name: `${e('btn_success')} Ajoutés`,             value: `${ok}`,      inline: true },
+        { name: `${e('btn_flag')} Skippés (nom inconnu)`, value: `${skipped}`, inline: true },
+        { name: `${e('ui_alert')} Échecs`,              value: `${failed}`,  inline: true },
+        { name: `${e('ui_user')} Par`,                 value: message.author.tag, inline: false },
       ],
       user        : message.author,
       category    : 'Innovation',

@@ -4,6 +4,7 @@ const { EmbedBuilder } = require('discord.js');
 const { db }                        = require('../../database');
 const { formatDuration, formatNumber, progressBar } = require('../../utils/format');
 const E                             = require('../../utils/embeds');
+const { e }                         = require('../../core/emojis');
 
 module.exports = {
   name        : 'stats',
@@ -43,17 +44,17 @@ module.exports = {
 
       const embed = new EmbedBuilder()
         .setColor(E.COLORS.PRIMARY)
-        .setTitle(`📊  Statistiques de ${message.guild.name}`)
+        .setTitle(`${e('cat_information')} Statistiques de ${message.guild.name}`)
         .setThumbnail(message.guild.iconURL({ dynamic: true }))
         .addFields(
-          { name: '💬 Messages totaux',  value: formatNumber(totals.total_messages), inline: true },
-          { name: '🎙️ Temps vocal total', value: formatDuration(totals.total_voice),  inline: true },
-          { name: '👥 Membres actifs',    value: formatNumber(totals.active_users),    inline: true },
-          { name: '👤 Membres',           value: formatNumber(message.guild.memberCount), inline: true },
-          { name: '📅 Création',          value: `<t:${Math.floor(message.guild.createdTimestamp / 1000)}:D>`, inline: true },
+          { name: `${e('ui_chat')} Messages totaux`,  value: formatNumber(totals.total_messages), inline: true },
+          { name: `${e('ui_mic')} Temps vocal total`, value: formatDuration(totals.total_voice),  inline: true },
+          { name: `${e('ui_members')} Membres actifs`,    value: formatNumber(totals.active_users),    inline: true },
+          { name: `${e('ui_user')} Membres`,           value: formatNumber(message.guild.memberCount), inline: true },
+          { name: `${e('btn_calendar')} Création`,          value: `<t:${Math.floor(message.guild.createdTimestamp / 1000)}:D>`, inline: true },
           { name: '\u200B', value: '\u200B', inline: true },
-          { name: '🏆 Top messages', value: topMsgUser ? `${topMsgUser.username} — ${formatNumber(topMsg.messages)}` : '*—*', inline: true },
-          { name: '🏆 Top vocal',    value: topVocUser ? `${topVocUser.username} — ${formatDuration(topVoc.voice_seconds)}` : '*—*', inline: true },
+          { name: 'Top messages', value: topMsgUser ? `${topMsgUser.username} — ${formatNumber(topMsg.messages)}` : '*—*', inline: true },
+          { name: 'Top vocal',    value: topVocUser ? `${topVocUser.username} — ${formatDuration(topVoc.voice_seconds)}` : '*—*', inline: true },
         )
         .setTimestamp();
 
@@ -81,14 +82,14 @@ module.exports = {
 
       const embed = new EmbedBuilder()
         .setColor(E.COLORS.PRIMARY)
-        .setTitle(`📊  Stats de ${target.displayName}`)
+        .setTitle(`${e('cat_information')} Stats de ${target.displayName}`)
         .setThumbnail(target.user.displayAvatarURL({ dynamic: true }))
         .addFields(
-          { name: '💬 Messages',     value: `${formatNumber(row?.messages ?? 0)}\n${msgBar}\n🏆 Rang #${rank}/${totalUsers}`,      inline: true },
-          { name: '🎙️ Temps vocal',  value: `${formatDuration(row?.voice_seconds ?? 0)}\n${vocBar}\n🏆 Rang #${rankVoc}/${totalUsers}`, inline: true },
-          { name: '📅 Dernier msg',  value: row?.last_message_at ? `<t:${row.last_message_at}:R>` : '*Jamais*', inline: true },
-          { name: '🎙️ Dernier vocal', value: row?.last_voice_at  ? `<t:${row.last_voice_at}:R>`  : '*Jamais*', inline: true },
-          { name: '📅 A rejoint le', value: `<t:${Math.floor(target.joinedTimestamp / 1000)}:D>`, inline: true },
+          { name: `${e('ui_chat')} Messages`,     value: `${formatNumber(row?.messages ?? 0)}\n${msgBar}\nRang #${rank}/${totalUsers}`,      inline: true },
+          { name: `${e('ui_mic')} Temps vocal`,  value: `${formatDuration(row?.voice_seconds ?? 0)}\n${vocBar}\nRang #${rankVoc}/${totalUsers}`, inline: true },
+          { name: `${e('btn_calendar')} Dernier msg`,  value: row?.last_message_at ? `<t:${row.last_message_at}:R>` : '*Jamais*', inline: true },
+          { name: `${e('ui_mic')} Dernier vocal`, value: row?.last_voice_at  ? `<t:${row.last_voice_at}:R>`  : '*Jamais*', inline: true },
+          { name: `${e('btn_calendar')} A rejoint le`, value: `<t:${Math.floor(target.joinedTimestamp / 1000)}:D>`, inline: true },
         )
         .setTimestamp();
 
@@ -100,7 +101,7 @@ module.exports = {
       const type     = (args[1] ?? 'messages').toLowerCase();
       const isVoice  = type === 'voc' || type === 'voice' || type === 'vocal';
       const field    = isVoice ? 'voice_seconds' : 'messages';
-      const label    = isVoice ? '🎙️ Temps vocal' : '💬 Messages';
+      const label    = isVoice ? `${e('ui_mic')} Temps vocal` : `${e('ui_chat')} Messages`;
 
       const top10 = db.prepare(`
         SELECT user_id, ${field} AS score FROM user_stats
@@ -108,17 +109,16 @@ module.exports = {
         ORDER BY ${field} DESC LIMIT 10
       `).all(guildId);
 
-      const medals = ['🥇', '🥈', '🥉'];
       const lines  = await Promise.all(top10.map(async (row, i) => {
         const u     = await client.users.fetch(row.user_id).catch(() => null);
         const name  = u ? u.username : `Utilisateur inconnu`;
         const score = isVoice ? formatDuration(row.score) : formatNumber(row.score);
-        return `${medals[i] ?? `\`${i + 1}.\``} **${name}** — ${score}`;
+        return `\`${i + 1}.\` **${name}** — ${score}`;
       }));
 
       const embed = new EmbedBuilder()
         .setColor(E.COLORS.GOLD)
-        .setTitle(`🏆  Top ${top10.length} — ${label}`)
+        .setTitle(`Top ${top10.length} — ${label}`)
         .setDescription(lines.join('\n') || '*Aucune donnée disponible.*')
         .setFooter({ text: message.guild.name, iconURL: message.guild.iconURL({ dynamic: true }) })
         .setTimestamp();
@@ -141,19 +141,18 @@ module.exports = {
         WHERE guild_id = ? AND channel_id = ?
       `).get(guildId, channel.id).t;
 
-      const medals = ['🥇', '🥈', '🥉'];
       const lines  = await Promise.all(top10.map(async (row, i) => {
         const u    = await client.users.fetch(row.user_id).catch(() => null);
         const name = u ? u.username : 'Inconnu';
         const pct  = total ? ((row.messages / total) * 100).toFixed(1) : '0';
-        return `${medals[i] ?? `\`${i + 1}.\``} **${name}** — ${formatNumber(row.messages)} (${pct}%)`;
+        return `\`${i + 1}.\` **${name}** — ${formatNumber(row.messages)} (${pct}%)`;
       }));
 
       const embed = new EmbedBuilder()
         .setColor(E.COLORS.PRIMARY)
-        .setTitle(`📊  Stats de #${channel.name}`)
+        .setTitle(`${e('cat_information')} Stats de #${channel.name}`)
         .setDescription(lines.join('\n') || '*Aucune donnée disponible.*')
-        .addFields({ name: '💬 Total messages', value: formatNumber(total), inline: true })
+        .addFields({ name: `${e('ui_chat')} Total messages`, value: formatNumber(total), inline: true })
         .setTimestamp();
 
       return message.reply({ embeds: [embed] });

@@ -77,24 +77,24 @@ module.exports = {
     const container = newContainer();
     buildHeader(container, {
       emojiKey : 'ui_lock',
-      title    : `🧊 Serveur GELÉ`,
+      title    : `Serveur GELÉ`,
       subtitle : `Par **${message.author.tag}** · <t:${Math.floor(Date.now() / 1000)}:F>`,
     });
 
     container.addTextDisplayComponents(
       text(
         `## Rapport\n` +
-        `• ${e('btn_success') || '✅'} **Salons verrouillés :** ${ok}\n` +
-        (skipped ? `• ⚠️ **Skippés (perm manquante) :** ${skipped}\n` : '') +
-        (failed  ? `• 🔴 **Échecs :** ${failed}\n` : '') +
-        (reason  ? `• 📝 **Raison :** ${reason}\n` : ''),
+        `• ${e('btn_success')} **Salons verrouillés :** ${ok}\n` +
+        (skipped ? `• ${e('ui_alert')} **Skippés (perm manquante) :** ${skipped}\n` : '') +
+        (failed  ? `• ${e('ui_alert')} **Échecs :** ${failed}\n` : '') +
+        (reason  ? `• ${e('btn_edit')} **Raison :** ${reason}\n` : ''),
       ),
     );
     container.addSeparatorComponents(separator('Small'));
 
     const expiryLine = expiresAt
-      ? `🕒 **Auto-dégel :** <t:${Math.floor(expiresAt / 1000)}:R>`
-      : `🔒 **Auto-dégel :** *manuel uniquement* (\`;unfreeze\`)`;
+      ? `${e('btn_calendar')} **Auto-dégel :** <t:${Math.floor(expiresAt / 1000)}:R>`
+      : `${e('ui_lock')} **Auto-dégel :** *manuel uniquement* (\`;unfreeze\`)`;
     container.addTextDisplayComponents(text(`## Expiration\n${expiryLine}`));
 
     container.addTextDisplayComponents(text(`-# Soulbot • Innovation • Panic v1.0`));

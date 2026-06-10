@@ -29,7 +29,7 @@ module.exports = {
 
     return message.reply({
       embeds: [E.base()
-        .setTitle('📸 Screenshot')
+        .setTitle('Screenshot')
         .setDescription(`URL : \`${url}\``)
         .setImage(apiUrl)
         .setFooter({ text: 'APIFlash · cache 1h' })],

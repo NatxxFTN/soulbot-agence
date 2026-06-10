@@ -67,22 +67,22 @@ module.exports = {
     container.addTextDisplayComponents(
       text(
         `## Propriétés\n` +
-        `• ${role.hoist ? '✅' : '❌'} Épinglé (hoist)\n` +
-        `• ${role.mentionable ? '✅' : '❌'} Mentionnable\n` +
-        `• ${role.managed ? '🔗 Managé (intégration)' : '❌ Non managé'}`,
+        `• **Épinglé (hoist) :** ${role.hoist ? 'Oui' : 'Non'}\n` +
+        `• **Mentionnable :** ${role.mentionable ? 'Oui' : 'Non'}\n` +
+        `• **Managé :** ${role.managed ? 'Oui (intégration)' : 'Non'}`,
       ),
     );
     container.addSeparatorComponents(separator('Small'));
 
     container.addTextDisplayComponents(
       text(
-        `## ${e('ui_lock') || '🔒'} Permissions clés (${keyPerms.length})\n${permsDisplay.slice(0, 1500)}`,
+        `## ${e('ui_lock')} Permissions clés (${keyPerms.length})\n${permsDisplay.slice(0, 1500)}`,
       ),
     );
     container.addSeparatorComponents(separator('Small'));
 
     container.addTextDisplayComponents(
-      text(`## ${e('btn_calendar') || '📅'} Créé\n<t:${createdTs}:F> · <t:${createdTs}:R>`),
+      text(`## ${e('btn_calendar')} Créé\n<t:${createdTs}:F> · <t:${createdTs}:R>`),
     );
 
     container.addTextDisplayComponents(text(`-# Soulbot • Admin • RoleInfo v1.0`));

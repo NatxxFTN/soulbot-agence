@@ -2,6 +2,7 @@
 
 const P = require('../../core/audit-mod-panels');
 const audit = require('../../core/audit-mod-storage');
+const { e } = require('../../core/emojis');
 
 const VALID_PERIODS = ['24h', '7d', '30d', 'all'];
 
@@ -40,12 +41,12 @@ module.exports = {
 
     const body = `**Période** : \`${period}\` · *(autres : ${VALID_PERIODS.filter(p => p !== period).join(', ')})*\n`
       + '---\n'
-      + '#### 🏆 Top 5 modérateurs\n' + topMods
+      + `#### ${e('ui_members')} Top 5 modérateurs\n` + topMods
       + '\n---\n'
-      + '#### 🎯 Top 5 actions\n' + topActions
+      + '#### Top 5 actions\n' + topActions
       + '\n---\n'
-      + '#### 📈 Évolution journalière (14 derniers jours)\n' + evolution;
+      + '#### Évolution journalière (14 derniers jours)\n' + evolution;
 
-    return message.reply(P.infoPanel('📊 Stats modération', body));
+    return message.reply(P.infoPanel(`${e('cat_information')} Stats modération`, body));
   },
 };

@@ -3,6 +3,7 @@
 const { db } = require('../../database');
 const P = require('../../core/audit-mod-panels');
 const audit = require('../../core/audit-mod-storage');
+const { e } = require('../../core/emojis');
 
 const STMT_ACTIVE_WARNS = db.prepare(
   'SELECT COUNT(DISTINCT user_id) AS users, COUNT(*) AS total FROM warnings WHERE guild_id = ?',
@@ -48,7 +49,7 @@ module.exports = {
       + `**Rôles lockés** : ${locks.count}`;
 
     const activity24h = recent24h.length
-      ? recent24h.map(r => `• **${r.type}** — ${r.count}`).join('\n')
+      ? recent24h.map(r => `• **${r.action_type}** — ${r.count}`).join('\n')
       : '*Aucune action sur 24h.*';
 
     const topMods = stats7d.topMods.length
@@ -59,14 +60,14 @@ module.exports = {
 
     const body = `**Serveur** : ${message.guild.name} · *snapshot <t:${now}:T>*\n`
       + '---\n'
-      + '#### 🛡️ Sanctions actives\n' + activeBlock
+      + `#### ${e('cat_moderation')} Sanctions actives\n` + activeBlock
       + '\n---\n'
-      + `#### 📊 Activité 24h (${total24h} action${total24h > 1 ? 's' : ''})\n`
+      + `#### ${e('cat_information')} Activité 24h (${total24h} action${total24h > 1 ? 's' : ''})\n`
       + activity24h
       + '\n---\n'
-      + '#### 🏆 Top mods (7 derniers jours)\n' + topMods
+      + `#### ${e('ui_diamond')} Top mods (7 derniers jours)\n` + topMods
       + '\n---\n'
-      + '#### ⚡ Actions rapides\n'
+      + `#### ${e('btn_tip')} Actions rapides\n`
       + '• `;warn @membre <raison>` — avertissement\n'
       + '• `;mute @membre <durée>` — silence\n'
       + '• `;kick @membre <raison>` — expulsion\n'
@@ -74,6 +75,6 @@ module.exports = {
       + '• `;modstats <période>` — stats détaillées\n'
       + '\n*Pour rafraîchir : retape `;moddashboard`*';
 
-    return message.reply(P.infoPanel('🛡️ Mod Dashboard', body));
+    return message.reply(P.infoPanel(`${e('ui_antispam')} Mod Dashboard`, body));
   },
 };

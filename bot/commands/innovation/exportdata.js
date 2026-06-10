@@ -3,6 +3,7 @@
 const { AttachmentBuilder, ChannelType } = require('discord.js');
 const { LEVELS } = require('../../core/permissions-levels');
 const { getUserLevel } = require('../../core/permissions');
+const { e } = require('../../core/emojis');
 const {
   newContainer, buildHeader, separator, text, toV2Payload,
   errorEmbed, toEmbedReply,
@@ -104,10 +105,10 @@ module.exports = {
       container.addTextDisplayComponents(
         text(
           `## Contenu\n` +
-          `• 👥 **Membres :** ${out.members.length}${truncated ? ' *(tronqué à 1000)*' : ''}\n` +
-          `• 📜 **Rôles :** ${out.roles.length}\n` +
-          `• 📂 **Salons :** ${out.channels.length}\n` +
-          `• ⚙️ **Tables Soulbot exportées :** ${Object.keys(out.config_soulbot).length}`,
+          `• ${e('ui_members')} **Membres :** ${out.members.length}${truncated ? ' *(tronqué à 1000)*' : ''}\n` +
+          `• ${e('ui_book')} **Rôles :** ${out.roles.length}\n` +
+          `• ${e('ui_folder')} **Salons :** ${out.channels.length}\n` +
+          `• ${e('cat_configuration')} **Tables Soulbot exportées :** ${Object.keys(out.config_soulbot).length}`,
         ),
       );
       container.addSeparatorComponents(separator('Small'));
@@ -117,9 +118,9 @@ module.exports = {
       container.addTextDisplayComponents(
         text(
           `## Fichier\n` +
-          `• 💾 **Taille :** ${sizeStr}\n` +
-          `• 📄 **Format :** JSON\n` +
-          (truncated ? `• ⚠️ **Tronqué :** oui (limite Discord 25 Mo)\n` : ''),
+          `• **Taille :** ${sizeStr}\n` +
+          `• **Format :** JSON\n` +
+          (truncated ? `• ${e('ui_alert')} **Tronqué :** oui (limite Discord 25 Mo)\n` : ''),
         ),
       );
 

@@ -39,7 +39,7 @@ module.exports = {
       return message.reply({ embeds: [E.error('Erreur API', `Impossible de modifier le pseudo : ${err.message}`)] });
     }
 
-    STMT_LOG.run(message.guild.id, 'NICKNAME', target.id, target.user.tag, message.author.id, message.author.tag, `${oldNick} → ${newNick ?? 'réinitialisé'}`);
+    STMT_LOG.run(message.guild.id, 'NICKNAME', target.id, target.user.tag, message.author.id, message.author.tag, `${oldNick} -> ${newNick ?? 'réinitialisé'}`);
 
     const desc = newNick
       ? `Pseudo de ${target} changé en **${newNick}**.`

@@ -2,6 +2,7 @@
 
 const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 const { db } = require('../../database');
 const L = require('../../core/logs-v3-helper');
 
@@ -40,7 +41,7 @@ module.exports = {
     const { count } = STMT_COUNT.get(message.guild.id, target.id);
     STMT_MOD_LOG.run(message.guild.id, 'WARN', target.id, target.user.tag, message.author.id, message.author.tag, reason);
 
-    target.send(`⚠️ Tu as reçu un avertissement sur **${message.guild.name}**.\nRaison : ${reason}\nTotal : **${count}** avertissement(s)`).catch(() => {});
+    target.send(`${e('ui_alert')} Tu as reçu un avertissement sur **${message.guild.name}**.\nRaison : ${reason}\nTotal : **${count}** avertissement(s)`).catch(() => {});
 
     // ── Hook Logs V3 ──────────────────────────────────────────────
     L.log(message.guild, 'mod_warn', {

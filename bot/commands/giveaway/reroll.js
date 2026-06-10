@@ -3,6 +3,8 @@
 const { PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const E = require('../../utils/embeds');
 const { getGiveaway, drawWinners } = require('../../core/giveaway-helper');
+const { e } = require('../../core/emojis');
+const { footer } = require('../../utils/response-builder');
 
 module.exports = {
   name       : 'reroll',
@@ -45,9 +47,10 @@ module.exports = {
         content: winners.length ? `<@${winners[0]}>` : '',
         embeds: [
           new EmbedBuilder()
-            .setColor(0xFF0000)
-            .setTitle('🔄 Reroll !')
+            .setColor(E.COLORS.PRIMARY)
+            .setTitle(`${e('ani_dice')} Reroll !`)
             .setDescription(`**Nouveau gagnant :** ${mention}\n**Gain :** ${gw.prize}`)
+            .setFooter(footer())
             .setTimestamp(),
         ],
       }).catch(() => {});

@@ -10,7 +10,7 @@ const ac = require('../../core/access-control');
 const storage = require('../../core/custom-commands-storage');
 
 function reply(message, content) {
-  const ct = new ContainerBuilder().setAccentColor(0xFF0000);
+  const ct = new ContainerBuilder().setAccentColor(0xFF3333);
   ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(content));
   return message.reply({
     components: [ct],
@@ -32,32 +32,32 @@ module.exports = {
     const guildId = message.guild.id;
 
     if (!ac.hasAccess(guildId, message.author.id)) {
-      return reply(message, `${e('btn_error')} **Accès refusé** — Niveau Owner+ requis.`);
+      return reply(message, `${e('ui_alert')} **Accès refusé** — Niveau Owner+ requis.`);
     }
 
     const name = (args[0] || '').toLowerCase();
     if (!name) {
       return reply(message,
-        `${e('btn_error')} **Syntaxe invalide**\n${e('cat_information')} Usage : \`;customremove <nom>\``,
+        `${e('ui_alert')} **Syntaxe invalide**\n${e('cat_information')} Usage : \`;customremove <nom>\``,
       );
     }
 
     const cmd = storage.getCommand(guildId, name);
     if (!cmd) {
-      return reply(message, `${e('btn_error')} \`;${name}\` n'existe pas sur ce serveur.`);
+      return reply(message, `${e('ui_alert')} \`;${name}\` n'existe pas sur ce serveur.`);
     }
 
     storage.deleteCommand(guildId, name);
     const total = storage.countCommands(guildId);
 
-    const container = new ContainerBuilder().setAccentColor(0xFF0000);
+    const container = new ContainerBuilder().setAccentColor(0x00C851);
     container.addTextDisplayComponents(
       new TextDisplayBuilder().setContent(`${e('btn_trash')} **Commande supprimée**`),
     );
     container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
     container.addTextDisplayComponents(
       new TextDisplayBuilder().setContent(
-        `${e('ui_edit')} \`;${cmd.name}\`\n` +
+        `${e('btn_edit')} \`;${cmd.name}\`\n` +
         `${e('ui_user')} Créée par <@${cmd.created_by}>\n` +
         `${e('cat_giveaway')} ${cmd.uses_count} utilisation(s)`,
       ),

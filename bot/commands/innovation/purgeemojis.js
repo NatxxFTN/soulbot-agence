@@ -138,7 +138,7 @@ module.exports = {
     });
 
     container.addTextDisplayComponents(
-      text(`> ⚠️ **Action destructive.** La suppression est définitive et non réversible.`),
+      text(`> ${e('ui_alert')} **Action destructive.** La suppression est définitive et non réversible.`),
     );
     container.addSeparatorComponents(separator('Small'));
 

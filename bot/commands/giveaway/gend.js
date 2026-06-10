@@ -48,7 +48,7 @@ module.exports = {
         content: winners.length ? winners.map(w => `<@${w}>`).join(' ') : '',
         embeds: [
           new EmbedBuilder()
-            .setColor(0xFF0000)
+            .setColor(E.COLORS.PRIMARY)
             .setTitle(`${e('cat_giveaway')} Giveaway terminé !`)
             .setDescription(`**Gain :** ${gw.prize}\n**Gagnant(s) :** ${mentions}`)
             .setTimestamp(),

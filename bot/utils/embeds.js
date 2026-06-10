@@ -2,14 +2,13 @@
 
 const { EmbedBuilder } = require('discord.js');
 
-// ─── Charte couleurs officielle — UI_UX_GUIDELINES.md §1.1 ───────────────────
+// ─── Charte couleurs officielle — Soulbot v2.1.2 ─────────────────────────────
 //
 // RÈGLE ABSOLUE : ces valeurs ne changent pas sans validation du Designer.
-// Toute déviation de PRIMARY = 0xFF0000 est un refus de livraison immédiat.
-// Référence : UI_UX_GUIDELINES.md §1.2 — "Pas notre orange → retour sans analyse"
+// Identité magenta #B600A8 depuis le pivot Soulbot v3.0 (upgrade visuel v2.1.2).
 //
 const COLORS = {
-  PRIMARY : 0xFF0000,  // Orange identitaire — SEULE couleur par défaut admise
+  PRIMARY : 0xB600A8,  // Magenta identitaire — SEULE couleur par défaut admise
   SUCCESS : 0x27AE60,  // Vert confirmation — action réussie, opération validée
   ERROR   : 0xE74C3C,  // Rouge erreur — refus, accès interdit, crash
   WARNING : 0xF1C40F,  // Jaune avertissement — action critique, irréversible imminente

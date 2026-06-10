@@ -8,7 +8,7 @@ const ARCHIVE_CATEGORY_NAME = '📁 Archives';
 module.exports = {
   name       : 'archive',
   aliases    : ['archiver'],
-  description: 'Archive un salon (read-only, déplacé dans 📁 Archives).',
+  description: 'Archive un salon (read-only, déplacé dans la catégorie Archives).',
   usage      : ';archive <#salon>',
   cooldown   : 10,
   guildOnly  : true,

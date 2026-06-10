@@ -47,7 +47,7 @@ module.exports = {
     if (!info) {
       const container = newContainer();
       buildHeader(container, {
-        emojiKey : 'btn_error',
+        emojiKey : 'ui_alert',
         title    : 'Commande non analysable',
         subtitle : `\`${cmd}\` n'est pas dans la liste des simulables.`,
       });
@@ -77,7 +77,7 @@ module.exports = {
             const authorTop = message.member.roles.highest.position;
             const botOk     = botTop > targetTop;
             const authorOk  = authorTop > targetTop || message.guild.ownerId === message.author.id;
-            hierarchy = `Bot : ${botOk ? '✅' : '❌'} · Auteur : ${authorOk ? '✅' : '❌'}`;
+            hierarchy = `Bot : ${botOk ? e('btn_success') : e('ui_alert')} · Auteur : ${authorOk ? e('btn_success') : e('ui_alert')}`;
           }
         } else {
           targetInfo = `<@${userId}> *(hors serveur)*`;
@@ -91,7 +91,7 @@ module.exports = {
     const container = newContainer();
     buildHeader(container, {
       emojiKey : 'btn_search',
-      title    : `🧪 SIMULATION — \`;${cmd} ${args.slice(1).join(' ')}\``,
+      title    : `SIMULATION — \`;${cmd} ${args.slice(1).join(' ')}\``,
       subtitle : '*Aucune action réellement exécutée.*',
     });
 
@@ -108,8 +108,8 @@ module.exports = {
     container.addTextDisplayComponents(
       text(
         `## Vérifications\n` +
-        `• **Perm bot (\`${info.botPerm}\`) :** ${botHasPerm ? '✅' : '❌'}\n` +
-        `• **Perm auteur (\`${info.botPerm}\`) :** ${authorHasPerm ? '✅' : '❌'}\n` +
+        `• **Perm bot (\`${info.botPerm}\`) :** ${botHasPerm ? e('btn_success') : e('ui_alert')}\n` +
+        `• **Perm auteur (\`${info.botPerm}\`) :** ${authorHasPerm ? e('btn_success') : e('ui_alert')}\n` +
         `• **Cible :** ${targetInfo}\n` +
         `• **Hiérarchie :** ${hierarchy}`,
       ),

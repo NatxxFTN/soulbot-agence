@@ -4,6 +4,7 @@ const { db } = require('../../database');
 const L = require('../../core/logs-v3-helper');
 const P = require('../../core/audit-mod-panels');
 const audit = require('../../core/audit-mod-storage');
+const { e } = require('../../core/emojis');
 
 const STMT_WARN = db.prepare(
   'INSERT INTO warnings (guild_id, user_id, user_tag, moderator_id, moderator_tag, reason) VALUES (?, ?, ?, ?, ?, ?)',
@@ -65,7 +66,7 @@ module.exports = {
     const confirmCmd = `;masswarn confirm ${targets.map(t => `<@${t.id}>`).join(' ')} | ${reason}`;
 
     if (!isConfirm) {
-      return message.reply(P.confirmPanel('⚠️ Mass-warn — Confirmation', previewBody, confirmCmd));
+      return message.reply(P.confirmPanel(`${e('ui_alert')} Mass-warn — Confirmation`, previewBody, confirmCmd));
     }
 
     const guildId = message.guild.id;
@@ -83,13 +84,13 @@ module.exports = {
           summary: `${t.user.tag} warn (mass) par ${modTag}`,
           actorId: modId, targetId: t.id,
         });
-        t.send(`⚠️ Tu as reçu un avertissement (mass) sur **${message.guild.name}**.\nRaison : ${reason}`).catch(() => {});
+        t.send(`${e('ui_alert')} Tu as reçu un avertissement (mass) sur **${message.guild.name}**.\nRaison : ${reason}`).catch(() => {});
         warned++;
       } catch { /* skip */ }
     }
 
     return message.reply(P.successPanel(
-      '✅ Mass-warn exécuté',
+      `${e('btn_success')} Mass-warn exécuté`,
       `**${warned} / ${targets.length}** membres avertis.\n**Raison** : ${reason}`,
     ));
   },

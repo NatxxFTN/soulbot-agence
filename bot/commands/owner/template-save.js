@@ -2,6 +2,7 @@
 
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const E = require('../../utils/embeds');
+const { e, forButton } = require('../../core/emojis');
 const {
   serializeGuild, saveTemplate, listTemplates,
   loadTemplate, deleteTemplate, logAction, sanitizeName,
@@ -35,7 +36,7 @@ module.exports = {
           '`;template delete <nom>` — Supprime un template',
           '',
           '**Flags (load) :**',
-          '`--reset` — Supprime tout avant de recréer ⚠️',
+          '`--reset` — Supprime tout avant de recréer (irréversible)',
           '`--emojis` — Inclut les emojis custom',
         ].join('\n')),
       ],
@@ -100,7 +101,7 @@ async function handleList(message) {
 
   const lines = templates.map(t =>
     t.error
-      ? `**\`${t.name}\`** — ⚠️ ${t.error}`
+      ? `**\`${t.name}\`** — ${e('ui_alert')} ${t.error}`
       : `**\`${t.name}\`** — ${t.stats.categories} cat · ${t.stats.channels} salons · ${t.stats.roles} rôles · ${t.size_kb} Ko`
   );
 
@@ -134,25 +135,26 @@ async function handleLoad(message, args) {
   const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId(confirmId)
-      .setLabel(reset ? '⚠️ CONFIRMER — tout supprimer puis créer' : '✅ Confirmer')
+      .setLabel(reset ? 'CONFIRMER — tout supprimer puis créer' : 'Confirmer')
+      .setEmoji(forButton(reset ? 'ui_alert' : 'btn_success'))
       .setStyle(reset ? ButtonStyle.Danger : ButtonStyle.Success),
     new ButtonBuilder()
       .setCustomId('tpl_cancel')
-      .setLabel('✗ Annuler')
+      .setLabel('Annuler')
       .setStyle(ButtonStyle.Secondary)
   );
 
   const lines = [
     `**Template :** \`${safeName}\``,
-    `**Mode :** ${reset ? '🔴 RESET — supprime tout avant création' : '🟢 ADD — ajoute sans supprimer'}`,
-    `**Emojis :** ${includeEmojis ? '✅ Oui' : '✗ Non'}`,
+    `**Mode :** ${reset ? `${e('ui_alert')} RESET — supprime tout avant création` : `${e('btn_success')} ADD — ajoute sans supprimer`}`,
+    `**Emojis :** ${includeEmojis ? `${e('btn_success')} Oui` : 'Non'}`,
     '',
     '**Va créer :**',
     `• ${template.categories?.length || 0} catégories`,
     `• ${totalCh} salons`,
     `• ${template.roles?.length || 0} rôles`,
     '',
-    ...(reset ? ['⚠️ **ATTENTION :** Toute la structure actuelle sera **SUPPRIMÉE** avant création. Action **irréversible**.', ''] : []),
+    ...(reset ? [`${e('ui_alert')} **ATTENTION :** Toute la structure actuelle sera **SUPPRIMÉE** avant création. Action **irréversible**.`, ''] : []),
     `Durée estimée : ~${estSecs}s`,
   ];
 

@@ -4,6 +4,7 @@ const { EmbedBuilder } = require('discord.js');
 const { db, getGuildSettings, setGuildSetting } = require('../../database');
 const { parseDays, formatDate } = require('../../utils/format');
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 
 /*
  * Commande unifiée ;role pour le module stats :
@@ -115,9 +116,9 @@ async function handleAncient(message, args, guildId, client) {
 
     const embed = new EmbedBuilder()
       .setColor(E.COLORS.PRIMARY)
-      .setTitle('👑  Rôles Anciens — Paliers')
+      .setTitle(`${e('cat_owner')}  Rôles Anciens — Paliers`)
       .setDescription(lines.join('\n'))
-      .addFields({ name: 'Mode', value: isCumul ? '✅ Cumulatif (garder les anciens rôles)' : '🔄 Non-cumulatif (remplacer)', inline: true })
+      .addFields({ name: 'Mode', value: isCumul ? `${e('btn_success')} Cumulatif (garder les anciens rôles)` : 'Non-cumulatif (remplacer)', inline: true })
       .setTimestamp();
 
     return message.reply({ embeds: [embed] });
@@ -162,7 +163,7 @@ async function handleAncient(message, args, guildId, client) {
 
     db.prepare('UPDATE ancient_roles SET cumulative = ? WHERE guild_id = ?').run(newCumul, guildId);
 
-    return message.reply({ embeds: [E.success('Mode cumulatif', newCumul ? '✅ Activé — les anciens rôles seront conservés.' : '🔄 Désactivé — seul le rôle le plus élevé sera conservé.')] });
+    return message.reply({ embeds: [E.success('Mode cumulatif', newCumul ? 'Activé — les anciens rôles seront conservés.' : 'Désactivé — seul le rôle le plus élevé sera conservé.')] });
   }
 
   // ── check (assigner manuellement) ─────────────────────────────────────────

@@ -1,6 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 const { version } = require('../../../package.json');
 
 function formatUptime(ms) {
@@ -39,15 +40,15 @@ module.exports = {
           E.base()
             .setTitle('Statut du bot')
             .addFields(
-              { name: '🏓 Latence',       value: `${ping}ms`,    inline: true },
-              { name: '⏱️ Uptime',         value: uptime,         inline: true },
-              { name: '📦 Version',        value: `v${version}`,  inline: true },
-              { name: '🌐 Serveurs',       value: `${guilds}`,    inline: true },
-              { name: '👥 Utilisateurs',   value: `${users}`,     inline: true },
-              { name: '⌨️ Commandes',      value: `${cmds}`,      inline: true },
-              { name: '🧠 Heap mémoire',   value: `${heapMB} MB`, inline: true },
-              { name: '💾 RSS mémoire',    value: `${rssMB} MB`,  inline: true },
-              { name: '🟢 Node.js',        value: process.version, inline: true },
+              { name: `${e('ui_ping')} Latence`,        value: `${ping}ms`,    inline: true },
+              { name: 'Uptime',                          value: uptime,         inline: true },
+              { name: 'Version',                         value: `v${version}`,  inline: true },
+              { name: `${e('ani_world')} Serveurs`,      value: `${guilds}`,    inline: true },
+              { name: `${e('ui_members')} Utilisateurs`, value: `${users}`,     inline: true },
+              { name: 'Commandes',                       value: `${cmds}`,      inline: true },
+              { name: 'Heap mémoire',                    value: `${heapMB} MB`, inline: true },
+              { name: 'RSS mémoire',                     value: `${rssMB} MB`,  inline: true },
+              { name: 'Node.js',                         value: process.version, inline: true },
             ),
         ],
       });

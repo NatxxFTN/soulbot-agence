@@ -8,8 +8,6 @@ const {
 const { e } = require('../../core/emojis');
 const storage = require('../../core/bump-storage');
 
-const MEDALS = ['🥇', '🥈', '🥉'];
-
 module.exports = {
   name       : 'bumpstats',
   aliases    : ['bstats', 'bumpinfo'],
@@ -89,7 +87,7 @@ module.exports = {
         new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small),
       );
       const topText = topAll
-        .map((t, i) => `${MEDALS[i]} <@${t.user_id}> — **${t.count}** bump${t.count > 1 ? 's' : ''}`)
+        .map((t, i) => `**${i + 1}.** <@${t.user_id}> — **${t.count}** bump${t.count > 1 ? 's' : ''}`)
         .join('\n');
       container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
@@ -101,7 +99,7 @@ module.exports = {
     // ── Top 3 du mois ───────────────────────────────────────────────────────
     if (topMonth.length > 0) {
       const topText = topMonth
-        .map((t, i) => `${MEDALS[i]} <@${t.user_id}> — **${t.count}** bump${t.count > 1 ? 's' : ''}`)
+        .map((t, i) => `**${i + 1}.** <@${t.user_id}> — **${t.count}** bump${t.count > 1 ? 's' : ''}`)
         .join('\n');
       container.addTextDisplayComponents(
         new TextDisplayBuilder().setContent(

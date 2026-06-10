@@ -58,8 +58,8 @@ module.exports = {
       ));
     } else {
       const lines = members.map((m, i) => {
-        const mic  = m.voice.selfMute  || m.voice.serverMute  ? '🔇' : '🎤';
-        const deaf = m.voice.selfDeaf  || m.voice.serverDeaf  ? '🔕' : '';
+        const mic  = m.voice.selfMute  || m.voice.serverMute  ? '`muet`' : e('ui_mic');
+        const deaf = m.voice.selfDeaf  || m.voice.serverDeaf  ? ' `sourdine`' : '';
         return `\`${String(i + 1).padStart(2, '0')}.\` ${mic}${deaf} ${m}`;
       });
       ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(lines.join('\n')));

@@ -46,7 +46,7 @@ module.exports = {
           .setDescription(`${visible}${more}`)
           .addFields(
             { name: 'Total',  value: `${participants.length}`, inline: true },
-            { name: 'Statut', value: gw.ended ? '🔒 Terminé' : '🟢 En cours', inline: true },
+            { name: 'Statut', value: gw.ended ? `${e('ui_lock')} Terminé` : `${e('btn_success')} En cours`, inline: true },
           ),
       ],
     });

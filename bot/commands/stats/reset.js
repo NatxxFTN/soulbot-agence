@@ -3,6 +3,7 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const { db } = require('../../database');
 const E = require('../../utils/embeds');
+const { e, forButton } = require('../../core/emojis');
 
 /*
  * ;reset all stats
@@ -32,7 +33,7 @@ module.exports = {
 
     const confirmEmbed = new EmbedBuilder()
       .setColor(E.COLORS.ERROR)
-      .setTitle('⚠️  Confirmation requise')
+      .setTitle(`${e('ui_alert')}  Confirmation requise`)
       .setDescription(
         `Tu es sur le point de supprimer **toutes** les statistiques de ${message.guild.name} :\n\n` +
         `• **${statsCount}** entrées utilisateur\n` +
@@ -42,8 +43,8 @@ module.exports = {
       .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder().setCustomId('confirm_reset').setLabel('✅ Confirmer').setStyle(ButtonStyle.Danger),
-      new ButtonBuilder().setCustomId('cancel_reset').setLabel('❌ Annuler').setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder().setCustomId('confirm_reset').setLabel('Confirmer').setEmoji(forButton('btn_success')).setStyle(ButtonStyle.Danger),
+      new ButtonBuilder().setCustomId('cancel_reset').setLabel('Annuler').setStyle(ButtonStyle.Secondary),
     );
 
     const reply = await message.reply({ embeds: [confirmEmbed], components: [row] });

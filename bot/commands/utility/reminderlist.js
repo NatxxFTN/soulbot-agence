@@ -34,7 +34,7 @@ module.exports = {
       const lines = list.slice(0, 15).map(r => {
         const t = Math.floor(r.trigger_at / 1000);
         const preview = (r.message_content || '').slice(0, 60);
-        const rec = r.recurring ? ` · 🔁 ${r.recurring}` : '';
+        const rec = r.recurring ? ` · ${e('btn_calendar')} ${r.recurring}` : '';
         const state = r.enabled ? '' : ' · *désactivé*';
         return `**#${r.id}** · <t:${t}:R>${rec}${state} · ${preview}`;
       });

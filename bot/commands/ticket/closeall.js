@@ -2,6 +2,7 @@
 
 const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 const { getOpenTickets, closeTicket, getConfig, logAction } = require('../../core/ticket-helper');
 
 module.exports = {
@@ -42,7 +43,7 @@ module.exports = {
       }
     }
 
-    await logAction(message.guild, config, `🔒 Mass close par ${message.author.tag} — ${success} ticket(s) fermé(s)`);
+    await logAction(message.guild, config, `${e('ui_lock')} Mass close par ${message.author.tag} — ${success} ticket(s) fermé(s)`);
 
     return message.channel.send({
       embeds: [

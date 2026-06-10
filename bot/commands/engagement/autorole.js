@@ -1,6 +1,7 @@
 'use strict';
 
 const E = require('../../utils/embeds');
+const { e } = require('../../core/emojis');
 const { db } = require('../../database');
 
 const STMT_LIST = db.prepare('SELECT role_id FROM guild_autoroles WHERE guild_id = ?');
@@ -26,7 +27,7 @@ module.exports = {
     if (sub === 'list') {
       const rows = STMT_LIST.all(guildId);
       const lines = rows.length ? rows.map(r => `<@&${r.role_id}>`).join('\n') : '_aucun_';
-      return message.reply({ embeds: [E.base().setTitle('🎭 Autoroles').setDescription(lines)] });
+      return message.reply({ embeds: [E.base().setTitle(`${e('cat_configuration')} Autoroles`).setDescription(lines)] });
     }
 
     if (sub === 'add' || sub === 'remove') {
