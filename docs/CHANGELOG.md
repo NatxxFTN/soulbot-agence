@@ -6,6 +6,32 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Unreleased]
 
+### Added — Studio /botconfig V5 + V6 « Total Control » (12 juin 2026)
+Personnalisation totale du bot — voir [botconfig-studio.md](botconfig-studio.md).
+
+- **Studio 7 onglets Components V2** (`;botconfig`) : Identité / Profil Bot /
+  Thème / Tarifs / Presets / Historique / Aperçu — ancien panel conservé
+  via `;botconfig legacy`
+- **Draft state** : zéro write DB avant « Appliquer », apply = transaction
+  better-sqlite3, side effects Discord tentés AVANT le write (jamais d'état
+  fantôme)
+- **Thème hérité par serveur** : `themed(guildId)` dans response-builder —
+  couleurs primaire/accent + **couleurs ET emojis sémantiques**
+  (succès/erreur/warning/info) surchargeables par serveur, cache 60 s
+- **Profil global du bot** (BotOwner) : bio, bannière de profil, username,
+  présence complète (statut/activité/texte/URL stream) **persistée dans
+  `bot_profile` et restaurée au démarrage**
+- **Presets** (10/serveur), **historique d'assets** FIFO 20, **audit trail**
+  `bot_config_log` avec rollback granulaire 1-clic
+- **SecOps** : validateurs centraux (hex strict, https+extensions only,
+  anti `data:`/`javascript:`, username anti-`@#:discord`), rate-limits
+  avatar/username/bannière 2/h, allowlists de colonnes
+- **DB** : `guild_bot_config` +15 colonnes (V5+V6), `bot_profile`,
+  `bot_presets`, `bot_assets_history`, `bot_config_log`,
+  `bot_pricing` +`is_default`/`display_order` — migrations idempotentes
+- **Tests** : `scripts/test-botconfig-v5.js` — 78/78 offline
+- Commits : `9864f18` (V5), `e456d32` (V6) — validation Discord en attente
+
 ## [2.0.0] — 2026-04-24 — "Logs Ultimate"
 
 **Saut majeur de version 1.0.0 → 2.0.0.** Justification (ADR) : arrivée de
