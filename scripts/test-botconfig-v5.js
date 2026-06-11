@@ -170,6 +170,65 @@ check('themed minimal sans footer', (() => {
   return embed.data.footer === undefined;
 })());
 
+// ─── 6. V6 : validateurs profil + couleurs/emojis sémantiques ────────────────
+console.log('\n── V6 : validateurs profil global ──');
+
+check('bio 400 max', !V.validateBio('x'.repeat(401)).ok && V.validateBio('Soulbot, le bot magenta.').ok);
+check('bio vide → null', V.validateBio('').value === null);
+check('presence_text 128 max', !V.validatePresenceText('x'.repeat(129)).ok);
+check('status dnd ok', V.validatePresenceStatus('dnd').ok);
+check('status inconnu rejeté', !V.validatePresenceStatus('away').ok);
+check('type streaming ok', V.validatePresenceType('streaming').ok);
+check('type inconnu rejeté', !V.validatePresenceType('vibing').ok);
+check('stream url twitch ok', V.validateStreamUrl('https://twitch.tv/natxxftn').ok);
+check('stream url www.twitch ok', V.validateStreamUrl('https://www.twitch.tv/natxxftn').ok);
+check('stream url http rejetée', !V.validateStreamUrl('http://twitch.tv/x').ok);
+check('stream url autre domaine rejetée', !V.validateStreamUrl('https://evil.com/x').ok);
+check('username 2-32', !V.validateUsername('x').ok && V.validateUsername('Soulbot Ultra').ok);
+check('username "discord" rejeté', !V.validateUsername('DiscordBot').ok);
+check('username @ rejeté', !V.validateUsername('soul@bot').ok);
+
+console.log('\n── V6 : couleurs/emojis sémantiques + profil DB ──');
+
+// Couleurs sémantiques par serveur → thème.
+GC.applyIdentityDraft(TEST_GUILD, {
+  color_success: '11AA22', emoji_error_id: '999888777666555444',
+}, TEST_USER);
+RB.invalidateTheme(TEST_GUILD);
+const themeV6 = RB.getTheme(TEST_GUILD);
+check('color_success héritée', themeV6.success === 0x11AA22);
+check('color_error défaut charte', themeV6.error === 0xFF3333);
+check('emoji_error override', themeV6.emojis.error === '999888777666555444');
+check('emoji_success défaut null', themeV6.emojis.success === null);
+check('themed().errorEmbed emoji override', (() => {
+  const embed = RB.themed(TEST_GUILD).errorEmbed('Oups', 'x');
+  return embed.data.title.startsWith('<:_:999888777666555444>');
+})());
+check('themed().successEmbed couleur héritée', RB.themed(TEST_GUILD).successEmbed('Ok', 'x').data.color === 0x11AA22);
+
+// Profil global : apply + journal + buildPresence.
+const BP = require('../bot/core/bot-profile');
+const beforeProfile = BP.getBotProfile();
+const pchanged = BP.applyProfileDraft(
+  { bio: 'Bot de test V6', presence_status: 'idle', presence_type: 'watching', presence_text: 'les tests passer' },
+  TEST_USER, TEST_GUILD,
+);
+check('applyProfileDraft 4 champs', pchanged.length === 4);
+check('profil persisté', BP.getBotProfile().presence_status === 'idle');
+check('journal profile: préfixé', GC.getConfigLog(TEST_GUILD, 10).some((l) => l.field === 'profile:bio'));
+
+const presence = BP.buildPresence();
+check('buildPresence status', presence.status === 'idle');
+check('buildPresence texte', presence.activities[0].name === 'les tests passer');
+
+// Restore : on remet le profil d'avant les tests (champ par champ).
+BP.applyProfileDraft({
+  bio: beforeProfile.bio, presence_status: beforeProfile.presence_status ?? 'online',
+  presence_type: beforeProfile.presence_type ?? 'custom', presence_text: beforeProfile.presence_text,
+}, TEST_USER, TEST_GUILD);
+const defaultPresence = BP.buildPresence({ presence_status: null, presence_type: null, presence_text: null });
+check('buildPresence défaut = Version x.y.z', defaultPresence.activities[0].name.startsWith('Version '));
+
 // ─── Nettoyage final + bilan ──────────────────────────────────────────────────
 cleanup();
 RB.invalidateTheme();

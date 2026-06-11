@@ -33,6 +33,7 @@ const { isOwner } = require('../../core/permissions');
 
 const TABS = [
   { key: 'identity', label: 'Identité',   emojiName: 'ui_user' },
+  { key: 'profile',  label: 'Profil Bot', emojiName: 'cat_owner' },
   { key: 'theme',    label: 'Thème',      emojiName: 'ui_bulb' },
   { key: 'pricing',  label: 'Tarifs',     emojiName: 'ani_coin' },
   { key: 'presets',  label: 'Presets',    emojiName: 'ui_folder' },
@@ -42,17 +43,41 @@ const TABS = [
 
 // Libellés FR des champs — affichage draft + historique.
 const FIELD_LABELS = {
-  nickname       : 'Nickname',
-  banner_url     : 'Bannière',
-  embed_color    : 'Couleur primaire',
-  accent_color   : 'Couleur accent',
-  theme_name     : 'Thème',
-  avatar_url     : 'Avatar (global)',
-  footer_text    : 'Footer',
-  footer_icon_url: 'Icône footer',
-  embed_style    : 'Style d\'embed',
-  brand_emoji_id : 'Emoji de marque',
-  prefix         : 'Prefix',
+  nickname         : 'Nickname',
+  banner_url       : 'Bannière',
+  embed_color      : 'Couleur primaire',
+  accent_color     : 'Couleur accent',
+  theme_name       : 'Thème',
+  avatar_url       : 'Avatar (global)',
+  footer_text      : 'Footer',
+  footer_icon_url  : 'Icône footer',
+  embed_style      : 'Style d\'embed',
+  brand_emoji_id   : 'Emoji de marque',
+  prefix           : 'Prefix',
+  // V6 — couleurs + emojis sémantiques
+  color_success    : 'Couleur succès',
+  color_error      : 'Couleur erreur',
+  color_warning    : 'Couleur warning',
+  color_info       : 'Couleur info',
+  emoji_success_id : 'Emoji succès',
+  emoji_error_id   : 'Emoji erreur',
+  emoji_warning_id : 'Emoji warning',
+  emoji_info_id    : 'Emoji info',
+  // V6 — profil global (préfixe 'profile:' dans l'historique)
+  'profile:bio'            : 'Bio du bot',
+  'profile:banner_url'     : 'Bannière de profil',
+  'profile:presence_status': 'Statut',
+  'profile:presence_type'  : 'Type d\'activité',
+  'profile:presence_text'  : 'Texte d\'activité',
+  'profile:presence_url'   : 'URL de stream',
+  'profile:username'       : 'Username',
+};
+
+// Libellés courts profil (clés sans préfixe — draft.profile).
+const PROFILE_LABELS = {
+  bio: 'Bio', banner_url: 'Bannière de profil', presence_status: 'Statut',
+  presence_type: 'Type d\'activité', presence_text: 'Texte d\'activité',
+  presence_url: 'URL de stream', username: 'Username',
 };
 
 function _fmtValue(field, value) {
@@ -90,9 +115,9 @@ function renderStudio(guild, tab = 'identity', draft = null, viewerId = null) {
   );
   container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
 
-  // Navigation : 6 onglets sur 2 rows de 3 — actif en Primary.
-  const navRows = [0, 3].map((start) => new ActionRowBuilder().addComponents(
-    TABS.slice(start, start + 3).map((t) => {
+  // Navigation : 7 onglets sur 2 rows (4 + 3) — actif en Primary.
+  const navRows = [[0, 4], [4, 7]].map(([start, end]) => new ActionRowBuilder().addComponents(
+    TABS.slice(start, end).map((t) => {
       const btn = new ButtonBuilder()
         .setCustomId(`botconfig:studio:tab:${t.key}`)
         .setLabel(t.label)
@@ -109,6 +134,7 @@ function renderStudio(guild, tab = 'identity', draft = null, viewerId = null) {
   // Corps de l'onglet actif.
   const body = {
     identity: _identityBody,
+    profile : _profileBody,
     theme   : _themeBody,
     pricing : _pricingBody,
     presets : _presetsBody,
@@ -120,8 +146,10 @@ function renderStudio(guild, tab = 'identity', draft = null, viewerId = null) {
   container.addTextDisplayComponents(new TextDisplayBuilder().setContent(text));
   for (const row of rows) container.addActionRowComponents(row);
 
-  // Barre de draft : visible dès qu'une modif est en attente.
-  const pendingCount = Object.keys(draft?.fields ?? {}).length + (draft?.prefix != null ? 1 : 0);
+  // Barre de draft : visible dès qu'une modif est en attente (guild + profil).
+  const pendingCount = Object.keys(draft?.fields ?? {}).length
+    + Object.keys(draft?.profile ?? {}).length
+    + (draft?.prefix != null ? 1 : 0);
   if (pendingCount > 0) {
     container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
     container.addTextDisplayComponents(
@@ -208,10 +236,24 @@ function _themeBody(guild, cfg, draft) {
   const footerT = _effective('footer_text', draft, cfg);
   const emojiId = _effective('brand_emoji_id', draft, cfg);
 
+  // V6 — couleurs + emojis sémantiques (null = charte Soulbot).
+  const semColor = (f, def) => {
+    const v = _effective(f, draft, cfg);
+    return v ? `\`#${v}\`` : `*${def}*`;
+  };
+  const semEmoji = (f, fallbackName) => {
+    const v = _effective(f, draft, cfg);
+    return v ? `<:_:${v}>` : e(fallbackName);
+  };
+
   const text =
     `${e('ui_bulb')} **Thème visuel** — hérité par TOUTES les commandes\n` +
     `> Thème : \`${themeNm}\` · Style : \`${style}\`\n` +
     `> Primaire : \`#${primary}\` · Accent : ${accent ? `\`#${accent}\`` : '*auto*'}\n` +
+    `> Succès : ${semEmoji('emoji_success_id', 'btn_success')} ${semColor('color_success', 'vert')} · ` +
+    `Erreur : ${semEmoji('emoji_error_id', 'ui_alert')} ${semColor('color_error', 'rouge')}\n` +
+    `> Warning : ${semEmoji('emoji_warning_id', 'btn_flag')} ${semColor('color_warning', 'orange')} · ` +
+    `Info : ${semEmoji('emoji_info_id', 'btn_tip')} ${semColor('color_info', 'bleu')}\n` +
     `> Footer : ${footerT ? `\`${footerT}\`` : '*Soulbot v' + version + '*'}\n` +
     `> Emoji de marque : ${emojiId ? `<:_:${emojiId}>` : '*aucun*'}`;
 
@@ -229,15 +271,87 @@ function _themeBody(guild, cfg, draft) {
       .setStyle(style === s ? ButtonStyle.Primary : ButtonStyle.Secondary)),
   );
 
-  const editRow = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId('botconfig:studio:edit:embed_color').setLabel('Couleur primaire').setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId('botconfig:studio:edit:accent_color').setLabel('Accent').setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId('botconfig:studio:edit:footer_text').setLabel('Footer').setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId('botconfig:studio:edit:brand_emoji_id').setLabel('Emoji').setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId('botconfig:studio:gallery:color').setLabel('↺ Couleurs').setStyle(ButtonStyle.Secondary),
+  // Tout le reste passe par UN select (limite Discord : 40 composants/message).
+  const editSelect = new ActionRowBuilder().addComponents(
+    new StringSelectMenuBuilder()
+      .setCustomId('botconfig:studio:editsel')
+      .setPlaceholder('Modifier un élément du thème…')
+      .addOptions([
+        { label: 'Couleur primaire',   value: 'embed_color',      description: `Actuel : #${primary}` },
+        { label: 'Couleur accent',     value: 'accent_color',     description: accent ? `Actuel : #${accent}` : 'Auto' },
+        { label: 'Couleur succès',     value: 'color_success',    description: 'Embeds de confirmation' },
+        { label: 'Couleur erreur',     value: 'color_error',      description: 'Embeds d\'erreur / refus' },
+        { label: 'Couleur warning',    value: 'color_warning',    description: 'Embeds d\'avertissement' },
+        { label: 'Couleur info',       value: 'color_info',       description: 'Embeds d\'information' },
+        { label: 'Emoji succès',       value: 'emoji_success_id', description: 'Remplace l\'emoji de confirmation' },
+        { label: 'Emoji erreur',       value: 'emoji_error_id',   description: 'Remplace l\'emoji d\'erreur' },
+        { label: 'Emoji warning',      value: 'emoji_warning_id', description: 'Remplace l\'emoji d\'avertissement' },
+        { label: 'Emoji info',         value: 'emoji_info_id',    description: 'Remplace l\'emoji d\'information' },
+        { label: 'Emoji de marque',    value: 'brand_emoji_id',   description: 'Affiché en tête des panels' },
+        { label: 'Texte du footer',    value: 'footer_text',      description: footerT ?? 'Soulbot v' + version },
+        { label: 'Icône du footer',    value: 'footer_icon_url',  description: 'Petite image 64×64' },
+        { label: 'Galerie des anciennes couleurs', value: 'gallery:color', description: 'Restaurer une couleur passée' },
+      ]),
   );
 
-  return { text: text, rows: [presetRow, styleRow, editRow] };
+  return { text, rows: [presetRow, styleRow, editSelect] };
+}
+
+// ─── Onglet Profil Bot (GLOBAL — BotOwner) ────────────────────────────────────
+
+function _profileBody(guild, cfg, draft, viewerId) {
+  const { getBotProfile } = require('../../core/bot-profile');
+  const profile = getBotProfile() ?? {};
+  const owner   = isOwner(viewerId);
+
+  const eff = (f) => (draft?.profile && f in draft.profile) ? draft.profile[f] : profile[f] ?? null;
+  const status = eff('presence_status') ?? 'online';
+  const ptype  = eff('presence_type') ?? 'custom';
+  const ptext  = eff('presence_text');
+  const bio    = eff('bio');
+
+  const STATUS_LABELS = { online: 'En ligne', idle: 'Inactif', dnd: 'Ne pas déranger', invisible: 'Invisible' };
+  const TYPE_LABELS   = { playing: 'Joue à', watching: 'Regarde', listening: 'Écoute', competing: 'En compétition', streaming: 'Streame', custom: 'Custom' };
+
+  const text =
+    `${e('cat_owner')} **Profil global du bot** — s'applique sur TOUS les serveurs ${owner ? '' : '*(lecture seule — BotOwner requis)*'}\n` +
+    `> Bio : ${bio ? `\`${bio.slice(0, 80)}${bio.length > 80 ? '…' : ''}\`` : '*vide*'}\n` +
+    `> Bannière de profil : ${_fmtValue('banner_url', eff('banner_url'))}\n` +
+    `> Statut : **${STATUS_LABELS[status] ?? status}** · Activité : **${TYPE_LABELS[ptype] ?? ptype}** ${ptext ? `\`${ptext}\`` : '*Version ' + version + '*'}\n` +
+    `> Username : **${guild.client?.user?.username ?? 'Soulbot'}**`;
+
+  if (!owner) return { text, rows: [] };
+
+  const statusRow = new ActionRowBuilder().addComponents(
+    Object.entries(STATUS_LABELS).map(([key, label]) => new ButtonBuilder()
+      .setCustomId(`botconfig:studio:pstatus:${key}`)
+      .setLabel(label)
+      .setStyle(status === key ? ButtonStyle.Primary : ButtonStyle.Secondary)),
+  );
+
+  const typeSelect = new ActionRowBuilder().addComponents(
+    new StringSelectMenuBuilder()
+      .setCustomId('botconfig:studio:ptype')
+      .setPlaceholder(`Type d'activité : ${TYPE_LABELS[ptype] ?? ptype}`)
+      .addOptions(Object.entries(TYPE_LABELS).map(([key, label]) => ({
+        label, value: key, default: ptype === key,
+      }))),
+  );
+
+  const editSelect = new ActionRowBuilder().addComponents(
+    new StringSelectMenuBuilder()
+      .setCustomId('botconfig:studio:peditsel')
+      .setPlaceholder('Modifier le profil…')
+      .addOptions([
+        { label: 'Bio ("À propos de moi")', value: 'bio',           description: '400 caractères max' },
+        { label: 'Texte d\'activité',       value: 'presence_text', description: 'Affiché sous le nom du bot' },
+        { label: 'Bannière de profil',      value: 'banner_url',    description: 'Image en haut du profil du bot' },
+        { label: 'URL de stream',           value: 'presence_url',  description: 'Twitch/YouTube — type Streame' },
+        { label: 'Username global',         value: 'username',      description: 'Rate-limit Discord 2/h — prudence' },
+      ]),
+  );
+
+  return { text, rows: [statusRow, typeSelect, editSelect] };
 }
 
 // ─── Onglet Tarifs ────────────────────────────────────────────────────────────
@@ -381,11 +495,20 @@ function _buildPreviewContainer(guild, cfg, draft) {
     new TextDisplayBuilder().setContent(`${brand}**${nick} — Démo du thème**`),
   );
   if (style !== 'compact') {
+    const semEmoji = (f, fallbackName) => {
+      const v = _effective(f, draft, cfg);
+      return v ? `<:_:${v}>` : e(fallbackName);
+    };
+    const semHex = (f, def) => `#${(_effective(f, draft, cfg) ?? def).toUpperCase()}`;
     preview.addTextDisplayComponents(
       new TextDisplayBuilder().setContent(
         'Voici à quoi ressemblera chaque réponse du bot sur ce serveur.\n' +
         `> Couleur primaire : \`#${String(primary).toUpperCase()}\`\n` +
-        `> Style : \`${style}\``,
+        `> Style : \`${style}\`\n` +
+        `> ${semEmoji('emoji_success_id', 'btn_success')} Succès \`${semHex('color_success', '00C851')}\` · ` +
+        `${semEmoji('emoji_error_id', 'ui_alert')} Erreur \`${semHex('color_error', 'FF3333')}\`\n` +
+        `> ${semEmoji('emoji_warning_id', 'btn_flag')} Warning \`${semHex('color_warning', 'FF8800')}\` · ` +
+        `${semEmoji('emoji_info_id', 'btn_tip')} Info \`${semHex('color_info', '5865F2')}\``,
       ),
     );
   }
@@ -403,4 +526,4 @@ function _buildPreviewContainer(guild, cfg, draft) {
   return preview;
 }
 
-module.exports = { renderStudio, TABS, FIELD_LABELS };
+module.exports = { renderStudio, TABS, FIELD_LABELS, PROFILE_LABELS };

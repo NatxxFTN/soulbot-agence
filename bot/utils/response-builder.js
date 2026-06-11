@@ -306,6 +306,8 @@ function getTheme(guildId) {
   const fallback = {
     primary: COLORS.primary, accent: COLORS.info, footerText: null,
     footerIconURL: null, embedStyle: 'rich', brandEmojiId: null, bannerURL: null,
+    success: COLORS.success, error: COLORS.error, warning: COLORS.warning, info: COLORS.info,
+    emojis : { success: null, error: null, warning: null, info: null },
   };
   if (!guildId) return fallback;
 
@@ -324,6 +326,18 @@ function getTheme(guildId) {
     embedStyle   : cfg.embed_style ?? 'rich',
     brandEmojiId : cfg.brand_emoji_id ?? null,
     bannerURL    : cfg.banner_url ?? null,
+    // V6 — couleurs sémantiques surchargées par serveur (null = charte).
+    success      : _hexToInt(cfg.color_success) ?? COLORS.success,
+    error        : _hexToInt(cfg.color_error)   ?? COLORS.error,
+    warning      : _hexToInt(cfg.color_warning) ?? COLORS.warning,
+    info         : _hexToInt(cfg.color_info)    ?? COLORS.info,
+    // V6 — emojis sémantiques surchargés par serveur (null = emojis Soulbot).
+    emojis: {
+      success: cfg.emoji_success_id ?? null,
+      error  : cfg.emoji_error_id   ?? null,
+      warning: cfg.emoji_warning_id ?? null,
+      info   : cfg.emoji_info_id    ?? null,
+    },
   };
   _themeCache.set(guildId, { data, ts: Date.now() });
   return data;
@@ -354,25 +368,28 @@ function _themedBase(color, theme) {
 /**
  * Builders sémantiques liés au thème d'un serveur.
  * Usage : const T = themed(guild.id); T.primaryEmbed('Titre', '...').
- * Les couleurs sémantiques (succès/erreur/warn) restent fixes — seuls
- * primary/accent/footer/style héritent de la personnalisation.
+ * V6 : TOUT hérite de la personnalisation — primary/accent/footer/style
+ * ET les couleurs + emojis sémantiques (succès/erreur/warn/info).
  * @param {?string} guildId
  */
 function themed(guildId) {
   const theme = getTheme(guildId);
-  const make = (color, emojiName) => (title, description, fields = []) => {
+  // Emoji sémantique : surcharge serveur (<:_:id>) sinon emoji Soulbot.
+  const sem = (kind, fallbackName) =>
+    theme.emojis?.[kind] ? `<:_:${theme.emojis[kind]}>` : e(fallbackName);
+  const make = (color, emojiStr) => (title, description, fields = []) => {
     const embed = _themedBase(color, theme).setDescription(description ?? null);
-    if (title) embed.setTitle(emojiName ? `${e(emojiName)} ${title}` : title);
+    if (title) embed.setTitle(emojiStr ? `${emojiStr} ${title}` : title);
     return applyFields(embed, fields);
   };
   return {
     theme,
     primaryEmbed: make(theme.primary, null),
     accentEmbed : make(theme.accent, null),
-    successEmbed: make(COLORS.success, 'btn_success'),
-    errorEmbed  : make(COLORS.error, 'ui_alert'),
-    infoEmbed   : make(theme.accent, 'btn_tip'),
-    warningEmbed: make(COLORS.warning, 'btn_flag'),
+    successEmbed: make(theme.success, sem('success', 'btn_success')),
+    errorEmbed  : make(theme.error,   sem('error',   'ui_alert')),
+    infoEmbed   : make(theme.info,    sem('info',    'btn_tip')),
+    warningEmbed: make(theme.warning, sem('warning', 'btn_flag')),
   };
 }
 

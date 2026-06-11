@@ -120,25 +120,117 @@ function validatePrefix(input) {
   return { ok: true, value: raw };
 }
 
+/* ═══ V6 — profil global du bot ═══ */
+
+const PRESENCE_STATUSES = ['online', 'idle', 'dnd', 'invisible'];
+const PRESENCE_TYPES    = ['playing', 'watching', 'listening', 'competing', 'streaming', 'custom'];
+const STREAM_HOSTS_RE   = /(^|\.)?(twitch\.tv|youtube\.com)$/i;
+
+/** Bio "À propos de moi" de l'app : 400 caractères max (limite Discord). Vide → null. */
+function validateBio(input) {
+  const raw = String(input ?? '').trim();
+  if (!raw) return { ok: true, value: null };
+  if (raw.length > 400) {
+    return { ok: false, error: 'Bio trop longue — 400 caractères maximum (limite Discord).' };
+  }
+  return { ok: true, value: raw };
+}
+
+/** Texte d'activité (statut) : 128 caractères max. Vide → null (présence par défaut). */
+function validatePresenceText(input) {
+  const raw = String(input ?? '').trim();
+  if (!raw) return { ok: true, value: null };
+  if (raw.length > 128) {
+    return { ok: false, error: 'Texte de statut trop long — 128 caractères maximum.' };
+  }
+  return { ok: true, value: raw };
+}
+
+/** Statut de présence : online | idle | dnd | invisible. */
+function validatePresenceStatus(input) {
+  const raw = String(input ?? '').trim().toLowerCase();
+  if (!PRESENCE_STATUSES.includes(raw)) {
+    return { ok: false, error: `Statut inconnu — valeurs : ${PRESENCE_STATUSES.map(s => `\`${s}\``).join(' ')}.` };
+  }
+  return { ok: true, value: raw };
+}
+
+/** Type d'activité : playing | watching | listening | competing | streaming | custom. */
+function validatePresenceType(input) {
+  const raw = String(input ?? '').trim().toLowerCase();
+  if (!PRESENCE_TYPES.includes(raw)) {
+    return { ok: false, error: `Type inconnu — valeurs : ${PRESENCE_TYPES.map(t => `\`${t}\``).join(' ')}.` };
+  }
+  return { ok: true, value: raw };
+}
+
+/** URL de stream (présence streaming) : https + twitch.tv/youtube.com only. Vide → null. */
+function validateStreamUrl(input) {
+  const raw = String(input ?? '').trim();
+  if (!raw) return { ok: true, value: null };
+  let url;
+  try { url = new URL(raw); }
+  catch { return { ok: false, error: 'URL invalide — vérifie le format.' }; }
+  if (url.protocol !== 'https:' || !STREAM_HOSTS_RE.test(url.hostname.replace(/^www\./, ''))) {
+    return { ok: false, error: 'URL de stream invalide — **https** + `twitch.tv` ou `youtube.com` uniquement.' };
+  }
+  return { ok: true, value: url.href };
+}
+
+/** Username global du bot : 2-32 caractères, sans @ # : ``` ni "discord". */
+function validateUsername(input) {
+  const raw = String(input ?? '').trim();
+  if (raw.length < 2 || raw.length > 32) {
+    return { ok: false, error: 'Username invalide — 2 à 32 caractères.' };
+  }
+  if (/[@#:]|```/.test(raw) || /discord/i.test(raw)) {
+    return { ok: false, error: 'Username refusé par Discord — pas de `@` `#` `:` ni "discord" dans le nom.' };
+  }
+  return { ok: true, value: raw };
+}
+
 // Mapping champ identité → validateur, pour router les modals du Studio
 // sans switch géant dans le handler.
 const FIELD_VALIDATORS = {
-  nickname       : validateNickname,
+  nickname        : validateNickname,
+  banner_url      : validateImageUrl,
+  avatar_url      : validateImageUrl,
+  footer_icon_url : validateImageUrl,
+  embed_color     : validateHexColor,
+  accent_color    : validateHexColor,
+  footer_text     : validateFooterText,
+  embed_style     : validateEmbedStyle,
+  theme_name      : validateThemeName,
+  brand_emoji_id  : validateBrandEmoji,
+  // V6 — couleurs + emojis sémantiques par serveur
+  color_success   : validateHexColor,
+  color_error     : validateHexColor,
+  color_warning   : validateHexColor,
+  color_info      : validateHexColor,
+  emoji_success_id: validateBrandEmoji,
+  emoji_error_id  : validateBrandEmoji,
+  emoji_warning_id: validateBrandEmoji,
+  emoji_info_id   : validateBrandEmoji,
+};
+
+// Champs du profil GLOBAL du bot (onglet Profil Bot — BotOwner only).
+const PROFILE_VALIDATORS = {
+  bio            : validateBio,
   banner_url     : validateImageUrl,
-  avatar_url     : validateImageUrl,
-  footer_icon_url: validateImageUrl,
-  embed_color    : validateHexColor,
-  accent_color   : validateHexColor,
-  footer_text    : validateFooterText,
-  embed_style    : validateEmbedStyle,
-  theme_name     : validateThemeName,
-  brand_emoji_id : validateBrandEmoji,
+  presence_status: validatePresenceStatus,
+  presence_type  : validatePresenceType,
+  presence_text  : validatePresenceText,
+  presence_url   : validateStreamUrl,
+  username       : validateUsername,
 };
 
 module.exports = {
   EMBED_STYLES,
   THEME_NAMES,
+  PRESENCE_STATUSES,
+  PRESENCE_TYPES,
   FIELD_VALIDATORS,
+  PROFILE_VALIDATORS,
   validateHexColor,
   validateImageUrl,
   validateNickname,
@@ -148,4 +240,10 @@ module.exports = {
   validateBrandEmoji,
   validatePresetName,
   validatePrefix,
+  validateBio,
+  validatePresenceText,
+  validatePresenceStatus,
+  validatePresenceType,
+  validateStreamUrl,
+  validateUsername,
 };

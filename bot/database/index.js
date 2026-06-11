@@ -992,6 +992,42 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_cfglog_guild ON bot_config_log(guild_id, ts DESC);
 `);
 
+/* ═══ Studio /botconfig V6 — Total Control ──────────────────────────────────
+   Couleurs sémantiques + emojis sémantiques PAR SERVEUR (guild_bot_config),
+   profil GLOBAL du bot (bio, bannière, présence) dans bot_profile (singleton,
+   BotOwner only — persisté pour survivre aux restarts). */
+
+// ── ALTER guild_bot_config — couleurs + emojis sémantiques (idempotent) ─────
+const BOTCONFIG_V6_COLS = {
+  color_success   : 'TEXT',   // hex sans #, null = vert charte
+  color_error     : 'TEXT',   // null = rouge charte
+  color_warning   : 'TEXT',   // null = orange charte
+  color_info      : 'TEXT',   // null = bleu charte
+  emoji_success_id: 'TEXT',   // emoji custom du serveur, null = btn_success
+  emoji_error_id  : 'TEXT',   // null = ui_alert
+  emoji_warning_id: 'TEXT',   // null = btn_flag
+  emoji_info_id   : 'TEXT',   // null = btn_tip
+};
+for (const [col, type] of Object.entries(BOTCONFIG_V6_COLS)) {
+  try { db.exec(`ALTER TABLE guild_bot_config ADD COLUMN ${col} ${type}`); } catch { /* déjà présent */ }
+}
+
+// ── bot_profile — profil global du bot (ligne unique id=1) ──────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS bot_profile (
+    id              INTEGER PRIMARY KEY CHECK (id = 1),
+    bio             TEXT,                       -- "À propos de moi" de l'app
+    banner_url      TEXT,                       -- bannière du PROFIL du bot
+    presence_status TEXT DEFAULT 'online',      -- online | idle | dnd | invisible
+    presence_type   TEXT DEFAULT 'custom',      -- playing|watching|listening|competing|streaming|custom
+    presence_text   TEXT,                       -- null = "Version x.y.z" par défaut
+    presence_url    TEXT,                       -- URL stream (type streaming uniquement)
+    updated_at      INTEGER DEFAULT (unixepoch()),
+    updated_by      TEXT
+  );
+  INSERT OR IGNORE INTO bot_profile (id) VALUES (1);
+`);
+
 /* ═══ Modération avancée — v2.1.2 (Sécurité V4) ─────────────────────────────
    global_blacklist : bannis de TOUS les serveurs Soulbot (BotOwner only).
    softmute_history : rôles sauvegardés pour restauration via ;unsoftmute. */

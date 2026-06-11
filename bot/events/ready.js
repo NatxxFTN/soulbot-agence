@@ -1,6 +1,6 @@
 'use strict';
 
-const { ActivityType, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType: DjsChannelType } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType: DjsChannelType } = require('discord.js');
 const { ensureGuild }  = require('../database');
 const E                = require('../utils/embeds');
 
@@ -22,12 +22,9 @@ module.exports = {
     const { reload: reloadEmojis } = require('../core/emojis');
     reloadEmojis();
 
-    // Présence
-    const { version } = require('../../package.json');
-    client.user.setPresence({
-      activities : [{ name: `Version ${version}`, type: ActivityType.Custom }],
-      status     : 'online',
-    });
+    // Présence — restaurée depuis bot_profile (Studio V6) ; sans config
+    // stockée, retombe sur "Version x.y.z" comme avant.
+    require('../core/bot-profile').applyPresence(client);
 
     // Initialiser chaque guilde en base
     for (const guild of client.guilds.cache.values()) {

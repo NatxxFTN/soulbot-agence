@@ -14,8 +14,10 @@
 const { PermissionFlagsBits, MessageFlags } = require('discord.js');
 const logger = require('../../utils/logger');
 const { editableModal } = require('../../utils/panels-v4');
-const { renderStudio, FIELD_LABELS } = require('../panels/botconfig-studio');
-const { FIELD_VALIDATORS, validatePrefix, validatePresetName } = require('../../utils/config-validators');
+const { renderStudio, FIELD_LABELS, PROFILE_LABELS } = require('../panels/botconfig-studio');
+const {
+  FIELD_VALIDATORS, PROFILE_VALIDATORS, validatePrefix, validatePresetName,
+} = require('../../utils/config-validators');
 const { invalidateTheme, THEME_PRESETS } = require('../../utils/response-builder');
 const { getGuildSettings, setGuildSetting } = require('../../database');
 const {
@@ -23,6 +25,9 @@ const {
   getAssetHistory, getConfigLog,
   listPresets, getPreset, savePreset, duplicatePreset, deletePreset, setActivePreset,
 } = require('../../core/guild-config');
+const {
+  getBotProfile, applyProfileDraft, applyPresence, applyBio, applyBotBanner,
+} = require('../../core/bot-profile');
 const pricing = require('../../core/pricing');
 const { isOwner } = require('../../core/permissions');
 
@@ -43,9 +48,10 @@ function getDraft(guildId, userId) {
 function ensureDraft(guildId, userId) {
   let d = getDraft(guildId, userId);
   if (!d) {
-    d = { fields: {}, prefix: null, tab: 'identity', ts: Date.now() };
+    d = { fields: {}, profile: {}, prefix: null, tab: 'identity', ts: Date.now() };
     _drafts.set(_draftKey(guildId, userId), d);
   }
+  if (!d.profile) d.profile = {}; // drafts V5 résiduels
   d.ts = Date.now();
   return d;
 }
@@ -74,6 +80,17 @@ function avatarRateLimited() {
   return _avatarChanges.length >= AVATAR_MAX;
 }
 
+// Username et bannière de profil : mêmes limites Discord (~2/h chacun).
+let _usernameChanges = [];
+let _bannerChanges   = [];
+
+function _rateLimited(arr) {
+  const now = Date.now();
+  const kept = arr.filter((t) => now - t < AVATAR_WINDOW);
+  arr.length = 0; arr.push(...kept);
+  return kept.length >= AVATAR_MAX;
+}
+
 // ─── Helpers réponse ──────────────────────────────────────────────────────────
 
 function _ephemeral(content) {
@@ -91,15 +108,32 @@ async function _rerender(interaction, tab, draft) {
 
 // Modals d'édition par champ : placeholder + valeur actuelle préremplie.
 const FIELD_MODAL_HINTS = {
-  nickname       : 'Soulbot Custom (vide = reset)',
-  banner_url     : 'https://… .png/.jpg/.gif/.webp (vide = reset)',
-  avatar_url     : 'https://… — global, BotOwner, max 2/h',
-  footer_icon_url: 'https://… icône 64×64 (vide = reset)',
-  embed_color    : '#B600A8',
-  accent_color   : '#E91E63',
-  footer_text    : 'Mon serveur — propulsé par Soulbot (vide = défaut)',
-  brand_emoji_id : '<:nom:123456789012345678> ou l\'ID seul',
-  prefix         : '; (1-5 caractères sans espace)',
+  nickname        : 'Soulbot Custom (vide = reset)',
+  banner_url      : 'https://… .png/.jpg/.gif/.webp (vide = reset)',
+  avatar_url      : 'https://… — global, BotOwner, max 2/h',
+  footer_icon_url : 'https://… icône 64×64 (vide = reset)',
+  embed_color     : '#B600A8',
+  accent_color    : '#E91E63',
+  footer_text     : 'Mon serveur — propulsé par Soulbot (vide = défaut)',
+  brand_emoji_id  : '<:nom:123456789012345678> ou l\'ID seul',
+  prefix          : '; (1-5 caractères sans espace)',
+  color_success   : '#00C851 (vide = vert charte)',
+  color_error     : '#FF3333 (vide = rouge charte)',
+  color_warning   : '#FF8800 (vide = orange charte)',
+  color_info      : '#5865F2 (vide = bleu charte)',
+  emoji_success_id: '<:nom:id> ou ID seul (vide = emoji Soulbot)',
+  emoji_error_id  : '<:nom:id> ou ID seul (vide = emoji Soulbot)',
+  emoji_warning_id: '<:nom:id> ou ID seul (vide = emoji Soulbot)',
+  emoji_info_id   : '<:nom:id> ou ID seul (vide = emoji Soulbot)',
+};
+
+// Hints des modals profil global (onglet Profil Bot).
+const PROFILE_MODAL_HINTS = {
+  bio          : 'Présentation du bot, 400 caractères max (vide = retire la bio)',
+  presence_text: 'Texte affiché sous le nom du bot (vide = Version x.y.z)',
+  banner_url   : 'https://… .png/.jpg/.gif — bannière du profil (vide = retire)',
+  presence_url : 'https://twitch.tv/… (type Streame uniquement)',
+  username     : 'Nouveau nom global — rate-limit Discord 2/h',
 };
 
 function _openFieldModal(interaction, field, currentValue) {
@@ -157,10 +191,70 @@ async function _applyDraft(interaction, draft) {
     }
   }
 
-  // 3) Transaction DB : identité + journal + historique d'assets.
-  const changed = applyIdentityDraft(guild.id, draft.fields, user.id);
+  // 3) Profil global (V6) : BotOwner only, side effects Discord AVANT le
+  //    write DB — un refus Discord ne laisse jamais d'état fantôme.
+  const profileDraft = { ...(draft.profile ?? {}) };
+  if (Object.keys(profileDraft).length && !isOwner(user.id)) {
+    for (const k of Object.keys(profileDraft)) delete profileDraft[k];
+    warnings.push('Profil global ignoré — réservé au BotOwner.');
+  }
 
-  // 4) Prefix (guild_settings, hors guild_bot_config) + journal.
+  // Username : pas une colonne bot_profile — side effect pur + journal.
+  if ('username' in profileDraft) {
+    const newName = profileDraft.username;
+    delete profileDraft.username;
+    if (_rateLimited(_usernameChanges)) {
+      warnings.push('Username ignoré — limite Discord (2/h) atteinte.');
+    } else {
+      try {
+        const old = interaction.client.user.username;
+        await interaction.client.user.setUsername(newName);
+        _usernameChanges.push(Date.now());
+        logConfigChange(guild.id, user.id, 'profile:username', old, newName);
+      } catch (err) {
+        warnings.push(`Username refusé par Discord : ${err.message?.slice(0, 80) ?? 'erreur inconnue'}`);
+      }
+    }
+  }
+
+  // Bannière du profil du bot (≠ banner_url du serveur).
+  if ('banner_url' in profileDraft) {
+    if (_rateLimited(_bannerChanges)) {
+      delete profileDraft.banner_url;
+      warnings.push('Bannière de profil ignorée — limite Discord (2/h) atteinte.');
+    } else {
+      try {
+        await applyBotBanner(interaction.client, profileDraft.banner_url);
+        _bannerChanges.push(Date.now());
+      } catch (err) {
+        delete profileDraft.banner_url;
+        warnings.push(`Bannière de profil refusée : ${err.message?.slice(0, 80) ?? 'erreur inconnue'}`);
+      }
+    }
+  }
+
+  // Bio "À propos de moi" de l'application.
+  if ('bio' in profileDraft) {
+    try {
+      await applyBio(interaction.client, profileDraft.bio);
+    } catch (err) {
+      delete profileDraft.bio;
+      warnings.push(`Bio refusée par Discord : ${err.message?.slice(0, 80) ?? 'erreur inconnue'}`);
+    }
+  }
+
+  // 4) Transactions DB : identité serveur, puis profil global.
+  const changed = applyIdentityDraft(guild.id, draft.fields, user.id);
+  const profileChanged = applyProfileDraft(profileDraft, user.id, guild.id);
+  changed.push(...profileChanged.map((f) => `profile:${f}`));
+
+  // 5) Présence : appliquée APRÈS le write (lit la DB à jour). Sans échec
+  //    possible côté Discord — setPresence est fire-and-forget gateway.
+  if (profileChanged.some((f) => f.startsWith('presence_'))) {
+    applyPresence(interaction.client);
+  }
+
+  // 6) Prefix (guild_settings, hors guild_bot_config) + journal.
   if (draft.prefix != null) {
     const old = getGuildSettings(guild.id)?.prefix ?? ';';
     if (old !== draft.prefix) {
@@ -234,6 +328,58 @@ async function handleStudioInteraction(interaction, params) {
       return _rerender(interaction, 'theme', draft);
     }
 
+    // ── Thème V6 : select unifié → modal (ou galerie) ──────────────────────
+    case 'editsel': {
+      const choice = interaction.values[0];
+      if (choice === 'gallery:color') {
+        // Même interaction, re-routée sur le flux galerie existant.
+        return handleStudioInteraction(interaction, ['studio', 'gallery', 'color']);
+      }
+      if (!FIELD_VALIDATORS[choice]) return interaction.reply(_ephemeral('Champ inconnu.'));
+      const cfg = getGuildBotConfig(guild.id);
+      const current = choice in draft.fields ? draft.fields[choice] : cfg?.[choice];
+      return _openFieldModal(interaction, choice, current);
+    }
+
+    // ── Profil Bot V6 (GLOBAL — BotOwner) ──────────────────────────────────
+    case 'pstatus': {
+      if (!isOwner(user.id)) return interaction.reply(_ephemeral('Profil global : réservé au **BotOwner**.'));
+      const check = require('../../utils/config-validators').validatePresenceStatus(param);
+      if (!check.ok) return interaction.reply(_ephemeral(check.error));
+      draft.profile.presence_status = check.value;
+      return _rerender(interaction, 'profile', draft);
+    }
+
+    case 'ptype': {
+      if (!isOwner(user.id)) return interaction.reply(_ephemeral('Profil global : réservé au **BotOwner**.'));
+      const check = require('../../utils/config-validators').validatePresenceType(interaction.values[0]);
+      if (!check.ok) return interaction.reply(_ephemeral(check.error));
+      draft.profile.presence_type = check.value;
+      return _rerender(interaction, 'profile', draft);
+    }
+
+    case 'peditsel': {
+      if (!isOwner(user.id)) return interaction.reply(_ephemeral('Profil global : réservé au **BotOwner**.'));
+      const field = interaction.values[0];
+      if (!PROFILE_VALIDATORS[field]) return interaction.reply(_ephemeral('Champ inconnu.'));
+      const profile = getBotProfile() ?? {};
+      const current = field in draft.profile ? draft.profile[field]
+        : field === 'username' ? interaction.client.user.username
+        : profile[field];
+      return interaction.showModal(editableModal({
+        customId: `botconfig_modal:studio:profile:${field}`,
+        title   : `Profil Bot — ${PROFILE_LABELS[field] ?? field}`,
+        fields  : [{
+          id         : 'value',
+          label      : PROFILE_LABELS[field] ?? field,
+          value      : current ?? undefined,
+          required   : false,
+          placeholder: PROFILE_MODAL_HINTS[field],
+          maxLength  : field === 'bio' ? 400 : field.endsWith('_url') ? 2048 : 128,
+        }],
+      }));
+    }
+
     // ── Galerie d'assets : restaurer une ancienne valeur dans le draft ─────
     case 'gallery': {
       const assets = getAssetHistory(guild.id, param, 20);
@@ -272,13 +418,19 @@ async function handleStudioInteraction(interaction, params) {
       const entry = getConfigLog(guild.id, 50).find((l) => String(l.id) === interaction.values[0]);
       if (!entry) return interaction.reply(_ephemeral('Entrée introuvable.'));
       if (entry.field === 'prefix') draft.prefix = entry.old_value ?? ';';
+      else if (entry.field.startsWith('profile:')) {
+        if (!isOwner(user.id)) return interaction.reply(_ephemeral('Rollback profil global : réservé au **BotOwner**.'));
+        draft.profile[entry.field.slice('profile:'.length)] = entry.old_value;
+      }
       else draft.fields[entry.field] = entry.old_value;
       return _rerender(interaction, 'history', draft);
     }
 
     // ── Apply / Discard ─────────────────────────────────────────────────────
     case 'apply': {
-      const pending = Object.keys(draft.fields).length + (draft.prefix != null ? 1 : 0);
+      const pending = Object.keys(draft.fields).length
+        + Object.keys(draft.profile ?? {}).length
+        + (draft.prefix != null ? 1 : 0);
       if (!pending) return interaction.reply(_ephemeral('Aucune modification en attente.'));
 
       await interaction.deferUpdate();
@@ -490,6 +642,18 @@ async function handleStudioModal(interaction, params) {
     return _rerender(interaction, 'pricing', draft);
   }
 
+  // ── Profil global V6 → draft.profile (BotOwner) ──────────────────────────
+  if (field === 'profile') {
+    if (!isOwner(user.id)) return interaction.reply(_ephemeral('Profil global : réservé au **BotOwner**.'));
+    const pField = param;
+    const validator = PROFILE_VALIDATORS[pField];
+    if (!validator) return interaction.reply(_ephemeral('Champ inconnu.'));
+    const check = validator(interaction.fields.getTextInputValue('value') ?? '');
+    if (!check.ok) return interaction.reply(_ephemeral(check.error));
+    draft.profile[pField] = check.value;
+    return _rerender(interaction, 'profile', draft);
+  }
+
   // ── Prefix → draft ────────────────────────────────────────────────────────
   const raw = interaction.fields.getTextInputValue('value') ?? '';
   if (field === 'prefix') {
@@ -517,6 +681,8 @@ async function handleStudioModal(interaction, params) {
     nickname: 'identity', banner_url: 'identity', avatar_url: 'identity',
     embed_color: 'theme', accent_color: 'theme', footer_text: 'theme',
     footer_icon_url: 'theme', embed_style: 'theme', brand_emoji_id: 'theme', theme_name: 'theme',
+    color_success: 'theme', color_error: 'theme', color_warning: 'theme', color_info: 'theme',
+    emoji_success_id: 'theme', emoji_error_id: 'theme', emoji_warning_id: 'theme', emoji_info_id: 'theme',
   };
   return _rerender(interaction, tabByField[field] ?? 'identity', draft);
 }

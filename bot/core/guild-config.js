@@ -106,6 +106,9 @@ function getGuildBanner(guildId) {
 const IDENTITY_FIELDS = [
   'nickname', 'banner_url', 'embed_color', 'accent_color', 'theme_name',
   'avatar_url', 'footer_text', 'footer_icon_url', 'embed_style', 'brand_emoji_id',
+  // V6 — couleurs + emojis sémantiques par serveur
+  'color_success', 'color_error', 'color_warning', 'color_info',
+  'emoji_success_id', 'emoji_error_id', 'emoji_warning_id', 'emoji_info_id',
 ];
 
 // Assets historisés (galerie "↺ restaurer ancien") + leur type en DB.
