@@ -918,6 +918,80 @@ db.prepare(`
     ('tier_premium', 'Tier Premium', 19.99, 1999, 'Accès complet',                '["all"]', 1)
 `).run();
 
+/* ═══ Studio /botconfig V5 — identité, presets, historique, audit trail ─────
+   guild_bot_config = source de vérité UNIQUE de l'identité (étendue V5,
+   pas de table bot_identity séparée — évite le doublon nickname/banner).
+   Tout write passe par bot/core/guild-config.js qui journalise dans
+   bot_config_log et pousse les assets dans bot_assets_history. */
+
+// ── ALTER guild_bot_config — colonnes identité V5 (idempotent) ──────────────
+const BOTCONFIG_V5_COLS = {
+  accent_color   : 'TEXT',                       // hex sans #, null = hérite primaire
+  theme_name     : "TEXT DEFAULT 'magenta'",     // magenta | cyber | mono | or | custom
+  avatar_url     : 'TEXT',                       // global bot — BotOwner only à l'apply
+  footer_text    : 'TEXT',                       // null = footer version par défaut
+  footer_icon_url: 'TEXT',
+  embed_style    : "TEXT DEFAULT 'rich'",        // compact | rich | minimal
+  brand_emoji_id : 'TEXT',                       // emoji custom du serveur
+};
+for (const [col, type] of Object.entries(BOTCONFIG_V5_COLS)) {
+  try { db.exec(`ALTER TABLE guild_bot_config ADD COLUMN ${col} ${type}`); } catch { /* déjà présent */ }
+}
+
+// ── ALTER bot_pricing — tri d'affichage + marqueur défaut (idempotent) ──────
+const PRICING_V5_COLS = {
+  is_default   : 'INTEGER DEFAULT 0',
+  display_order: 'INTEGER DEFAULT 0',
+};
+for (const [col, type] of Object.entries(PRICING_V5_COLS)) {
+  try { db.exec(`ALTER TABLE bot_pricing ADD COLUMN ${col} ${type}`); } catch { /* déjà présent */ }
+}
+// Backfill : ordre d'affichage initial = ordre de prix, tiers seedés marqués défaut.
+try {
+  db.prepare(`
+    UPDATE bot_pricing SET display_order = (
+      SELECT COUNT(*) FROM bot_pricing AS p2 WHERE p2.price_usd < bot_pricing.price_usd
+    ) WHERE display_order = 0
+  `).run();
+  db.prepare(`
+    UPDATE bot_pricing SET is_default = 1
+    WHERE id IN ('fixed', 'tier_basic', 'tier_pro', 'tier_premium') AND is_default = 0
+  `).run();
+} catch { /* ignore */ }
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS bot_presets (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id   TEXT NOT NULL,
+    name       TEXT NOT NULL,
+    payload    TEXT NOT NULL,             -- JSON : snapshot identité + tarifs + prefix
+    is_active  INTEGER DEFAULT 0,         -- preset actuellement appliqué
+    created_at INTEGER DEFAULT (unixepoch()),
+    UNIQUE (guild_id, name)
+  );
+  CREATE INDEX IF NOT EXISTS idx_presets_guild ON bot_presets(guild_id);
+
+  CREATE TABLE IF NOT EXISTS bot_assets_history (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id   TEXT NOT NULL,
+    asset_type TEXT NOT NULL,             -- avatar | banner | color
+    value      TEXT NOT NULL,
+    applied_at INTEGER DEFAULT (unixepoch())
+  );
+  CREATE INDEX IF NOT EXISTS idx_assets_guild ON bot_assets_history(guild_id, asset_type, applied_at DESC);
+
+  CREATE TABLE IF NOT EXISTS bot_config_log (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id  TEXT NOT NULL,
+    user_id   TEXT NOT NULL,
+    field     TEXT NOT NULL,
+    old_value TEXT,
+    new_value TEXT,
+    ts        INTEGER DEFAULT (unixepoch())
+  );
+  CREATE INDEX IF NOT EXISTS idx_cfglog_guild ON bot_config_log(guild_id, ts DESC);
+`);
+
 /* ═══ Modération avancée — v2.1.2 (Sécurité V4) ─────────────────────────────
    global_blacklist : bannis de TOUS les serveurs Soulbot (BotOwner only).
    softmute_history : rôles sauvegardés pour restauration via ;unsoftmute. */

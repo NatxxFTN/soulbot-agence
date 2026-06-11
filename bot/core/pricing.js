@@ -11,7 +11,7 @@
 const { db } = require('../database');
 const logger = require('../utils/logger');
 
-const _all    = db.prepare('SELECT * FROM bot_pricing WHERE is_active = 1 ORDER BY price_usd ASC');
+const _all    = db.prepare('SELECT * FROM bot_pricing WHERE is_active = 1 ORDER BY display_order ASC, price_usd ASC');
 const _byId   = db.prepare('SELECT * FROM bot_pricing WHERE id = ?');
 const _update = db.prepare(`
   UPDATE bot_pricing
@@ -110,6 +110,54 @@ async function syncPricingAcrossBot(pricingId, client) {
   }
 }
 
+// ─── Gestion des tiers — Studio V5 (BotOwner) ────────────────────────────────
+
+const _insert = db.prepare(`
+  INSERT INTO bot_pricing (id, name, price_usd, price_discord, description, features, is_active, display_order, updated_by)
+  VALUES (?, ?, ?, ?, ?, '[]', 1, ?, ?)
+`);
+const _deactivate = db.prepare('UPDATE bot_pricing SET is_active = 0, updated_at = unixepoch(), updated_by = ? WHERE id = ?');
+const _setOrder   = db.prepare('UPDATE bot_pricing SET display_order = ?, updated_at = unixepoch(), updated_by = ? WHERE id = ?');
+const _setDefault = db.prepare('UPDATE bot_pricing SET is_default = ?, updated_at = unixepoch(), updated_by = ? WHERE id = ?');
+const _maxOrder   = db.prepare('SELECT COALESCE(MAX(display_order), -1) + 1 AS next FROM bot_pricing');
+
+/**
+ * Crée un tier. id = slug du nom (a-z0-9_), placé en fin de liste.
+ * @returns {{ ok: boolean, id?: string, reason?: 'duplicate'|'badname' }}
+ */
+function addPricing(name, priceUsd, description, updatedBy) {
+  const id = String(name).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 32);
+  if (!id) return { ok: false, reason: 'badname' };
+  try {
+    _insert.run(id, name, priceUsd, Math.round(priceUsd * 100), description ?? null, _maxOrder.get().next, updatedBy);
+    invalidatePricingCache();
+    return { ok: true, id };
+  } catch {
+    return { ok: false, reason: 'duplicate' };
+  }
+}
+
+/** Désactive un tier (soft delete — jamais de DELETE, les achats y réfèrent). */
+function deactivatePricing(id, updatedBy) {
+  const changed = _deactivate.run(updatedBy, id).changes > 0;
+  if (changed) invalidatePricingCache();
+  return changed;
+}
+
+/** Position d'affichage d'un tier (0 = premier). */
+function setPricingOrder(id, order, updatedBy) {
+  const changed = _setOrder.run(order, updatedBy, id).changes > 0;
+  if (changed) invalidatePricingCache();
+  return changed;
+}
+
+/** Marque/démarque un tier comme tarif par défaut. */
+function setPricingDefault(id, isDefault, updatedBy) {
+  const changed = _setDefault.run(isDefault ? 1 : 0, updatedBy, id).changes > 0;
+  if (changed) invalidatePricingCache();
+  return changed;
+}
+
 module.exports = {
   getAllPricing,
   getPricingById,
@@ -117,4 +165,8 @@ module.exports = {
   getFeaturesByTier,
   invalidatePricingCache,
   syncPricingAcrossBot,
+  addPricing,
+  deactivatePricing,
+  setPricingOrder,
+  setPricingDefault,
 };

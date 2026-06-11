@@ -273,8 +273,112 @@ function logLine(action, user, details) {
   return `[${action}] ${user} | ${details} | <t:${ts}:f>`;
 }
 
+// ─── Thème par serveur — Studio V5 ───────────────────────────────────────────
+// Chaque serveur peut surcharger couleurs/footer/style via /botconfig.
+// L'API historique (successEmbed & co) reste inchangée : thème par défaut.
+// Les commandes migrent progressivement vers themed(guildId).<builder>.
+// Cache 60 s par guild + invalidation explicite à l'apply du Studio.
+
+const THEME_TTL = 60_000;
+const _themeCache = new Map(); // guildId → { data, ts }
+
+// Presets de thèmes intégrés (onglet Thème du Studio).
+const THEME_PRESETS = {
+  magenta: { primary: 0xB600A8, accent: 0xE91E63 },
+  cyber  : { primary: 0x00E5FF, accent: 0x7C4DFF },
+  mono   : { primary: 0x2B2D31, accent: 0x99AAB5 },
+  or     : { primary: 0xD4AF37, accent: 0xFFE082 },
+};
+
+function _hexToInt(hex) {
+  const n = parseInt(String(hex ?? '').replace(/^#/, ''), 16);
+  return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * Thème résolu d'un serveur (config DB + fallbacks charte).
+ * @param {?string} guildId - null/undefined → thème par défaut Soulbot
+ * @returns {{ primary: number, accent: number, footerText: ?string,
+ *             footerIconURL: ?string, embedStyle: string, brandEmojiId: ?string,
+ *             bannerURL: ?string }}
+ */
+function getTheme(guildId) {
+  const fallback = {
+    primary: COLORS.primary, accent: COLORS.info, footerText: null,
+    footerIconURL: null, embedStyle: 'rich', brandEmojiId: null, bannerURL: null,
+  };
+  if (!guildId) return fallback;
+
+  const hit = _themeCache.get(guildId);
+  if (hit && Date.now() - hit.ts < THEME_TTL) return hit.data;
+
+  // require tardif : guild-config require database, pas de cycle avec ce module.
+  const { getGuildBotConfig } = require('../core/guild-config');
+  const cfg = getGuildBotConfig(guildId);
+
+  const data = !cfg ? fallback : {
+    primary      : _hexToInt(cfg.embed_color)  ?? COLORS.primary,
+    accent       : _hexToInt(cfg.accent_color) ?? COLORS.info,
+    footerText   : cfg.footer_text ?? null,
+    footerIconURL: cfg.footer_icon_url ?? null,
+    embedStyle   : cfg.embed_style ?? 'rich',
+    brandEmojiId : cfg.brand_emoji_id ?? null,
+    bannerURL    : cfg.banner_url ?? null,
+  };
+  _themeCache.set(guildId, { data, ts: Date.now() });
+  return data;
+}
+
+/** À appeler après chaque apply du Studio pour refléter le thème immédiatement. */
+function invalidateTheme(guildId) {
+  if (guildId) _themeCache.delete(guildId);
+  else _themeCache.clear();
+}
+
+function _themedFooter(theme) {
+  if (theme.embedStyle === 'minimal') return null;
+  return {
+    text   : theme.footerText ?? `Soulbot v${version}`,
+    iconURL: theme.footerIconURL ?? _botIdentity.iconURL ?? undefined,
+  };
+}
+
+function _themedBase(color, theme) {
+  const embed = new EmbedBuilder().setColor(color);
+  const f = _themedFooter(theme);
+  if (f) embed.setFooter(f);
+  if (theme.embedStyle === 'rich') embed.setTimestamp();
+  return embed;
+}
+
+/**
+ * Builders sémantiques liés au thème d'un serveur.
+ * Usage : const T = themed(guild.id); T.primaryEmbed('Titre', '...').
+ * Les couleurs sémantiques (succès/erreur/warn) restent fixes — seuls
+ * primary/accent/footer/style héritent de la personnalisation.
+ * @param {?string} guildId
+ */
+function themed(guildId) {
+  const theme = getTheme(guildId);
+  const make = (color, emojiName) => (title, description, fields = []) => {
+    const embed = _themedBase(color, theme).setDescription(description ?? null);
+    if (title) embed.setTitle(emojiName ? `${e(emojiName)} ${title}` : title);
+    return applyFields(embed, fields);
+  };
+  return {
+    theme,
+    primaryEmbed: make(theme.primary, null),
+    accentEmbed : make(theme.accent, null),
+    successEmbed: make(COLORS.success, 'btn_success'),
+    errorEmbed  : make(COLORS.error, 'ui_alert'),
+    infoEmbed   : make(theme.accent, 'btn_tip'),
+    warningEmbed: make(COLORS.warning, 'btn_flag'),
+  };
+}
+
 module.exports = {
   COLORS,
+  THEME_PRESETS,
   init,
   footer,
   successEmbed,
@@ -288,4 +392,7 @@ module.exports = {
   legalFooter,
   legalFields,
   logLine,
+  getTheme,
+  invalidateTheme,
+  themed,
 };

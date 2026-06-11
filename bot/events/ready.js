@@ -496,6 +496,15 @@ module.exports = {
     client.selectHandlers.set('botcfg', handleBotConfigInteraction);
     client.modalHandlers .set('botcfg_modal', handleBotConfigModal);
 
+    // ── Handlers BotConfig Studio V5 (draft state + apply atomique) ──────────
+    const {
+      handleStudioInteraction,
+      handleStudioModal,
+    } = require('../ui/handlers/botconfig-studio-handler');
+    client.buttonHandlers.set('botconfig', handleStudioInteraction);
+    client.selectHandlers.set('botconfig', handleStudioInteraction);
+    client.modalHandlers .set('botconfig_modal', handleStudioModal);
+
     // ── Handlers Access Control (buyers + owners panels) ─────────────────────
     const { handleBuyersInteraction } = require('../ui/handlers/buyers-handler');
     const { handleOwnersInteraction } = require('../ui/handlers/owners-handler');

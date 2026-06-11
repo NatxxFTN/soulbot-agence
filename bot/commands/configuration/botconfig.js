@@ -103,8 +103,15 @@ module.exports = {
       });
     }
 
-    // ── Défaut : panel interactif ────────────────────────────────────────────
-    const payload = renderBotConfigPanel(message.guild, 'general', message.author.id);
+    // ── ;botconfig legacy : ancien panel 3 onglets ───────────────────────────
+    if (sub === 'legacy') {
+      const payload = renderBotConfigPanel(message.guild, 'general', message.author.id);
+      return message.reply({ ...payload, allowedMentions: { repliedUser: false } });
+    }
+
+    // ── Défaut : Studio V5 (personnalisation totale) ─────────────────────────
+    const { renderStudio } = require('../../ui/panels/botconfig-studio');
+    const payload = renderStudio(message.guild, 'identity', null, message.author.id);
     await message.reply({ ...payload, allowedMentions: { repliedUser: false } });
   },
 };
