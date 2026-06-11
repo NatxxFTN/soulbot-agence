@@ -9,7 +9,7 @@ module.exports = {
   async check(message, _config) {
     if (!message.mentions.everyone) return { triggered: false };
 
-    if (message.member?.permissions.has(PermissionFlagsBits.MentionEveryone)) {
+    if (message.member?.permissions?.has(PermissionFlagsBits.MentionEveryone)) {
       return { triggered: false };
     }
 

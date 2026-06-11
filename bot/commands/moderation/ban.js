@@ -3,6 +3,7 @@
 const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
 const { db } = require('../../database');
+const storage = require('../../core/security-storage');
 
 const STMT = db.prepare(
   'INSERT OR IGNORE INTO mod_logs (guild_id, action, user_id, user_tag, moderator_id, moderator_tag, reason) VALUES (?, ?, ?, ?, ?, ?, ?)'
@@ -28,6 +29,11 @@ module.exports = {
 
     const reason = (args.slice(1).join(' ') || 'Aucune raison fournie').slice(0, 512);
 
+    // DM AVANT le ban — impossible de DM un utilisateur déjà banni
+    await target.send({
+      embeds: [E.error('Tu as été banni', `**Serveur :** ${message.guild.name}\n**Raison :** ${reason}`)],
+    }).catch(() => { /* DMs fermés */ });
+
     try {
       await target.ban({ reason, deleteMessageSeconds: 86400 });
     } catch (err) {
@@ -36,6 +42,7 @@ module.exports = {
     }
 
     STMT.run(message.guild.id, 'BAN', target.id, target.user.tag, message.author.id, message.author.tag, reason);
+    storage.logAction(message.guild.id, target.id, 'moderation', 'ban', reason, message.channel.id);
 
     return message.channel.send({
       embeds: [

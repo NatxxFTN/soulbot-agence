@@ -918,4 +918,28 @@ db.prepare(`
     ('tier_premium', 'Tier Premium', 19.99, 1999, 'Accès complet',                '["all"]', 1)
 `).run();
 
+/* ═══ Modération avancée — v2.1.2 (Sécurité V4) ─────────────────────────────
+   global_blacklist : bannis de TOUS les serveurs Soulbot (BotOwner only).
+   softmute_history : rôles sauvegardés pour restauration via ;unsoftmute. */
+db.exec(`
+  CREATE TABLE IF NOT EXISTS global_blacklist (
+    user_id    TEXT PRIMARY KEY,
+    reason     TEXT,
+    moderator  TEXT,
+    added_at   INTEGER DEFAULT (unixepoch())
+  );
+  CREATE TABLE IF NOT EXISTS softmute_history (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id        TEXT NOT NULL,
+    user_id         TEXT NOT NULL,
+    previous_roles  TEXT,
+    reason          TEXT,
+    moderator       TEXT,
+    duration        TEXT,
+    created_at      INTEGER DEFAULT (unixepoch()),
+    ended_at        INTEGER
+  );
+  CREATE INDEX IF NOT EXISTS idx_softmute_active ON softmute_history(guild_id, user_id, ended_at);
+`);
+
 module.exports = { db, ensureGuild, getGuildSettings, setGuildSetting };

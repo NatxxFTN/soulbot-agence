@@ -4,6 +4,7 @@ const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
 const { db } = require('../../database');
 const L = require('../../core/logs-v3-helper');
+const storage = require('../../core/security-storage');
 
 const STMT = db.prepare(
   'INSERT OR IGNORE INTO mod_logs (guild_id, action, user_id, user_tag, moderator_id, moderator_tag, reason, duration) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
@@ -40,8 +41,12 @@ module.exports = {
     const durationLabel = `${Math.round(duration / 60000)} min`;
 
     await target.timeout(duration, reason);
+    await target.send({
+      embeds: [E.warning('Tu as été rendu muet', `**Serveur :** ${message.guild.name}\n**Durée :** ${durationLabel}\n**Raison :** ${reason}`)],
+    }).catch(() => { /* DMs fermés */ });
 
     STMT.run(message.guild.id, 'MUTE', target.id, target.user.tag, message.author.id, message.author.tag, reason, durationLabel);
+    storage.logAction(message.guild.id, target.id, 'moderation', 'mute', reason, message.channel.id);
 
     // ── Hook Logs V3 ──────────────────────────────────────────────
     L.log(message.guild, 'mod_mute', {

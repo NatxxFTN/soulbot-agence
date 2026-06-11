@@ -4,6 +4,7 @@ const { PermissionFlagsBits } = require('discord.js');
 const E = require('../../utils/embeds');
 const { db } = require('../../database');
 const L = require('../../core/logs-v3-helper');
+const storage = require('../../core/security-storage');
 
 const STMT = db.prepare(
   'INSERT OR IGNORE INTO mod_logs (guild_id, action, user_id, user_tag, moderator_id, moderator_tag, reason) VALUES (?, ?, ?, ?, ?, ?, ?)'
@@ -25,6 +26,11 @@ module.exports = {
 
     const reason = (args.slice(1).join(' ') || 'Aucune raison fournie').slice(0, 512);
 
+    // DM AVANT le kick — plus de serveur commun après l'expulsion
+    await target.send({
+      embeds: [E.error('Tu as été expulsé', `**Serveur :** ${message.guild.name}\n**Raison :** ${reason}`)],
+    }).catch(() => { /* DMs fermés */ });
+
     try {
       await target.kick(reason);
     } catch (err) {
@@ -33,6 +39,7 @@ module.exports = {
     }
 
     STMT.run(message.guild.id, 'KICK', target.id, target.user.tag, message.author.id, message.author.tag, reason);
+    storage.logAction(message.guild.id, target.id, 'moderation', 'kick', reason, message.channel.id);
 
     // ── Hook Logs V3 — emit member_kick (fire-and-forget) ──
     L.log(message.guild, 'member_kick', {

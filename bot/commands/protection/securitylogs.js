@@ -1,67 +1,78 @@
 'use strict';
 
-const {
-  PermissionFlagsBits,
-  ContainerBuilder, TextDisplayBuilder,
-  SeparatorBuilder, SeparatorSpacingSize,
-  MessageFlags,
-} = require('discord.js');
-const { e } = require('../../core/emojis');
+// ── ;securitylogs — panel Logs V4 filtrable + paginé + export CSV ─────────────
+// Refonte v2.1.2 : filtres dynamiques par module et gravité, navigation,
+// export CSV. Rendu centralisé dans bot/utils/logs-renderer.js.
+
+const { PermissionFlagsBits, AttachmentBuilder, MessageFlags } = require('discord.js');
+const { errorEmbed } = require('../../utils/response-builder');
 const storage = require('../../core/security-storage');
-const { FEATURE_LABELS } = require('../../core/security-punishments');
+const { renderLogsPanel, logsToCsv } = require('../../utils/logs-renderer');
 
 module.exports = {
   name       : 'securitylogs',
   aliases    : ['seclog', 'securitylog', 'seclogs'],
   category   : 'protection',
-  description: 'Affiche les logs sécurité récents (filtrable par feature).',
-  usage      : ';securitylogs [feature] [limit]',
+  description: 'Panel Logs V4 : filtres par module/gravité, pagination, export CSV.',
+  usage      : ';securitylogs [feature]',
   cooldown   : 3,
   guildOnly  : true,
   permissions: [PermissionFlagsBits.ManageGuild],
 
   async execute(message, args) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
-      const ct = new ContainerBuilder().setAccentColor(0xFF0000);
-      ct.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${e('btn_error')} Permission requise : **Gérer le serveur**.`));
-      return message.reply({ components: [ct], flags: MessageFlags.IsComponentsV2, allowedMentions: { repliedUser: false } });
+      return message.reply({ embeds: [errorEmbed('Accès refusé', 'Permission **Gérer le serveur** requise.')] });
     }
 
-    const feature = (args[0] || '').toLowerCase();
-    const limit   = Math.min(50, Math.max(1, parseInt(args[1], 10) || 15));
+    const state = {
+      page: 1,
+      filterFeature: (args[0] || '').toLowerCase() || null,
+      filterSeverity: null,
+    };
 
-    const logs = feature
-      ? storage.getLogsByFeature(message.guild.id, feature, limit)
-      : storage.getRecentLogs(message.guild.id, limit);
+    let logs = storage.getRecentLogs(message.guild.id, 200);
+    const panel = renderLogsPanel(logs, state);
+    const reply = await message.reply({
+      embeds: panel.embeds, components: panel.components,
+      allowedMentions: { repliedUser: false, parse: [] },
+    });
 
-    const container = new ContainerBuilder().setAccentColor(0xFF0000);
-    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-      `${e('ui_pin')} **Logs sécurité** · ${logs.length} entrée(s)` +
-      (feature ? ` · filtre : \`${feature}\`` : ''),
-    ));
-    container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
+    const collector = reply.createMessageComponentCollector({
+      filter: (i) => i.user.id === message.author.id,
+      time: 300_000,
+    });
 
-    if (logs.length === 0) {
-      container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `${e('btn_tip')} Aucun log${feature ? ` pour \`${feature}\`` : ''}.`,
-      ));
-    } else {
-      const lines = logs.map(l => {
-        const label = FEATURE_LABELS[l.feature] || l.feature;
-        return `• <t:${Math.floor(l.triggered_at / 1000)}:R> · <@${l.user_id}> · **${label}** → \`${l.action_taken}\``;
-      });
-      container.addTextDisplayComponents(new TextDisplayBuilder().setContent(lines.join('\n')));
-    }
+    collector.on('collect', async (i) => {
+      const [ns, action, param] = i.customId.split(':');
+      if (ns !== 'seclogs') return;
 
-    container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
-    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(
-      `${e('btn_tip')} Filtrer : \`;securitylogs <feature> [limit]\` — ex: \`;securitylogs antilink 20\``,
-    ));
+      if (action === 'feature') {
+        state.filterFeature = i.values[0] === 'all' ? null : i.values[0];
+        state.page = 1;
+      } else if (action === 'severity') {
+        state.filterSeverity = i.values[0] === 'all' ? null : i.values[0];
+        state.page = 1;
+      } else if (action === 'page') {
+        state.page = parseInt(param, 10) || 1;
+      } else if (action === 'refresh') {
+        logs = storage.getRecentLogs(message.guild.id, 200);
+      } else if (action === 'export') {
+        const { filtered } = renderLogsPanel(logs, state);
+        return i.reply({
+          files: [new AttachmentBuilder(
+            Buffer.from(logsToCsv(filtered), 'utf8'),
+            { name: `soulbot-seclogs-${message.guild.id}-${Date.now()}.csv` },
+          )],
+          flags: MessageFlags.Ephemeral,
+        });
+      }
 
-    await message.reply({
-      components: [container],
-      flags     : MessageFlags.IsComponentsV2,
-      allowedMentions: { repliedUser: false },
+      const updated = renderLogsPanel(logs, state);
+      await i.update({ embeds: updated.embeds, components: updated.components });
+    });
+
+    collector.on('end', () => {
+      reply.edit({ components: [] }).catch(() => {});
     });
   },
 };

@@ -76,6 +76,19 @@ module.exports = {
   async execute(member, _client) {
     if (!member.guild) return;
 
+    // ── 0. Blacklist globale (avant tout le reste) ─────────────────────────
+    try {
+      const { db } = require('../database');
+      const gbl = db.prepare('SELECT * FROM global_blacklist WHERE user_id = ?').get(member.id);
+      if (gbl) {
+        await member.ban({ reason: `Global blacklist (auto) : ${gbl.reason ?? 'sans raison'}` }).catch(() => {});
+        storage.logAction(member.guild.id, member.id, 'globalblacklist', 'ban', `Join bloqué : ${gbl.reason ?? ''}`, null);
+        return;
+      }
+    } catch (err) {
+      console.error('[sec-member] globalblacklist:', err.message);
+    }
+
     // ── 1. antibot (priorité absolue) ──────────────────────────────────────
     const antibotCfg = storage.getConfig(member.guild.id, 'antibot');
     if (antibotCfg?.enabled && member.user.bot) {

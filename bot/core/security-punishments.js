@@ -18,6 +18,8 @@ const ACTION_LABELS = {
   mute_1h: 'Muet 1 heure',
   kick   : 'Expulsé',
   ban    : 'Banni',
+  timeout: 'Timeout 10 minutes',
+  none   : 'Détection seule',
 };
 
 const FEATURE_LABELS = {
@@ -33,6 +35,8 @@ const FEATURE_LABELS = {
   antinsfw      : 'Anti-Explicit',
   antinewaccount: 'Anti-Nouveau compte',
   antiraid      : 'Anti-Raid',
+  antispam      : 'Anti-Spam',
+  antileak      : 'Anti-Leak',
 };
 
 /**
