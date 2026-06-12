@@ -1,7 +1,23 @@
 'use strict';
 
-const E = require('../../utils/embeds');
+const {
+  ContainerBuilder,
+  TextDisplayBuilder,
+  SeparatorBuilder,
+  SeparatorSpacingSize,
+  MessageFlags,
+} = require('discord.js');
 const { e } = require('../../core/emojis');
+
+function panel(title, body) {
+  const container = new ContainerBuilder().setAccentColor(0xFF0000);
+  container.addTextDisplayComponents(new TextDisplayBuilder().setContent(title));
+  if (body) {
+    container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(body));
+  }
+  return container;
+}
 
 module.exports = {
   name       : 'dice',
@@ -19,9 +35,12 @@ module.exports = {
     const total = rolls.reduce((a, b) => a + b, 0);
 
     return message.reply({
-      embeds: [E.base()
-        .setTitle(`${e('ani_dice')} ${count}d${faces}`)
-        .setDescription(rolls.map(r => `\`${r}\``).join(' · ') + (count > 1 ? `\n\n**Total : ${total}**` : ''))],
+      components: [panel(
+        `${e('ani_dice')} **${count}d${faces}**`,
+        rolls.map(r => `\`${r}\``).join(' · ') + (count > 1 ? `\n\n**Total : ${total}**` : ''),
+      )],
+      flags: MessageFlags.IsComponentsV2,
+      allowedMentions: { parse: [] },
     });
   },
 };

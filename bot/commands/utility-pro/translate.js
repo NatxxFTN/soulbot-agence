@@ -1,10 +1,38 @@
 'use strict';
 
-const E = require('../../utils/embeds');
+const {
+  ContainerBuilder,
+  TextDisplayBuilder,
+  SeparatorBuilder,
+  SeparatorSpacingSize,
+  MessageFlags,
+} = require('discord.js');
 const { e } = require('../../core/emojis');
 
 // Endpoint LibreTranslate public (sans clé). Source : libretranslate.com (peut être lent / down).
 const LT_ENDPOINT = process.env.LIBRETRANSLATE_URL || 'https://translate.disroot.org/translate';
+
+function panel(title, body, footer) {
+  const container = new ContainerBuilder().setAccentColor(0xFF0000);
+  container.addTextDisplayComponents(new TextDisplayBuilder().setContent(title));
+  if (body) {
+    container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(body));
+  }
+  if (footer) {
+    container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(footer));
+  }
+  return container;
+}
+
+function replyPanel(message, title, body, footer) {
+  return message.reply({
+    components: [panel(title, body, footer)],
+    flags: MessageFlags.IsComponentsV2,
+    allowedMentions: { parse: [] },
+  });
+}
 
 module.exports = {
   name       : 'translate',
@@ -16,8 +44,8 @@ module.exports = {
 
   async execute(message, args) {
     const text = args.join(' ').trim();
-    if (!text) return message.reply({ embeds: [E.error('Usage', '`;translate <texte>`')] });
-    if (text.length > 1000) return message.reply({ embeds: [E.error('Trop long', 'Max 1000 caractères.')] });
+    if (!text) return replyPanel(message, `${e('btn_error')} **Usage**`, '`;translate <texte>`');
+    if (text.length > 1000) return replyPanel(message, `${e('btn_error')} **Trop long**`, 'Max 1000 caractères.');
 
     try {
       const res = await fetch(LT_ENDPOINT, {
@@ -46,17 +74,15 @@ module.exports = {
       }
 
       const srcLang = data.detectedLanguage?.language || '?';
-      return message.reply({
-        embeds: [E.base()
-          .setTitle(`${e('ani_world')} Traduction`)
-          .addFields(
-            { name: `Source (${srcLang})`, value: text.slice(0, 1000) },
-            { name: `Cible (${target})`,   value: (data.translatedText || '_(vide)_').slice(0, 1000) },
-          )
-          .setFooter({ text: 'LibreTranslate · gratuit' })],
-      });
+      return replyPanel(
+        message,
+        `${e('ani_world')} **Traduction**`,
+        `**Source (${srcLang})**\n${text.slice(0, 1000)}\n\n` +
+        `**Cible (${target})**\n${(data.translatedText || '_(vide)_').slice(0, 1000)}`,
+        'LibreTranslate · gratuit',
+      );
     } catch (err) {
-      return message.reply({ embeds: [E.error('API indisponible', `LibreTranslate : ${err.message}`)] });
+      return replyPanel(message, `${e('btn_error')} **API indisponible**`, `LibreTranslate : ${err.message}`);
     }
   },
 };

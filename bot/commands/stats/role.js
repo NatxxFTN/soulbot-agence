@@ -1,10 +1,9 @@
 'use strict';
 
-const { EmbedBuilder } = require('discord.js');
 const { db, getGuildSettings, setGuildSetting } = require('../../database');
 const { parseDays, formatDate } = require('../../utils/format');
-const E = require('../../utils/embeds');
 const { e } = require('../../core/emojis');
+const V2 = require('./_components-v2');
 
 /*
  * Commande unifiée ;role pour le module stats :
@@ -52,7 +51,7 @@ module.exports = {
       return handleSimpleRole(message, args.slice(1), guildId, sub, simpleMap[sub]);
     }
 
-    return message.reply({ embeds: [E.usage(';', 'role <ancient|badge|bday|boost|voc> ...', 'Gestion des rôles automatiques.')] });
+    return V2.reply(message, V2.usage(';', 'role <ancient|badge|bday|boost|voc> ...', 'Gestion des rôles automatiques.'));
   },
 };
 
@@ -69,31 +68,29 @@ async function handleSimpleRole(message, args, guildId, roleName, dbField) {
     const settings = getGuildSettings(guildId);
     const currentId = settings[dbField];
     const currentRole = currentId ? message.guild.roles.cache.get(currentId) : null;
-    return message.reply({
-      embeds: [E.info(`Rôle ${label}`, currentRole ? `Rôle actuel : ${currentRole}` : '*Non configuré*')]
-    });
+    return V2.reply(message, V2.info(`Rôle ${label}`, currentRole ? `Rôle actuel : ${currentRole}` : '*Non configuré*'));
   }
 
   // Définir le rôle
   if (action === 'set' || action === 'add') {
-    if (!role) return message.reply({ embeds: [E.error('Usage', `\`;role ${roleName} set @role\``)] });
+    if (!role) return V2.reply(message, V2.error('Usage', `\`;role ${roleName} set @role\``));
     setGuildSetting(guildId, dbField, role.id);
-    return message.reply({ embeds: [E.success(`Rôle ${label}`, `Rôle ${role} défini comme rôle **${label}**.`)] });
+    return V2.reply(message, V2.success(`Rôle ${label}`, `Rôle ${role} défini comme rôle **${label}**.`));
   }
 
   // Supprimer le rôle
   if (action === 'remove' || action === 'del' || action === 'delete') {
     setGuildSetting(guildId, dbField, null);
-    return message.reply({ embeds: [E.success(`Rôle ${label}`, `Le rôle **${label}** a été retiré.`)] });
+    return V2.reply(message, V2.success(`Rôle ${label}`, `Le rôle **${label}** a été retiré.`));
   }
 
   // Si un rôle est mentionné directement sans action → définir
   if (role && !action) {
     setGuildSetting(guildId, dbField, role.id);
-    return message.reply({ embeds: [E.success(`Rôle ${label}`, `Rôle ${role} défini comme rôle **${label}**.`)] });
+    return V2.reply(message, V2.success(`Rôle ${label}`, `Rôle ${role} défini comme rôle **${label}**.`));
   }
 
-  return message.reply({ embeds: [E.usage(';', `role ${roleName} [set|remove] @role`, `Définir le rôle ${label}.`)] });
+  return V2.reply(message, V2.usage(';', `role ${roleName} [set|remove] @role`, `Définir le rôle ${label}.`));
 }
 
 // ─── Handler rôles anciens ─────────────────────────────────────────────────────
@@ -105,7 +102,7 @@ async function handleAncient(message, args, guildId, client) {
     const rules = db.prepare('SELECT * FROM ancient_roles WHERE guild_id = ? ORDER BY days_threshold ASC').all(guildId);
 
     if (!rules.length) {
-      return message.reply({ embeds: [E.info('Rôles Anciens', 'Aucun palier configuré.\nUtilise `;role ancient add @role <jours>` pour en ajouter.')] });
+      return V2.reply(message, V2.info('Rôles Anciens', 'Aucun palier configuré.\nUtilise `;role ancient add @role <jours>` pour en ajouter.'));
     }
 
     const isCumul = rules.some(r => r.cumulative);
@@ -114,14 +111,10 @@ async function handleAncient(message, args, guildId, client) {
       return `• ${role ?? `<@&${r.role_id}>`} — **${r.days_threshold} jour(s)**`;
     });
 
-    const embed = new EmbedBuilder()
-      .setColor(E.COLORS.PRIMARY)
-      .setTitle(`${e('cat_owner')}  Rôles Anciens — Paliers`)
-      .setDescription(lines.join('\n'))
-      .addFields({ name: 'Mode', value: isCumul ? `${e('btn_success')} Cumulatif (garder les anciens rôles)` : 'Non-cumulatif (remplacer)', inline: true })
-      .setTimestamp();
-
-    return message.reply({ embeds: [embed] });
+    return V2.reply(message, V2.panel(
+      `${e('cat_owner')}  **Rôles Anciens — Paliers**`,
+      `${lines.join('\n')}\n\n**Mode**\n${isCumul ? `${e('btn_success')} Cumulatif (garder les anciens rôles)` : 'Non-cumulatif (remplacer)'}`,
+    ));
   }
 
   // ── add @role <jours> ──────────────────────────────────────────────────────
@@ -130,7 +123,7 @@ async function handleAncient(message, args, guildId, client) {
     const days = parseDays(args.find(a => /^\d+d?$/i.test(a)));
 
     if (!role || !days) {
-      return message.reply({ embeds: [E.usage(';', 'role ancient add @role <jours>', 'Ex: `;role ancient add @Vétéran 30`')] });
+      return V2.reply(message, V2.usage(';', 'role ancient add @role <jours>', 'Ex: `;role ancient add @Vétéran 30`'));
     }
 
     db.prepare(`
@@ -138,48 +131,48 @@ async function handleAncient(message, args, guildId, client) {
       VALUES (?, ?, ?)
     `).run(guildId, role.id, days);
 
-    return message.reply({ embeds: [E.success('Palier ajouté', `${role} sera attribué après **${days} jour(s)** de présence.`)] });
+    return V2.reply(message, V2.success('Palier ajouté', `${role} sera attribué après **${days} jour(s)** de présence.`));
   }
 
   // ── del @role ──────────────────────────────────────────────────────────────
   if (action === 'del' || action === 'delete' || action === 'remove' || action === 'supprimer') {
     const role = message.mentions.roles.first();
-    if (!role) return message.reply({ embeds: [E.usage(';', 'role ancient del @role', '')] });
+    if (!role) return V2.reply(message, V2.usage(';', 'role ancient del @role', ''));
 
     const existing = db.prepare('SELECT * FROM ancient_roles WHERE guild_id = ? AND role_id = ?').get(guildId, role.id);
-    if (!existing) return message.reply({ embeds: [E.error('Introuvable', `Le rôle ${role} n'est pas dans la liste des paliers.`)] });
+    if (!existing) return V2.reply(message, V2.error('Introuvable', `Le rôle ${role} n'est pas dans la liste des paliers.`));
 
     db.prepare('DELETE FROM ancient_roles WHERE guild_id = ? AND role_id = ?').run(guildId, role.id);
-    return message.reply({ embeds: [E.success('Palier supprimé', `Le palier pour ${role} a été retiré.`)] });
+    return V2.reply(message, V2.success('Palier supprimé', `Le palier pour ${role} a été retiré.`));
   }
 
   // ── cumul (toggle) ─────────────────────────────────────────────────────────
   if (action === 'cumul' || action === 'cumulative') {
     const rules = db.prepare('SELECT * FROM ancient_roles WHERE guild_id = ? LIMIT 1').get(guildId);
-    if (!rules) return message.reply({ embeds: [E.error('Aucun palier', 'Configure d\'abord des paliers avec `;role ancient add`.')] });
+    if (!rules) return V2.reply(message, V2.error('Aucun palier', 'Configure d\'abord des paliers avec `;role ancient add`.'));
 
     const currentCumul = rules.cumulative;
     const newCumul     = currentCumul ? 0 : 1;
 
     db.prepare('UPDATE ancient_roles SET cumulative = ? WHERE guild_id = ?').run(newCumul, guildId);
 
-    return message.reply({ embeds: [E.success('Mode cumulatif', newCumul ? 'Activé — les anciens rôles seront conservés.' : 'Désactivé — seul le rôle le plus élevé sera conservé.')] });
+    return V2.reply(message, V2.success('Mode cumulatif', newCumul ? 'Activé — les anciens rôles seront conservés.' : 'Désactivé — seul le rôle le plus élevé sera conservé.'));
   }
 
   // ── check (assigner manuellement) ─────────────────────────────────────────
   if (action === 'check' || action === 'refresh' || action === 'sync') {
-    const processingMsg = await message.reply({ embeds: [E.info('Vérification...', 'Assignation des rôles anciens en cours...')] });
+    const processingMsg = await V2.reply(message, V2.info('Vérification...', 'Assignation des rôles anciens en cours...'));
 
     const rules = db.prepare('SELECT * FROM ancient_roles WHERE guild_id = ? ORDER BY days_threshold ASC').all(guildId);
     if (!rules.length) {
-      return processingMsg.edit({ embeds: [E.error('Aucun palier', 'Configure d\'abord des paliers.')] });
+      return V2.edit(processingMsg, V2.error('Aucun palier', 'Configure d\'abord des paliers.'));
     }
 
     let members;
     try {
       members = await message.guild.members.fetch();
     } catch {
-      return processingMsg.edit({ embeds: [E.error('Erreur', 'Impossible de récupérer les membres.')] });
+      return V2.edit(processingMsg, V2.error('Erreur', 'Impossible de récupérer les membres.'));
     }
 
     const now  = Math.floor(Date.now() / 1000);
@@ -210,8 +203,8 @@ async function handleAncient(message, args, guildId, client) {
       }
     }
 
-    return processingMsg.edit({ embeds: [E.success('Vérification terminée', `**${added}** attribution(s) effectuée(s).`)] });
+    return V2.edit(processingMsg, V2.success('Vérification terminée', `**${added}** attribution(s) effectuée(s).`));
   }
 
-  return message.reply({ embeds: [E.usage(';', 'role ancient <add|del|list|cumul|check>', 'Gestion des rôles d\'ancienneté.')] });
+  return V2.reply(message, V2.usage(';', 'role ancient <add|del|list|cumul|check>', 'Gestion des rôles d\'ancienneté.'));
 }

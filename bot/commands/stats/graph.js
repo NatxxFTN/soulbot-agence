@@ -1,9 +1,8 @@
 'use strict';
 
-const { EmbedBuilder } = require('discord.js');
 const { db }           = require('../../database');
 const { formatDuration, formatNumber } = require('../../utils/format');
-const E = require('../../utils/embeds');
+const V2 = require('./_components-v2');
 
 /*
  * Génère l'URL d'un graphique via QuickChart.io (gratuit, aucune dép native).
@@ -42,7 +41,7 @@ module.exports = {
     `).all(guildId);
 
     if (!rows.length) {
-      return message.reply({ embeds: [E.info('Aucune donnée', 'Pas encore de statistiques enregistrées pour cette période.')] });
+      return V2.reply(message, V2.info('Aucune donnée', 'Pas encore de statistiques enregistrées pour cette période.'));
     }
 
     // ── Résolution des noms ───────────────────────────────────────────────────
@@ -87,14 +86,14 @@ module.exports = {
       return `\`${String(i + 1).padStart(2, ' ')}.\` **${labels[i]}** — ${score}`;
     });
 
-    const embed = new EmbedBuilder()
-      .setColor(E.COLORS.PRIMARY)
-      .setTitle(`Graphique — ${label}`)
-      .setDescription(lines.join('\n'))
-      .setImage(chartUrl)
-      .setFooter({ text: `Période : ${timeLabel} • ${message.guild.name}` })
-      .setTimestamp();
-
-    return message.reply({ embeds: [embed] });
+    return V2.reply(message, V2.panel(
+      `**Graphique — ${label}**`,
+      lines.join('\n'),
+      {
+        image: chartUrl,
+        imageDescription: `Graphique — ${label}`,
+        footer: `Période : ${timeLabel} • ${message.guild.name}`,
+      },
+    ));
   },
 };

@@ -115,4 +115,6 @@ function register(client) {
   client.modalHandlers.set('lockdown',  handleLockdownInteraction);
 }
 
-module.exports = { handleLockdownInteraction, register };
+// executeLock/executeUnlock exportés pour le dock SOC (security-studio-handler)
+// — même moteur de verrouillage, pas de duplication.
+module.exports = { handleLockdownInteraction, register, executeLock, executeUnlock };

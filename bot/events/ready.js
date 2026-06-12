@@ -22,6 +22,10 @@ module.exports = {
     const { reload: reloadEmojis } = require('../core/emojis');
     reloadEmojis();
 
+    // Garde anti-COMPONENT_INVALID_EMOJI : seuls les emojis hébergés sur un
+    // serveur où le bot est membre sont utilisables dans les composants.
+    require('../core/emoji-cache').setAccessibleGuilds([...client.guilds.cache.keys()]);
+
     // Présence — restaurée depuis bot_profile (Studio V6) ; sans config
     // stockée, retombe sur "Version x.y.z" comme avant.
     require('../core/bot-profile').applyPresence(client);
@@ -518,10 +522,9 @@ module.exports = {
     client.modalHandlers .set('custom_modal',  handleCustomModal);
     client.selectHandlers.set('custom_select', handleCustomSelect);
 
-    // ── Handler Security (panel + toggle/config selects + buttons) ───────────
-    const { handleSecurityInteraction } = require('../ui/handlers/security-handler');
-    client.buttonHandlers.set('security', handleSecurityInteraction);
-    client.selectHandlers.set('security', handleSecurityInteraction);
+    // ── Handler Security Studio V5 (hub unifié — remplace security-handler) ──
+    const { register: registerSecurityStudio } = require('../ui/handlers/security-studio-handler');
+    registerSecurityStudio(client);
 
     // ── Handler Security Feature (mini-panels secfeat:<feature>:*) ───────────
     const { handleSecurityFeatureInteraction } = require('../ui/handlers/security-feature-handler');

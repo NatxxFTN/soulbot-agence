@@ -12,33 +12,18 @@ const {
 } = require('discord.js');
 const { e } = require('../core/emojis');
 const storage = require('../core/security-storage');
+const registry = require('../core/security-registry');
+const { applySanctionMember } = require('../core/apply-sanction');
 
+// SOC Phase 1 : exécution déléguée à apply-sanction (exécuteur unique,
+// garde-fous owner/bot + log honnête). Les actions legacy (mute_5m…)
+// sont normalisées vers l'échelle canonique par le registry.
 async function applyMemberAction(member, feature, reason, action) {
-  const fullReason = `[${feature}] ${reason}`;
-  try {
-    switch (action) {
-      case 'kick':
-        if (member.kickable) await member.kick(fullReason);
-        break;
-      case 'ban':
-        if (member.bannable) await member.ban({ reason: fullReason, deleteMessageSeconds: 0 });
-        break;
-      case 'mute_5m':
-        if (member.moderatable) await member.timeout(5 * 60 * 1000, fullReason);
-        break;
-      case 'mute_1h':
-        if (member.moderatable) await member.timeout(60 * 60 * 1000, fullReason);
-        break;
-      case 'warn':
-        /* join-time warn = log seulement */
-        break;
-    }
-  } catch (err) {
-    console.error(`[sec-member] ${feature} ${action}:`, err.message);
-  }
-
-  storage.logAction(member.guild.id, member.id, feature, action, `Join: ${reason}`, null);
-  storage.incrementStat(member.guild.id, feature);
+  const { sanction, timeoutMinutes } = registry.normalizeSanction(action);
+  await applySanctionMember(member, feature, sanction, reason, {
+    durationMs: timeoutMinutes ? timeoutMinutes * 60_000 : null,
+    detail    : `Join: ${reason}`,
+  });
 }
 
 async function notifyAdminsRaid(guild, reason) {

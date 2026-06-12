@@ -1,9 +1,9 @@
 'use strict';
 
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const { db } = require('../../database');
-const E = require('../../utils/embeds');
 const { e, forButton } = require('../../core/emojis');
+const V2 = require('./_components-v2');
 
 /*
  * ;reset all stats
@@ -24,30 +24,27 @@ module.exports = {
     // Vérifier les sous-arguments "all stats"
     const sub = args.join(' ').toLowerCase();
     if (sub !== 'all stats' && sub !== 'allstats') {
-      return message.reply({ embeds: [E.usage(';', 'reset all stats', 'Réinitialise **toutes** les statistiques du serveur.')] });
+      return V2.reply(message, V2.usage(';', 'reset all stats', 'Réinitialise **toutes** les statistiques du serveur.'));
     }
 
     // ── Confirmation avec boutons ─────────────────────────────────────────────
     const statsCount = db.prepare('SELECT COUNT(*) AS c FROM user_stats WHERE guild_id = ?').get(guildId).c;
     const sessCount  = db.prepare('SELECT COUNT(*) AS c FROM voice_sessions WHERE guild_id = ?').get(guildId).c;
 
-    const confirmEmbed = new EmbedBuilder()
-      .setColor(E.COLORS.ERROR)
-      .setTitle(`${e('ui_alert')}  Confirmation requise`)
-      .setDescription(
-        `Tu es sur le point de supprimer **toutes** les statistiques de ${message.guild.name} :\n\n` +
-        `• **${statsCount}** entrées utilisateur\n` +
-        `• **${sessCount}** session(s) vocale(s) active(s)\n\n` +
-        `**Cette action est irréversible.**`
-      )
-      .setTimestamp();
+    const confirmPanel = V2.panel(
+      `${e('ui_alert')}  **Confirmation requise**`,
+      `Tu es sur le point de supprimer **toutes** les statistiques de ${message.guild.name} :\n\n` +
+      `• **${statsCount}** entrées utilisateur\n` +
+      `• **${sessCount}** session(s) vocale(s) active(s)\n\n` +
+      `**Cette action est irréversible.**`,
+    );
 
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder().setCustomId('confirm_reset').setLabel('Confirmer').setEmoji(forButton('btn_success')).setStyle(ButtonStyle.Danger),
       new ButtonBuilder().setCustomId('cancel_reset').setLabel('Annuler').setStyle(ButtonStyle.Secondary),
     );
 
-    const reply = await message.reply({ embeds: [confirmEmbed], components: [row] });
+    const reply = await message.reply(V2.payload(confirmPanel, { components: [row] }));
 
     // ── Attente de la réponse (30s) ───────────────────────────────────────────
     const collector = reply.createMessageComponentCollector({
@@ -70,20 +67,18 @@ module.exports = {
         resetAll();
 
         await interaction.update({
-          embeds     : [E.success('Réinitialisation effectuée', `Toutes les statistiques de **${message.guild.name}** ont été supprimées.`)],
-          components : [],
+          ...V2.payload(V2.success('Réinitialisation effectuée', `Toutes les statistiques de **${message.guild.name}** ont été supprimées.`)),
         });
       } else {
         await interaction.update({
-          embeds     : [E.info('Annulé', 'La réinitialisation a été annulée.')],
-          components : [],
+          ...V2.payload(V2.info('Annulé', 'La réinitialisation a été annulée.')),
         });
       }
     });
 
     collector.on('end', (collected) => {
       if (!collected.size) {
-        reply.edit({ components: [] }).catch(() => {});
+        reply.edit(V2.payload(confirmPanel)).catch(() => {});
       }
     });
   },

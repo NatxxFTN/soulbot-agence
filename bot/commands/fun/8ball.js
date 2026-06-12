@@ -1,6 +1,13 @@
 'use strict';
 
-const E = require('../../utils/embeds');
+const {
+  ContainerBuilder,
+  TextDisplayBuilder,
+  SeparatorBuilder,
+  SeparatorSpacingSize,
+  MessageFlags,
+} = require('discord.js');
+const { e } = require('../../core/emojis');
 
 const RESPONSES = [
   { text: 'Absolument.',          type: 'success' },
@@ -17,6 +24,23 @@ const RESPONSES = [
   { text: 'Les perspectives sont mauvaises.', type: 'error' },
 ];
 
+function panel(iconName, title, body) {
+  const container = new ContainerBuilder().setAccentColor(0xFF0000);
+  container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${e(iconName)} **${title}**`));
+  if (body) {
+    container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(body));
+  }
+  return container;
+}
+
+function iconForType(type) {
+  if (type === 'success') return 'btn_success';
+  if (type === 'warning') return 'btn_tip';
+  if (type === 'error') return 'btn_error';
+  return 'cat_information';
+}
+
 module.exports = {
   name      : '8ball',
   aliases   : ['boule', 'magic'],
@@ -29,13 +53,20 @@ module.exports = {
   async execute(message, args) {
     const question = args.join(' ').trim();
     if (!question) {
-      return message.reply({ embeds: [E.error('Question manquante', 'Pose une question : `;8ball <question>`')] });
+      return message.reply({
+        components: [panel('btn_error', 'Question manquante', 'Pose une question : `;8ball <question>`')],
+        flags: MessageFlags.IsComponentsV2,
+        allowedMentions: { parse: [] },
+      });
     }
 
     const pick  = RESPONSES[Math.floor(Math.random() * RESPONSES.length)];
-    const embed = E[pick.type]('Boule Magique', pick.text)
-      .addFields({ name: 'Question', value: question, inline: false });
+    const body = `${pick.text}\n\n**Question**\n${question}`;
 
-    message.channel.send({ embeds: [embed] });
+    message.channel.send({
+      components: [panel(iconForType(pick.type), 'Boule Magique', body)],
+      flags: MessageFlags.IsComponentsV2,
+      allowedMentions: { parse: [] },
+    });
   },
 };

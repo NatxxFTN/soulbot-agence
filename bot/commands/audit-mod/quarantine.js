@@ -84,38 +84,57 @@ module.exports = {
       ));
     }
 
-    let qRole;
-    try {
-      qRole = await ensureQuarantineRole(message.guild);
-    } catch {
-      return message.reply(P.dangerPanel('Erreur', 'Impossible de créer/trouver le rôle Quarantine (permissions ?).'));
+    const result = await quarantineMember(message.guild, target, message.author, reason);
+    if (!result.ok) {
+      return message.reply(P.dangerPanel('Erreur', result.error));
     }
-
-    const originalRoles = [...target.roles.cache.values()]
-      .filter(r => r.id !== message.guild.roles.everyone.id && !r.managed)
-      .map(r => r.id);
-
-    try {
-      await target.roles.set([qRole.id], `Quarantine par ${message.author.tag}: ${reason}`);
-    } catch {
-      return message.reply(P.dangerPanel('Erreur', 'Impossible de modifier les rôles du membre (permissions ?).'));
-    }
-
-    audit.quarantineUser(message.guild.id, target.id, message.author.id, reason, originalRoles);
-    audit.recordModAction(message.guild.id, target.id, message.author.id, 'QUARANTINE', reason);
-
-    L.log(message.guild, 'mod_warn', {
-      user: target.user, member: target, executor: message.author, reason,
-      summary: `${target.user.tag} mis en quarantaine par ${message.author.tag}`,
-      actorId: message.author.id, targetId: target.id,
-    });
-
-    target.send(`${e('ui_lock')} Tu as été mis en quarantaine sur **${message.guild.name}**.\nRaison : ${reason}`).catch(() => {});
 
     return message.reply(P.successPanel(
       `${e('ui_lock')} Quarantine appliquée`,
-      `**${target.user.tag}** isolé. ${originalRoles.length} rôle(s) sauvegardé(s) pour restauration future.\n` +
+      `**${target.user.tag}** isolé. ${result.savedRoles} rôle(s) sauvegardé(s) pour restauration future.\n` +
       `Pour libérer : \`;unquarantine @${target.user.username}\`.`,
     ));
   },
 };
+
+/**
+ * Cœur de la quarantaine — partagé entre ;quarantine et le dock SOC.
+ * NE FAIT PAS les checks de hiérarchie/permissions de l'appelant :
+ * c'est la responsabilité du point d'entrée (commande ou handler).
+ * @returns {Promise<{ok: boolean, error?: string, savedRoles?: number}>}
+ */
+async function quarantineMember(guild, target, executor, reason) {
+  let qRole;
+  try {
+    qRole = await ensureQuarantineRole(guild);
+  } catch {
+    return { ok: false, error: 'Impossible de créer/trouver le rôle Quarantine (permissions ?).' };
+  }
+
+  const originalRoles = [...target.roles.cache.values()]
+    .filter(r => r.id !== guild.roles.everyone.id && !r.managed)
+    .map(r => r.id);
+
+  try {
+    await target.roles.set([qRole.id], `Quarantine par ${executor.tag}: ${reason}`);
+  } catch {
+    return { ok: false, error: 'Impossible de modifier les rôles du membre (permissions ?).' };
+  }
+
+  audit.quarantineUser(guild.id, target.id, executor.id, reason, originalRoles);
+  audit.recordModAction(guild.id, target.id, executor.id, 'QUARANTINE', reason);
+
+  L.log(guild, 'mod_warn', {
+    user: target.user, member: target, executor, reason,
+    summary: `${target.user.tag} mis en quarantaine par ${executor.tag}`,
+    actorId: executor.id, targetId: target.id,
+  });
+
+  target.send(`${e('ui_lock')} Tu as été mis en quarantaine sur **${guild.name}**.\nRaison : ${reason}`).catch(() => {});
+
+  return { ok: true, savedRoles: originalRoles.length };
+}
+
+module.exports.quarantineMember = quarantineMember;
+module.exports.ensureQuarantineRole = ensureQuarantineRole;
+module.exports.getActiveQuarantine = (guildId, userId) => audit.getQuarantine(guildId, userId);

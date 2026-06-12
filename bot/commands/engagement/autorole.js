@@ -1,6 +1,12 @@
 'use strict';
 
-const E = require('../../utils/embeds');
+const {
+  ContainerBuilder,
+  TextDisplayBuilder,
+  SeparatorBuilder,
+  SeparatorSpacingSize,
+  MessageFlags,
+} = require('discord.js');
 const { e } = require('../../core/emojis');
 const { db } = require('../../database');
 
@@ -10,6 +16,24 @@ const STMT_DEL = db.prepare('DELETE FROM guild_autoroles WHERE guild_id = ? AND 
 const STMT_COUNT = db.prepare('SELECT COUNT(*) AS n FROM guild_autoroles WHERE guild_id = ?');
 
 const MAX_AUTOROLES = 5;
+
+function panel(title, body) {
+  const container = new ContainerBuilder().setAccentColor(0xFF0000);
+  container.addTextDisplayComponents(new TextDisplayBuilder().setContent(title));
+  if (body) {
+    container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(body));
+  }
+  return container;
+}
+
+function replyPanel(message, title, body) {
+  return message.reply({
+    components: [panel(title, body)],
+    flags: MessageFlags.IsComponentsV2,
+    allowedMentions: { parse: [] },
+  });
+}
 
 module.exports = {
   name       : 'autorole',
@@ -27,28 +51,28 @@ module.exports = {
     if (sub === 'list') {
       const rows = STMT_LIST.all(guildId);
       const lines = rows.length ? rows.map(r => `<@&${r.role_id}>`).join('\n') : '_aucun_';
-      return message.reply({ embeds: [E.base().setTitle(`${e('cat_configuration')} Autoroles`).setDescription(lines)] });
+      return replyPanel(message, `${e('cat_configuration')} **Autoroles**`, lines);
     }
 
     if (sub === 'add' || sub === 'remove') {
       const role = message.mentions.roles.first();
-      if (!role) return message.reply({ embeds: [E.error('Rôle manquant', 'Mentionne un rôle.')] });
+      if (!role) return replyPanel(message, `${e('btn_error')} **Rôle manquant**`, 'Mentionne un rôle.');
 
       if (sub === 'add') {
         const { n } = STMT_COUNT.get(guildId);
         if (n >= MAX_AUTOROLES) {
-          return message.reply({ embeds: [E.error('Limite atteinte', `Max ${MAX_AUTOROLES} autoroles.`)] });
+          return replyPanel(message, `${e('btn_error')} **Limite atteinte**`, `Max ${MAX_AUTOROLES} autoroles.`);
         }
         if (role.position >= message.guild.members.me.roles.highest.position) {
-          return message.reply({ embeds: [E.error('Hiérarchie', 'Mon rôle doit être au-dessus.')] });
+          return replyPanel(message, `${e('btn_error')} **Hiérarchie**`, 'Mon rôle doit être au-dessus.');
         }
         STMT_INS.run(guildId, role.id, message.author.id);
-        return message.reply({ embeds: [E.success('Autorole ajouté', `${role} sera donné aux nouveaux membres.`)] });
+        return replyPanel(message, `${e('btn_success')} **Autorole ajouté**`, `${role} sera donné aux nouveaux membres.`);
       }
       STMT_DEL.run(guildId, role.id);
-      return message.reply({ embeds: [E.success('Autorole retiré', `${role} ne sera plus donné.`)] });
+      return replyPanel(message, `${e('btn_success')} **Autorole retiré**`, `${role} ne sera plus donné.`);
     }
 
-    return message.reply({ embeds: [E.error('Usage', '`;autorole <add|remove|list> <@role>`')] });
+    return replyPanel(message, `${e('btn_error')} **Usage**`, '`;autorole <add|remove|list> <@role>`');
   },
 };

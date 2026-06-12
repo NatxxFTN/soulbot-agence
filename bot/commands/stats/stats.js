@@ -1,10 +1,9 @@
 'use strict';
 
-const { EmbedBuilder } = require('discord.js');
 const { db }                        = require('../../database');
 const { formatDuration, formatNumber, progressBar } = require('../../utils/format');
-const E                             = require('../../utils/embeds');
 const { e }                         = require('../../core/emojis');
+const V2                            = require('./_components-v2');
 
 module.exports = {
   name        : 'stats',
@@ -42,23 +41,18 @@ module.exports = {
       const topMsgUser = topMsg ? await client.users.fetch(topMsg.user_id).catch(() => null) : null;
       const topVocUser = topVoc ? await client.users.fetch(topVoc.user_id).catch(() => null) : null;
 
-      const embed = new EmbedBuilder()
-        .setColor(E.COLORS.PRIMARY)
-        .setTitle(`${e('cat_information')} Statistiques de ${message.guild.name}`)
-        .setThumbnail(message.guild.iconURL({ dynamic: true }))
-        .addFields(
-          { name: `${e('ui_chat')} Messages totaux`,  value: formatNumber(totals.total_messages), inline: true },
-          { name: `${e('ui_mic')} Temps vocal total`, value: formatDuration(totals.total_voice),  inline: true },
-          { name: `${e('ui_members')} Membres actifs`,    value: formatNumber(totals.active_users),    inline: true },
-          { name: `${e('ui_user')} Membres`,           value: formatNumber(message.guild.memberCount), inline: true },
-          { name: `${e('btn_calendar')} Création`,          value: `<t:${Math.floor(message.guild.createdTimestamp / 1000)}:D>`, inline: true },
-          { name: '\u200B', value: '\u200B', inline: true },
-          { name: 'Top messages', value: topMsgUser ? `${topMsgUser.username} — ${formatNumber(topMsg.messages)}` : '*—*', inline: true },
-          { name: 'Top vocal',    value: topVocUser ? `${topVocUser.username} — ${formatDuration(topVoc.voice_seconds)}` : '*—*', inline: true },
-        )
-        .setTimestamp();
-
-      return message.reply({ embeds: [embed] });
+      return V2.reply(message, V2.panel(
+        `${e('cat_information')} **Statistiques de ${message.guild.name}**`,
+        V2.fieldBlock([
+          { name: `${e('ui_chat')} Messages totaux`, value: formatNumber(totals.total_messages) },
+          { name: `${e('ui_mic')} Temps vocal total`, value: formatDuration(totals.total_voice) },
+          { name: `${e('ui_members')} Membres actifs`, value: formatNumber(totals.active_users) },
+          { name: `${e('ui_user')} Membres`, value: formatNumber(message.guild.memberCount) },
+          { name: `${e('btn_calendar')} Création`, value: `<t:${Math.floor(message.guild.createdTimestamp / 1000)}:D>` },
+          { name: 'Top messages', value: topMsgUser ? `${topMsgUser.username} — ${formatNumber(topMsg.messages)}` : '*—*' },
+          { name: 'Top vocal', value: topVocUser ? `${topVocUser.username} — ${formatDuration(topVoc.voice_seconds)}` : '*—*' },
+        ]),
+      ));
     }
 
     // ── ;stats user [@mention] ────────────────────────────────────────────────
@@ -80,20 +74,16 @@ module.exports = {
       const msgBar  = progressBar(row?.messages ?? 0,      (db.prepare('SELECT MAX(messages) AS m FROM user_stats WHERE guild_id = ?').get(guildId).m ?? 1));
       const vocBar  = progressBar(row?.voice_seconds ?? 0, (db.prepare('SELECT MAX(voice_seconds) AS m FROM user_stats WHERE guild_id = ?').get(guildId).m ?? 1));
 
-      const embed = new EmbedBuilder()
-        .setColor(E.COLORS.PRIMARY)
-        .setTitle(`${e('cat_information')} Stats de ${target.displayName}`)
-        .setThumbnail(target.user.displayAvatarURL({ dynamic: true }))
-        .addFields(
-          { name: `${e('ui_chat')} Messages`,     value: `${formatNumber(row?.messages ?? 0)}\n${msgBar}\nRang #${rank}/${totalUsers}`,      inline: true },
-          { name: `${e('ui_mic')} Temps vocal`,  value: `${formatDuration(row?.voice_seconds ?? 0)}\n${vocBar}\nRang #${rankVoc}/${totalUsers}`, inline: true },
-          { name: `${e('btn_calendar')} Dernier msg`,  value: row?.last_message_at ? `<t:${row.last_message_at}:R>` : '*Jamais*', inline: true },
-          { name: `${e('ui_mic')} Dernier vocal`, value: row?.last_voice_at  ? `<t:${row.last_voice_at}:R>`  : '*Jamais*', inline: true },
-          { name: `${e('btn_calendar')} A rejoint le`, value: `<t:${Math.floor(target.joinedTimestamp / 1000)}:D>`, inline: true },
-        )
-        .setTimestamp();
-
-      return message.reply({ embeds: [embed] });
+      return V2.reply(message, V2.panel(
+        `${e('cat_information')} **Stats de ${target.displayName}**`,
+        V2.fieldBlock([
+          { name: `${e('ui_chat')} Messages`, value: `${formatNumber(row?.messages ?? 0)}\n${msgBar}\nRang #${rank}/${totalUsers}` },
+          { name: `${e('ui_mic')} Temps vocal`, value: `${formatDuration(row?.voice_seconds ?? 0)}\n${vocBar}\nRang #${rankVoc}/${totalUsers}` },
+          { name: `${e('btn_calendar')} Dernier msg`, value: row?.last_message_at ? `<t:${row.last_message_at}:R>` : '*Jamais*' },
+          { name: `${e('ui_mic')} Dernier vocal`, value: row?.last_voice_at ? `<t:${row.last_voice_at}:R>` : '*Jamais*' },
+          { name: `${e('btn_calendar')} A rejoint le`, value: `<t:${Math.floor(target.joinedTimestamp / 1000)}:D>` },
+        ]),
+      ));
     }
 
     // ── ;stats best [messages|voc] ────────────────────────────────────────────
@@ -116,14 +106,11 @@ module.exports = {
         return `\`${i + 1}.\` **${name}** — ${score}`;
       }));
 
-      const embed = new EmbedBuilder()
-        .setColor(E.COLORS.GOLD)
-        .setTitle(`Top ${top10.length} — ${label}`)
-        .setDescription(lines.join('\n') || '*Aucune donnée disponible.*')
-        .setFooter({ text: message.guild.name, iconURL: message.guild.iconURL({ dynamic: true }) })
-        .setTimestamp();
-
-      return message.reply({ embeds: [embed] });
+      return V2.reply(message, V2.panel(
+        `**Top ${top10.length} — ${label}**`,
+        lines.join('\n') || '*Aucune donnée disponible.*',
+        { footer: message.guild.name },
+      ));
     }
 
     // ── ;stats channel [#salon] ───────────────────────────────────────────────
@@ -148,16 +135,12 @@ module.exports = {
         return `\`${i + 1}.\` **${name}** — ${formatNumber(row.messages)} (${pct}%)`;
       }));
 
-      const embed = new EmbedBuilder()
-        .setColor(E.COLORS.PRIMARY)
-        .setTitle(`${e('cat_information')} Stats de #${channel.name}`)
-        .setDescription(lines.join('\n') || '*Aucune donnée disponible.*')
-        .addFields({ name: `${e('ui_chat')} Total messages`, value: formatNumber(total), inline: true })
-        .setTimestamp();
-
-      return message.reply({ embeds: [embed] });
+      return V2.reply(message, V2.panel(
+        `${e('cat_information')} **Stats de #${channel.name}**`,
+        `${lines.join('\n') || '*Aucune donnée disponible.*'}\n\n**${e('ui_chat')} Total messages**\n${formatNumber(total)}`,
+      ));
     }
 
-    return message.reply({ embeds: [E.usage(';', 'stats [best|channel|server|user] [@user|#channel] [messages|voc]', 'Affiche les statistiques du serveur.')] });
+    return V2.reply(message, V2.usage(';', 'stats [best|channel|server|user] [@user|#channel] [messages|voc]', 'Affiche les statistiques du serveur.'));
   },
 };

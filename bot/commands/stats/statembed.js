@@ -1,10 +1,9 @@
 'use strict';
 
-const { EmbedBuilder } = require('discord.js');
 const { db, getGuildSettings, setGuildSetting } = require('../../database');
 const { formatDuration, formatNumber }           = require('../../utils/format');
-const E = require('../../utils/embeds');
 const { e } = require('../../core/emojis');
+const V2 = require('./_components-v2');
 
 /*
  * ;statembed                — Afficher/rafraîchir le live embed
@@ -33,11 +32,11 @@ module.exports = {
     // ── ;statembed set #salon ─────────────────────────────────────────────────
     if (action === 'set') {
       const channel = message.mentions.channels.first();
-      if (!channel) return message.reply({ embeds: [E.usage(';', 'statembed set #salon', '')] });
+      if (!channel) return V2.reply(message, V2.usage(';', 'statembed set #salon', ''));
 
       // Poster l'embed initial
-      const embed = await buildStatEmbed(message.guild, client, db);
-      const posted = await channel.send({ embeds: [embed] });
+      const panel = await buildStatPanel(message.guild, client, db);
+      const posted = await channel.send(V2.payload(panel));
 
       setGuildSetting(guildId, 'statembed_channel_id', channel.id);
       setGuildSetting(guildId, 'statembed_message_id', posted.id);
@@ -45,17 +44,17 @@ module.exports = {
       // Démarrer le refresh périodique pour cette guilde
       startLiveUpdate(client, guildId, 10 * 60 * 1000); // 10 min
 
-      return message.reply({ embeds: [E.success('StatEmbed configuré', `L'embed live est maintenant dans ${channel}. Il se rafraîchit toutes les 10 minutes.`)] });
+      return V2.reply(message, V2.success('StatEmbed configuré', `L'embed live est maintenant dans ${channel}. Il se rafraîchit toutes les 10 minutes.`));
     }
 
     // ── ;statembed refresh ────────────────────────────────────────────────────
     if (action === 'refresh') {
       if (!settings.statembed_channel_id || !settings.statembed_message_id) {
-        return message.reply({ embeds: [E.error('Non configuré', 'Aucun StatEmbed actif. Utilise `;statembed set #salon`.') ]});
+        return V2.reply(message, V2.error('Non configuré', 'Aucun StatEmbed actif. Utilise `;statembed set #salon`.'));
       }
 
       const updated = await updateStatEmbed(client, guildId, settings);
-      return message.reply({ embeds: [updated ? E.success('Rafraîchi', 'L\'embed a été mis à jour.') : E.error('Erreur', 'Impossible de trouver le message. Reconfigure avec `;statembed set #salon`.')] });
+      return V2.reply(message, updated ? V2.success('Rafraîchi', 'L\'embed a été mis à jour.') : V2.error('Erreur', 'Impossible de trouver le message. Reconfigure avec `;statembed set #salon`.'));
     }
 
     // ── ;statembed remove ─────────────────────────────────────────────────────
@@ -71,19 +70,17 @@ module.exports = {
 
       setGuildSetting(guildId, 'statembed_channel_id', null);
       setGuildSetting(guildId, 'statembed_message_id', null);
-      return message.reply({ embeds: [E.success('StatEmbed supprimé', 'L\'embed live a été désactivé.')] });
+      return V2.reply(message, V2.success('StatEmbed supprimé', 'L\'embed live a été désactivé.'));
     }
 
     // Afficher le statut actuel
     const chan = settings.statembed_channel_id ? `<#${settings.statembed_channel_id}>` : '*Non défini*';
-    return message.reply({
-      embeds: [E.info('StatEmbed', `Salon actuel : ${chan}\n\nCommandes :\n• \`;statembed set #salon\`\n• \`;statembed refresh\`\n• \`;statembed remove\``)]
-    });
+    return V2.reply(message, V2.info('StatEmbed', `Salon actuel : ${chan}\n\nCommandes :\n• \`;statembed set #salon\`\n• \`;statembed refresh\`\n• \`;statembed remove\``));
   },
 };
 
-// ─── Construire l'embed de stats ──────────────────────────────────────────────
-async function buildStatEmbed(guild, client, db) {
+// ─── Construire le panel de stats ─────────────────────────────────────────────
+async function buildStatPanel(guild, client, db) {
   const guildId = guild.id;
 
   const totals = db.prepare(`
@@ -108,22 +105,19 @@ async function buildStatEmbed(guild, client, db) {
     return lines.join('\n') || '*—*';
   };
 
-  return new EmbedBuilder()
-    .setColor(E.COLORS.PRIMARY)
-    .setTitle(`${e('cat_information')} Live Stats — ${guild.name}`)
-    .setThumbnail(guild.iconURL({ dynamic: true }))
-    .addFields(
-      { name: `${e('ui_members')} Membres`,           value: formatNumber(guild.memberCount),   inline: true },
-      { name: `${e('ui_mic')} En vocal maintenant`, value: `${active}`,                     inline: true },
-      { name: '\u200B', value: '\u200B', inline: true },
-      { name: `${e('ui_chat')} Messages totaux`,   value: formatNumber(totals.msgs),          inline: true },
-      { name: `${e('ui_mic')} Vocal total`,       value: formatDuration(totals.voice),       inline: true },
-      { name: `${e('ui_user')} Utilisateurs actifs`, value: formatNumber(totals.users),       inline: true },
-      { name: 'Top messages',       value: await formatTop(topMsg, 'messages', false), inline: true },
-      { name: 'Top vocal',          value: await formatTop(topVoc, 'voice_seconds', true), inline: true },
-    )
-    .setFooter({ text: `Mis à jour le` })
-    .setTimestamp();
+  return V2.panel(
+    `${e('cat_information')} **Live Stats — ${guild.name}**`,
+    V2.fieldBlock([
+      { name: `${e('ui_members')} Membres`, value: formatNumber(guild.memberCount) },
+      { name: `${e('ui_mic')} En vocal maintenant`, value: `${active}` },
+      { name: `${e('ui_chat')} Messages totaux`, value: formatNumber(totals.msgs) },
+      { name: `${e('ui_mic')} Vocal total`, value: formatDuration(totals.voice) },
+      { name: `${e('ui_user')} Utilisateurs actifs`, value: formatNumber(totals.users) },
+      { name: 'Top messages', value: await formatTop(topMsg, 'messages', false) },
+      { name: 'Top vocal', value: await formatTop(topVoc, 'voice_seconds', true) },
+    ]),
+    { footer: 'Mis à jour le' },
+  );
 }
 
 // ─── Mettre à jour un embed existant ──────────────────────────────────────────
@@ -136,8 +130,8 @@ async function updateStatEmbed(client, guildId, settings) {
     if (!msg) return false;
 
     const guild = client.guilds.cache.get(guildId);
-    const embed = await buildStatEmbed(guild, client, db);
-    await msg.edit({ embeds: [embed] });
+    const panel = await buildStatPanel(guild, client, db);
+    await msg.edit(V2.payload(panel));
     return true;
   } catch {
     return false;

@@ -1,6 +1,15 @@
 'use strict';
 
-const E = require('../../utils/embeds');
+const {
+  ContainerBuilder,
+  TextDisplayBuilder,
+  SeparatorBuilder,
+  SeparatorSpacingSize,
+  MediaGalleryBuilder,
+  MediaGalleryItemBuilder,
+  MessageFlags,
+} = require('discord.js');
+const { e } = require('../../core/emojis');
 
 const NAMED_COLORS = {
   rouge: '#FF0000', bleu: '#0000FF', vert: '#00FF00', jaune: '#FFFF00',
@@ -39,6 +48,32 @@ function hslToHex(h, s, l) {
   return `#${[r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase()}`;
 }
 
+function panel(title, body, mediaUrl) {
+  const container = new ContainerBuilder().setAccentColor(0xFF0000);
+  container.addTextDisplayComponents(new TextDisplayBuilder().setContent(title));
+  if (body) {
+    container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(body));
+  }
+  if (mediaUrl) {
+    container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
+    container.addMediaGalleryComponents(
+      new MediaGalleryBuilder().addItems(
+        new MediaGalleryItemBuilder().setURL(mediaUrl).setDescription(title.replace(/\*/g, '')),
+      ),
+    );
+  }
+  return container;
+}
+
+function replyPanel(message, title, body, mediaUrl) {
+  return message.reply({
+    components: [panel(title, body, mediaUrl)],
+    flags: MessageFlags.IsComponentsV2,
+    allowedMentions: { parse: [] },
+  });
+}
+
 module.exports = {
   name       : 'color',
   aliases    : ['couleur', 'col'],
@@ -49,7 +84,7 @@ module.exports = {
 
   async execute(message, args) {
     const input = args.join(' ').trim().toLowerCase();
-    if (!input) return message.reply({ embeds: [E.error('Usage', '`;color <#FF0000 | rgb(255,0,0) | rouge>`')] });
+    if (!input) return replyPanel(message, `${e('btn_error')} **Usage**`, '`;color <#FF0000 | rgb(255,0,0) | rouge>`');
 
     let hex = null;
     if (NAMED_COLORS[input]) hex = NAMED_COLORS[input];
@@ -58,11 +93,11 @@ module.exports = {
       const m = input.match(/(\d{1,3})[\s,]+(\d{1,3})[\s,]+(\d{1,3})/);
       if (m) {
         const r = +m[1], g = +m[2], b = +m[3];
-        if (r > 255 || g > 255 || b > 255) return message.reply({ embeds: [E.error('RGB invalide', 'Valeurs 0-255.')] });
+        if (r > 255 || g > 255 || b > 255) return replyPanel(message, `${e('btn_error')} **RGB invalide**`, 'Valeurs 0-255.');
         hex = `#${[r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase()}`;
       }
     }
-    if (!hex) return message.reply({ embeds: [E.error('Format inconnu', 'Utilise hex, RGB ou un nom commun.')] });
+    if (!hex) return replyPanel(message, `${e('btn_error')} **Format inconnu**`, 'Utilise hex, RGB ou un nom commun.');
 
     const [r, g, b] = hexToRgb(hex);
     const [h, s, l] = rgbToHsl(r, g, b);
@@ -72,20 +107,16 @@ module.exports = {
     const analog1 = hslToHex((h + 30) % 360, s, l);
     const analog2 = hslToHex((h - 30 + 360) % 360, s, l);
 
-    const colorInt = parseInt(hex.replace('#', ''), 16);
     const previewUrl = `https://singlecolorimage.com/get/${hex.replace('#', '')}/200x200`;
 
-    return message.reply({
-      embeds: [E.base()
-        .setColor(colorInt)
-        .setTitle(hex)
-        .setThumbnail(previewUrl)
-        .addFields(
-          { name: 'HEX', value: `\`${hex}\``, inline: true },
-          { name: 'RGB', value: `\`rgb(${r}, ${g}, ${b})\``, inline: true },
-          { name: 'HSL', value: `\`hsl(${h}, ${s}%, ${l}%)\``, inline: true },
-          { name: 'Palette assortie', value: `Complémentaire : \`${complement}\`\nAnalogues : \`${analog1}\` · \`${analog2}\`` },
-        )],
-    });
+    return replyPanel(
+      message,
+      `${e('ui_diamond')} **${hex}**`,
+      `**HEX**\n\`${hex}\`\n\n` +
+      `**RGB**\n\`rgb(${r}, ${g}, ${b})\`\n\n` +
+      `**HSL**\n\`hsl(${h}, ${s}%, ${l}%)\`\n\n` +
+      `**Palette assortie**\nComplémentaire : \`${complement}\`\nAnalogues : \`${analog1}\` · \`${analog2}\``,
+      previewUrl,
+    );
   },
 };

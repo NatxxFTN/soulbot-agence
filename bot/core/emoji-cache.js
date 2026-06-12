@@ -17,14 +17,37 @@ function saveCache(cache) {
   fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2));
 }
 
-function setEmojiId(name, id, animated = false) {
+function setEmojiId(name, id, animated = false, guildId = null) {
   const cache = loadCache();
-  cache[name] = { id, animated, updated_at: Date.now() };
+  const entry = { id, animated, updated_at: Date.now() };
+  if (guildId) entry.guildId = guildId;
+  cache[name] = entry;
   saveCache(cache);
 }
 
 function getEmojiId(name) {
   return loadCache()[name] || null;
+}
+
+// ─── Garde anti-COMPONENT_INVALID_EMOJI ──────────────────────────────────────
+// Un emoji custom n'est utilisable QUE si le bot est membre du serveur qui
+// l'héberge. Sinon Discord rejette le composant entier (erreur 50035).
+// La liste des serveurs accessibles est injectée au démarrage (ready.js).
+let _accessibleGuilds = null; // null = inconnu (avant ready) → on n'écarte rien
+
+function setAccessibleGuilds(guildIds) {
+  _accessibleGuilds = new Set(guildIds);
+}
+
+/**
+ * @param {{id?: string, guildId?: string}} entry - entrée du cache
+ * @returns {boolean} false si l'emoji vit sur un serveur où le bot n'est pas
+ */
+function isEmojiUsable(entry) {
+  if (!entry || !entry.id) return false;
+  if (!_accessibleGuilds) return true;     // avant ready : on suppose accessible
+  if (!entry.guildId) return true;          // entrée legacy sans guildId : idem
+  return _accessibleGuilds.has(entry.guildId);
 }
 
 /**
@@ -35,7 +58,7 @@ function getEmojiId(name) {
  */
 function getEmoji(name, fallback = '') {
   const entry = getEmojiId(name);
-  if (!entry) return fallback;
+  if (!isEmojiUsable(entry)) return fallback; // absent OU serveur inaccessible
   return entry.animated ? `<a:${name}:${entry.id}>` : `<:${name}:${entry.id}>`;
 }
 
@@ -45,4 +68,7 @@ function clearCache() {
   if (fs.existsSync(CACHE_FILE)) fs.unlinkSync(CACHE_FILE);
 }
 
-module.exports = { loadCache, saveCache, setEmojiId, getEmojiId, getEmoji, listAll, clearCache };
+module.exports = {
+  loadCache, saveCache, setEmojiId, getEmojiId, getEmoji, listAll, clearCache,
+  setAccessibleGuilds, isEmojiUsable,
+};

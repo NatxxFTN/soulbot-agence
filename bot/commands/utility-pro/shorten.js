@@ -1,6 +1,31 @@
 'use strict';
 
-const E = require('../../utils/embeds');
+const {
+  ContainerBuilder,
+  TextDisplayBuilder,
+  SeparatorBuilder,
+  SeparatorSpacingSize,
+  MessageFlags,
+} = require('discord.js');
+const { e } = require('../../core/emojis');
+
+function panel(title, body) {
+  const container = new ContainerBuilder().setAccentColor(0xFF0000);
+  container.addTextDisplayComponents(new TextDisplayBuilder().setContent(title));
+  if (body) {
+    container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(body));
+  }
+  return container;
+}
+
+function replyPanel(message, title, body) {
+  return message.reply({
+    components: [panel(title, body)],
+    flags: MessageFlags.IsComponentsV2,
+    allowedMentions: { parse: [] },
+  });
+}
 
 module.exports = {
   name       : 'shorten',
@@ -12,10 +37,10 @@ module.exports = {
 
   async execute(message, args) {
     const url = args[0];
-    if (!url) return message.reply({ embeds: [E.error('Usage', '`;shorten <url>`')] });
+    if (!url) return replyPanel(message, `${e('btn_error')} **Usage**`, '`;shorten <url>`');
 
     try { new URL(url); }
-    catch { return message.reply({ embeds: [E.error('URL invalide', 'Format : https://example.com')] }); }
+    catch { return replyPanel(message, `${e('btn_error')} **URL invalide**`, 'Format : https://example.com'); }
 
     try {
       const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`, {
@@ -25,15 +50,13 @@ module.exports = {
       const short = (await res.text()).trim();
       if (!short.startsWith('http')) throw new Error('Réponse invalide');
 
-      return message.reply({
-        embeds: [E.success('URL raccourcie')
-          .addFields(
-            { name: 'Original', value: `\`${url.slice(0, 1000)}\`` },
-            { name: 'Court',    value: short },
-          )],
-      });
+      return replyPanel(
+        message,
+        `${e('btn_success')} **URL raccourcie**`,
+        `**Original**\n\`${url.slice(0, 1000)}\`\n\n**Court**\n${short}`,
+      );
     } catch (err) {
-      return message.reply({ embeds: [E.error('Erreur API', err.message)] });
+      return replyPanel(message, `${e('btn_error')} **Erreur API**`, err.message);
     }
   },
 };

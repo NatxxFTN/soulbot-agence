@@ -1,6 +1,12 @@
 'use strict';
 
-const E = require('../../utils/embeds');
+const {
+  ContainerBuilder,
+  TextDisplayBuilder,
+  SeparatorBuilder,
+  SeparatorSpacingSize,
+  MessageFlags,
+} = require('discord.js');
 const { e } = require('../../core/emojis');
 const { db } = require('../../database');
 
@@ -8,6 +14,28 @@ const STMT_TOP = db.prepare('SELECT user_id, xp, level FROM guild_xp WHERE guild
 const STMT_COUNT = db.prepare('SELECT COUNT(*) AS n FROM guild_xp WHERE guild_id = ?');
 
 const PAGE_SIZE = 10;
+
+function panel(title, body, footer) {
+  const container = new ContainerBuilder().setAccentColor(0xFF0000);
+  container.addTextDisplayComponents(new TextDisplayBuilder().setContent(title));
+  if (body) {
+    container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(body));
+  }
+  if (footer) {
+    container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(footer));
+  }
+  return container;
+}
+
+function replyPanel(message, title, body, footer) {
+  return message.reply({
+    components: [panel(title, body, footer)],
+    flags: MessageFlags.IsComponentsV2,
+    allowedMentions: { parse: [] },
+  });
+}
 
 module.exports = {
   name       : 'levelboard',
@@ -24,7 +52,7 @@ module.exports = {
     const { n } = STMT_COUNT.get(message.guild.id);
 
     if (!rows.length) {
-      return message.reply({ embeds: [E.info('Leaderboard vide', 'Aucun XP pour ce serveur — utilise `;xpset @user <amount>`.')] });
+      return replyPanel(message, `${e('cat_information')} **Leaderboard vide**`, 'Aucun XP pour ce serveur — utilise `;xpset @user <amount>`.');
     }
 
     const lines = rows.map((r, i) => {
@@ -36,12 +64,11 @@ module.exports = {
 
     const totalPages = Math.ceil(n / PAGE_SIZE);
 
-    return message.reply({
-      embeds: [E.base()
-        .setTitle(`${e('cat_level')} Leaderboard XP — ${message.guild.name}`)
-        .setDescription(lines.join('\n'))
-        .setFooter({ text: `Page ${page}/${totalPages} · ${n} membres avec XP` })
-      ],
-    });
+    return replyPanel(
+      message,
+      `${e('cat_level')} **Leaderboard XP — ${message.guild.name}**`,
+      lines.join('\n'),
+      `Page ${page}/${totalPages} · ${n} membres avec XP`,
+    );
   },
 };

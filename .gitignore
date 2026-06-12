@@ -76,6 +76,15 @@ data/emojis-ids.json
 *.bak
 *.bak-*
 
+# Snapshots rollback chirurgicaux (ad-hoc, runtime-only)
+*.backup-rollback
+*.backup-rollback-*
+*~
+
+# Previews / rapports générés (runtime)
+data/soc-preview.png
+reports/
+
 # Backups de données serveur (nuke, restauration, etc.)
 data/backups/
 
@@ -98,3 +107,4 @@ Welcome.md
 # Dossiers temporaires (analyses jetables, extractions ad-hoc)
 .tmp-*/
 .tmp-toolbox/
+.codex/

@@ -29,11 +29,11 @@
     "forge:emojis": "node bot/scripts/forge-upload-emojis.js"
   },
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.99",
+    "@napi-rs/canvas": "^0.1.100",
     "better-sqlite3": "^12.8.0",
     "chalk": "^4.1.2",
     "cors": "^2.8.5",
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.19.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-session": "^1.17.3",

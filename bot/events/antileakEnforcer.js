@@ -8,8 +8,8 @@
 // Sanction par type de fuite (sanction_discord_token, sanction_ip, ...).
 // ═══════════════════════════════════════════════
 
-const { PermissionFlagsBits } = require('discord.js');
-const { getAntileakConfig, getWhitelistRoles } = require('../core/antileak-helper');
+const { getAntileakConfig } = require('../core/antileak-helper');
+const registry = require('../core/security-registry');
 const { applySanction } = require('../core/apply-sanction');
 
 // Token bot Discord : 3 segments base64 séparés par des points
@@ -58,13 +58,15 @@ module.exports = {
     const config = getAntileakConfig(message.guild.id);
     if (!config?.enabled) return;
 
-    if (message.member?.permissions?.has(PermissionFlagsBits.ManageMessages)) return;
-    const wlRoles = getWhitelistRoles(message.guild.id);
-    if (wlRoles.length && message.member?.roles.cache.some(r => wlRoles.includes(r.id))) return;
+    // Exemption VAULT-ONLY (SOC Phase 1) — le hack ManageMessages est supprimé.
+    if (registry.isExempt(message, 'antileak')) return;
 
     const hit = detect(message.content, config);
     if (!hit || hit.sanction === 'none') return;
 
-    await applySanction(message, 'antileak', hit.sanction, hit.reason, config.logs_channel_id);
+    // Ladder : plancher = la sanction configurée du type de fuite détecté.
+    const res = registry.sanctionForTrigger(message.guild.id, message.author.id, 'antileak', hit.sanction);
+    await applySanction(message, 'antileak', res.action, hit.reason, config.logs_channel_id,
+      { durationMs: res.durationMs, offenseCount: res.count });
   },
 };

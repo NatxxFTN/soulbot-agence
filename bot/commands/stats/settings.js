@@ -1,9 +1,8 @@
 'use strict';
 
-const { EmbedBuilder } = require('discord.js');
 const { db, getGuildSettings, setGuildSetting } = require('../../database');
-const E = require('../../utils/embeds');
 const { e } = require('../../core/emojis');
+const V2 = require('./_components-v2');
 
 /*
  * ;settings global
@@ -47,49 +46,44 @@ module.exports = {
       const starChan   = settings.star_channel_id   ? `<#${settings.star_channel_id}>` : '*Non défini*';
       const embedChan  = settings.statembed_channel_id ? `<#${settings.statembed_channel_id}>` : '*Non défini*';
 
-      const embed = new EmbedBuilder()
-        .setColor(E.COLORS.PRIMARY)
-        .setTitle(`⚙️  Paramètres — ${message.guild.name}`)
-        .setThumbnail(message.guild.iconURL({ dynamic: true }))
-        .addFields(
-          { name: '🔧 Préfixe',            value: `\`${settings.prefix}\``,                                        inline: true },
-          { name: '📊 Stats activées',      value: settings.stats_enabled ? '✅ Oui' : '❌ Non',                    inline: true },
-          { name: '\u200B', value: '\u200B', inline: true },
-          { name: '⭐ Starboard',           value: settings.star_enabled ? `✅ Actif · ${starChan}` : '❌ Inactif', inline: true },
-          { name: '⭐ Emoji star',          value: settings.star_emoji,                                              inline: true },
-          { name: '⭐ Seuil',              value: `${settings.star_threshold} étoile(s)`,                           inline: true },
-          { name: '🎖️ Rôle Badge',          value: badgeRole,   inline: true },
-          { name: '🎂 Rôle Anniversaire',   value: bdayRole,    inline: true },
-          { name: '🚀 Rôle Booster',        value: boostRole,   inline: true },
-          { name: '🎙️ Rôle Vocal',          value: vocRole,     inline: true },
-          { name: '📌 StatEmbed',           value: embedChan,   inline: true },
-        )
-        .setTimestamp();
-
-      return message.reply({ embeds: [embed] });
+      return V2.reply(message, V2.panel(
+        `${e('cat_configuration')}  **Paramètres — ${message.guild.name}**`,
+        V2.fieldBlock([
+          { name: `${e('cat_utility')} Préfixe`, value: `\`${settings.prefix}\`` },
+          { name: `${e('cat_information')} Stats activées`, value: settings.stats_enabled ? `${e('btn_success')} Oui` : `${e('btn_error')} Non` },
+          { name: `${settings.star_emoji} Starboard`, value: settings.star_enabled ? `${e('btn_success')} Actif · ${starChan}` : `${e('btn_error')} Inactif` },
+          { name: `${settings.star_emoji} Emoji star`, value: settings.star_emoji },
+          { name: `${settings.star_emoji} Seuil`, value: `${settings.star_threshold} étoile(s)` },
+          { name: `${e('cat_owner')} Rôle Badge`, value: badgeRole },
+          { name: `${e('btn_calendar')} Rôle Anniversaire`, value: bdayRole },
+          { name: `${e('cat_giveaway')} Rôle Booster`, value: boostRole },
+          { name: `${e('ui_mic')} Rôle Vocal`, value: vocRole },
+          { name: `${e('ui_pin')} StatEmbed`, value: embedChan },
+        ]),
+      ));
     }
 
     // ── Modifier le préfixe ───────────────────────────────────────────────────
     if (action === 'prefix') {
       const newPrefix = args[2];
       if (!newPrefix || newPrefix.length > 5) {
-        return message.reply({ embeds: [E.error('Préfixe invalide', 'Le préfixe doit faire 1 à 5 caractères.')] });
+        return V2.reply(message, V2.error('Préfixe invalide', 'Le préfixe doit faire 1 à 5 caractères.'));
       }
       setGuildSetting(guildId, 'prefix', newPrefix);
-      return message.reply({ embeds: [E.success('Préfixe mis à jour', `Nouveau préfixe : \`${newPrefix}\``)] });
+      return V2.reply(message, V2.success('Préfixe mis à jour', `Nouveau préfixe : \`${newPrefix}\``));
     }
 
     // ── Activer/désactiver les stats ──────────────────────────────────────────
     if (action === 'stats') {
       const val = (args[2] ?? '').toLowerCase();
       if (!['on', 'off', '1', '0', 'true', 'false'].includes(val)) {
-        return message.reply({ embeds: [E.usage(';', 'settings global stats <on|off>', '')] });
+        return V2.reply(message, V2.usage(';', 'settings global stats <on|off>', ''));
       }
       const enabled = ['on', '1', 'true'].includes(val) ? 1 : 0;
       setGuildSetting(guildId, 'stats_enabled', enabled);
-      return message.reply({ embeds: [E.success('Stats', enabled ? '✅ Tracking des statistiques activé.' : '❌ Tracking des statistiques désactivé.')] });
+      return V2.reply(message, V2.success('Stats', enabled ? `${e('btn_success')} Tracking des statistiques activé.` : `${e('btn_error')} Tracking des statistiques désactivé.`));
     }
 
-    return message.reply({ embeds: [E.usage(';', 'settings global [prefix|stats] [valeur]', 'Paramètres globaux du bot.')] });
+    return V2.reply(message, V2.usage(';', 'settings global [prefix|stats] [valeur]', 'Paramètres globaux du bot.'));
   },
 };

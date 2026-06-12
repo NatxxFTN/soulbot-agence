@@ -100,7 +100,7 @@ function renderHelpHome(page = 1, botAvatarURL = null) {
   const embed = new EmbedBuilder()
     .setColor(COLORS.accent)
     .setTitle('Information')
-    .setDescription('```ini\n► Version ' + version + '\n```')
+    .setDescription('```ini\n► Version ' + version + ' bêta\n```')
     .addFields(
       { name: `${e('ui_folder')} Catégories`, value: categoriesCol, inline: true  },
       { name: 'Syntaxes',   value: syntaxesCol,   inline: true  },

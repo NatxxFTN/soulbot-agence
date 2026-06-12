@@ -1,10 +1,9 @@
 'use strict';
 
-const { EmbedBuilder } = require('discord.js');
 const { db }           = require('../../database');
 const { formatBirthday } = require('../../utils/format');
-const E = require('../../utils/embeds');
 const { e } = require('../../core/emojis');
+const V2 = require('./_components-v2');
 
 /*
  * ;list bday [mois]
@@ -40,7 +39,7 @@ module.exports = {
     }
 
     if (!rows.length) {
-      return message.reply({ embeds: [E.info('Anniversaires', hasFilter ? `Aucun anniversaire enregistré pour ce mois.` : 'Aucun anniversaire enregistré sur ce serveur.\nUtilise `;bday set JJ/MM` pour enregistrer le tien !')] });
+      return V2.reply(message, V2.info('Anniversaires', hasFilter ? `Aucun anniversaire enregistré pour ce mois.` : 'Aucun anniversaire enregistré sur ce serveur.\nUtilise `;bday set JJ/MM` pour enregistrer le tien !'));
     }
 
     // Identifier les anniversaires du mois en cours / à venir
@@ -65,13 +64,10 @@ module.exports = {
     const monthNames = ['', 'Janvier','Février','Mars','Avril','Mai','Juin',
                         'Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
-    const embed = new EmbedBuilder()
-      .setColor(E.COLORS.PRIMARY)
-      .setTitle(`${e('btn_calendar')}  Anniversaires${hasFilter ? ` — ${monthNames[monthFilter]}` : ''}`)
-      .setDescription(lines.join('\n'))
-      .setFooter({ text: `${total} anniversaire(s) enregistré(s) • Page ${page + 1}/${Math.ceil(total / PAGE_SIZE)}` })
-      .setTimestamp();
-
-    return message.reply({ embeds: [embed] });
+    return V2.reply(message, V2.panel(
+      `${e('btn_calendar')}  **Anniversaires${hasFilter ? ` — ${monthNames[monthFilter]}` : ''}**`,
+      lines.join('\n'),
+      { footer: `${total} anniversaire(s) enregistré(s) • Page ${page + 1}/${Math.ceil(total / PAGE_SIZE)}` },
+    ));
   },
 };

@@ -1,9 +1,8 @@
 'use strict';
 
-const { EmbedBuilder } = require('discord.js');
 const { db }           = require('../../database');
 const { formatNumber } = require('../../utils/format');
-const E = require('../../utils/embeds');
+const V2 = require('./_components-v2');
 
 const EMOJI_NUMBERS = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣'];
 
@@ -28,14 +27,14 @@ module.exports = {
     // ── ;poll end <id> ────────────────────────────────────────────────────────
     if (sub === 'end' || sub === 'close' || sub === 'fermer') {
       const pollId = parseInt(args[1]);
-      if (!pollId) return message.reply({ embeds: [E.error('Usage', '`;poll end <id>`')] });
+      if (!pollId) return V2.reply(message, V2.error('Usage', '`;poll end <id>`'));
 
       const poll = db.prepare('SELECT * FROM polls WHERE id = ? AND guild_id = ?').get(pollId, guildId);
-      if (!poll) return message.reply({ embeds: [E.error('Introuvable', `Sondage #${pollId} introuvable.`)] });
-      if (!poll.active) return message.reply({ embeds: [E.info('Info', 'Ce sondage est déjà terminé.')] });
+      if (!poll) return V2.reply(message, V2.error('Introuvable', `Sondage #${pollId} introuvable.`));
+      if (!poll.active) return V2.reply(message, V2.info('Info', 'Ce sondage est déjà terminé.'));
 
       if (poll.creator_id !== message.author.id && !message.member.permissions.has('ManageMessages')) {
-        return message.reply({ embeds: [E.error('Permission', 'Tu ne peux pas clore ce sondage.')] });
+        return V2.reply(message, V2.error('Permission', 'Tu ne peux pas clore ce sondage.'));
       }
 
       db.prepare('UPDATE polls SET active = 0 WHERE id = ?').run(pollId);
@@ -45,10 +44,10 @@ module.exports = {
     // ── ;poll results <id> ────────────────────────────────────────────────────
     if (sub === 'results' || sub === 'résultats') {
       const pollId = parseInt(args[1]);
-      if (!pollId) return message.reply({ embeds: [E.error('Usage', '`;poll results <id>`')] });
+      if (!pollId) return V2.reply(message, V2.error('Usage', '`;poll results <id>`'));
 
       const poll = db.prepare('SELECT * FROM polls WHERE id = ? AND guild_id = ?').get(pollId, guildId);
-      if (!poll) return message.reply({ embeds: [E.error('Introuvable', `Sondage #${pollId} introuvable.`)] });
+      if (!poll) return V2.reply(message, V2.error('Introuvable', `Sondage #${pollId} introuvable.`));
 
       return _showResults(message, poll, guildId, client);
     }
@@ -81,13 +80,13 @@ module.exports = {
     const options = rawOptions.filter(Boolean);
 
     if (question && question.length > 200) {
-      return message.reply({ embeds: [E.error('Question trop longue', 'Maximum **200 caractères**.')] });
+      return V2.reply(message, V2.error('Question trop longue', 'Maximum **200 caractères**.'));
     }
     if (!question || options.length < 2) {
-      return message.reply({ embeds: [E.usage(';', 'poll "Question" option1 option2 [--duration 24h]', 'Il faut au moins **2 options**. Entoure la question de guillemets.')] });
+      return V2.reply(message, V2.usage(';', 'poll "Question" option1 option2 [--duration 24h]', 'Il faut au moins **2 options**. Entoure la question de guillemets.'));
     }
     if (options.length > 9) {
-      return message.reply({ embeds: [E.error('Trop d\'options', 'Maximum **9 options** par sondage.')] });
+      return V2.reply(message, V2.error('Trop d\'options', 'Maximum **9 options** par sondage.'));
     }
 
     const endsAt = durationSec ? Math.floor(Date.now() / 1000) + durationSec : null;
@@ -95,14 +94,11 @@ module.exports = {
     // ── Créer l'embed du sondage ───────────────────────────────────────────────
     const desc = options.map((opt, i) => `**${i + 1}.**  ${opt}`).join('\n');
 
-    const embed = new EmbedBuilder()
-      .setColor(E.COLORS.PRIMARY)
-      .setTitle(question)
-      .setDescription(desc)
-      .setFooter({ text: `Sondage par ${message.author.tag}${endsAt ? ` • Ferme <t:${endsAt}:R>` : ''}` })
-      .setTimestamp();
-
-    const pollMsg = await message.channel.send({ embeds: [embed] });
+    const pollMsg = await V2.send(message.channel, V2.panel(
+      `**${question}**`,
+      desc,
+      { footer: `Sondage par ${message.author.tag}${endsAt ? ` • Ferme <t:${endsAt}:R>` : ''}` },
+    ));
 
     // Ajouter les réactions
     for (let i = 0; i < options.length; i++) {
@@ -164,13 +160,11 @@ async function _showResults(context, poll, guildId, client) {
     return `**${i + 1}.**  **${opt}**\n${bar}  **${pct}%** (${count} vote(s))`;
   });
 
-  const embed = new EmbedBuilder()
-    .setColor(E.COLORS.SUCCESS)
-    .setTitle(`Résultats — ${poll.question}`)
-    .setDescription(lines.join('\n\n'))
-    .addFields({ name: 'Votes totaux', value: formatNumber(finalTotal), inline: true })
-    .setFooter({ text: `Sondage #${poll.id} • ${poll.active ? 'En cours' : 'Terminé'}` })
-    .setTimestamp();
+  const container = V2.panel(
+    `**Résultats — ${poll.question}**`,
+    `${lines.join('\n\n')}\n\n**Votes totaux**\n${formatNumber(finalTotal)}`,
+    { footer: `Sondage #${poll.id} • ${poll.active ? 'En cours' : 'Terminé'}` },
+  );
 
-  return context.channel ? context.channel.send({ embeds: [embed] }) : context.reply({ embeds: [embed] });
+  return context.channel ? V2.send(context.channel, container) : V2.reply(context, container);
 }

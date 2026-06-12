@@ -96,4 +96,44 @@ const LABELS = {
   selectOption:  'Sélectionner une option',
 };
 
-module.exports = { COLORS, HEX, EMOJIS, LABELS };
+// ═══════════════════════════════════════════════
+// SOC — palette de posture sémantique + thèmes du dashboard image
+// (Defense Grid 2A). Couleurs DESIGN.md : success #00FF88, warning #FFD700.
+// ═══════════════════════════════════════════════
+
+const SOC_POSTURE = {
+  SECURE  : { accent: 0x00FF88, hex: '#00FF88', label: 'SECURE'   },
+  ELEVATED: { accent: 0xFFD700, hex: '#FFD700', label: 'ELEVATED' },
+  BREACH  : { accent: 0xFF0000, hex: '#FF0000', label: 'BREACH'   },
+};
+
+// Thèmes du renderer image — chaque preset redéfinit les couleurs du PNG.
+// L'accent du container CV2 suit la POSTURE, pas le thème (posture > déco).
+const SOC_THEMES = {
+  red_alert: {
+    label: 'RED ALERT',
+    bg: '#0A0A0A', panel: '#141414', border: '#2A2A2A', grid: 'rgba(255,0,0,0.05)',
+    text: '#F5F5F5', muted: '#666666', accent: '#FF0000',
+    ok: '#00FF88', warn: '#FFD700', bad: '#FF3333',
+  },
+  matrix: {
+    label: 'MATRIX',
+    bg: '#020A02', panel: '#06140A', border: '#103018', grid: 'rgba(0,255,100,0.06)',
+    text: '#C8FFD8', muted: '#3E6B4C', accent: '#00FF66',
+    ok: '#00FF66', warn: '#AAFF00', bad: '#FF5544',
+  },
+  ice: {
+    label: 'ICE',
+    bg: '#04080F', panel: '#0A1422', border: '#1A2C44', grid: 'rgba(80,160,255,0.06)',
+    text: '#DCEBFF', muted: '#46627F', accent: '#4499FF',
+    ok: '#44DDFF', warn: '#FFD700', bad: '#FF4466',
+  },
+  mono: {
+    label: 'MONO',
+    bg: '#0C0C0C', panel: '#161616', border: '#2E2E2E', grid: 'rgba(255,255,255,0.04)',
+    text: '#EEEEEE', muted: '#777777', accent: '#FFFFFF',
+    ok: '#CCCCCC', warn: '#999999', bad: '#FFFFFF',
+  },
+};
+
+module.exports = { COLORS, HEX, EMOJIS, LABELS, SOC_POSTURE, SOC_THEMES };

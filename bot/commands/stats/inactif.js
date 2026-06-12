@@ -1,10 +1,9 @@
 'use strict';
 
-const { EmbedBuilder }      = require('discord.js');
 const { db }                = require('../../database');
 const { parseDays, formatDate } = require('../../utils/format');
-const E = require('../../utils/embeds');
 const { e } = require('../../core/emojis');
+const V2 = require('./_components-v2');
 
 /*
  * ;inactif [jours] [--export]
@@ -40,7 +39,7 @@ module.exports = {
     try {
       members = await message.guild.members.fetch();
     } catch {
-      return message.reply({ embeds: [E.error('Erreur', 'Impossible de récupérer la liste des membres.')] });
+      return V2.reply(message, V2.error('Erreur', 'Impossible de récupérer la liste des membres.'));
     }
 
     const inactiveList = [];
@@ -66,7 +65,7 @@ module.exports = {
     }
 
     if (!inactiveList.length) {
-      return message.reply({ embeds: [E.success('Résultat', `Aucun membre inactif depuis **${days} jours** !`)] });
+      return V2.reply(message, V2.success('Résultat', `Aucun membre inactif depuis **${days} jours** !`));
     }
 
     // Pagination (max 20 par embed)
@@ -81,14 +80,10 @@ module.exports = {
       return `\`${String(idx).padStart(3, ' ')}.\` ${item.member} — dernier msg : ${when} (${item.messages} msgs)`;
     });
 
-    const embed = new EmbedBuilder()
-      .setColor(E.COLORS.WARNING)
-      .setTitle(`${e('ui_alert')}  Membres inactifs depuis ${days}j`)
-      .setDescription(lines.join('\n'))
-      .addFields({ name: `${e('ui_members')} Total`, value: `**${total}** membre(s) inactif(s)`, inline: true })
-      .setFooter({ text: `Page ${page + 1}/${Math.ceil(total / PAGE_SIZE)} • ${message.guild.name}` })
-      .setTimestamp();
-
-    return message.reply({ embeds: [embed] });
+    return V2.reply(message, V2.panel(
+      `${e('ui_alert')}  **Membres inactifs depuis ${days}j**`,
+      `${lines.join('\n')}\n\n**${e('ui_members')} Total**\n**${total}** membre(s) inactif(s)`,
+      { footer: `Page ${page + 1}/${Math.ceil(total / PAGE_SIZE)} • ${message.guild.name}` },
+    ));
   },
 };

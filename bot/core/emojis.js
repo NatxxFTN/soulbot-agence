@@ -6,7 +6,7 @@
 // avec FALLBACK_EMOJIS, forButton, categoryEmoji
 // ═══════════════════════════════════════════════
 
-const { getEmoji, getEmojiId, loadCache } = require('./emoji-cache');
+const { getEmoji, getEmojiId, loadCache, isEmojiUsable } = require('./emoji-cache');
 
 // ─── Serveurs emoji configurés (multi-serveur) ────────────────────────────────
 // Lecture depuis .env — un emoji peut résider sur n'importe lequel des serveurs
@@ -170,7 +170,9 @@ function e(name) {
  */
 function forButton(name) {
   const entry = getEmojiId(name);
-  if (entry && entry.id) {
+  // isEmojiUsable écarte les emojis hébergés sur un serveur où le bot n'est
+  // pas membre → évite COMPONENT_INVALID_EMOJI (crash 50035 du composant).
+  if (isEmojiUsable(entry)) {
     return { name, id: entry.id, animated: !!entry.animated };
   }
   return FALLBACK_EMOJIS[name] || '📁';

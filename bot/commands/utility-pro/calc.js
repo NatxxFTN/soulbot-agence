@@ -1,6 +1,12 @@
 'use strict';
 
-const E = require('../../utils/embeds');
+const {
+  ContainerBuilder,
+  TextDisplayBuilder,
+  SeparatorBuilder,
+  SeparatorSpacingSize,
+  MessageFlags,
+} = require('discord.js');
 const math = require('mathjs');
 const { e } = require('../../core/emojis');
 
@@ -17,6 +23,24 @@ limitedMath.import({
 
 const parser = limitedMath.parser();
 
+function panel(title, body) {
+  const container = new ContainerBuilder().setAccentColor(0xFF0000);
+  container.addTextDisplayComponents(new TextDisplayBuilder().setContent(title));
+  if (body) {
+    container.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small));
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(body));
+  }
+  return container;
+}
+
+function replyPanel(message, title, body) {
+  return message.reply({
+    components: [panel(title, body)],
+    flags: MessageFlags.IsComponentsV2,
+    allowedMentions: { parse: [] },
+  });
+}
+
 module.exports = {
   name       : 'calc',
   aliases    : ['calcul', 'math'],
@@ -27,23 +51,20 @@ module.exports = {
 
   async execute(message, args) {
     const expr = args.join(' ').trim();
-    if (!expr) return message.reply({ embeds: [E.error('Usage', '`;calc 2+2*5`')] });
-    if (expr.length > 200) return message.reply({ embeds: [E.error('Trop long', 'Max 200 caractères.')] });
+    if (!expr) return replyPanel(message, `${e('btn_error')} **Usage**`, '`;calc 2+2*5`');
+    if (expr.length > 200) return replyPanel(message, `${e('btn_error')} **Trop long**`, 'Max 200 caractères.');
 
     try {
       parser.clear();
       const result = parser.evaluate(expr);
       const out = typeof result === 'object' ? math.format(result, { precision: 10 }) : String(result);
-      return message.reply({
-        embeds: [E.base()
-          .setTitle(`${e('cat_utility')} Calculatrice`)
-          .addFields(
-            { name: 'Expression', value: `\`${expr}\`` },
-            { name: 'Résultat',   value: `**${out}**` },
-          )],
-      });
+      return replyPanel(
+        message,
+        `${e('cat_utility')} **Calculatrice**`,
+        `**Expression**\n\`${expr}\`\n\n**Résultat**\n**${out}**`,
+      );
     } catch (err) {
-      return message.reply({ embeds: [E.error('Expression invalide', err.message)] });
+      return replyPanel(message, `${e('btn_error')} **Expression invalide**`, err.message);
     }
   },
 };

@@ -1,10 +1,9 @@
 'use strict';
 
-const { EmbedBuilder } = require('discord.js');
 const { db }           = require('../../database');
 const { formatDuration, formatNumber } = require('../../utils/format');
-const E = require('../../utils/embeds');
 const { e } = require('../../core/emojis');
+const V2 = require('./_components-v2');
 
 module.exports = {
   name        : 'compteur',
@@ -52,22 +51,18 @@ module.exports = {
       return `${i + 1}. ${ch ? `<#${ch.id}>` : row.channel_id} — **${formatNumber(row.total)}** messages`;
     }).join('\n');
 
-    const embed = new EmbedBuilder()
-      .setColor(E.COLORS.PRIMARY)
-      .setTitle(`${e('cat_information')} Compteur — ${message.guild.name}`)
-      .setThumbnail(message.guild.iconURL({ dynamic: true }))
-      .addFields(
-        { name: `${e('ui_chat')} Messages totaux`,      value: formatNumber(totals.messages),        inline: true },
-        { name: `${e('ui_mic')} Temps vocal total`,     value: formatDuration(totals.voice),          inline: true },
-        { name: `${e('ui_members')} Utilisateurs actifs`, value: formatNumber(totals.users),          inline: true },
-        { name: `${e('ui_speaker')} En vocal maintenant`, value: `${activeSessions} utilisateur(s)`,  inline: true },
-        { name: `${e('btn_calendar')} Actifs (7j)`,     value: `${recentUsers} utilisateur(s)`,       inline: true },
-        { name: `${e('ui_user')} Membres totaux`,       value: formatNumber(message.guild.memberCount), inline: true },
-        { name: 'Top 5 salons',                         value: chanLines || '*Aucun salon enregistré*', inline: false },
-      )
-      .setFooter({ text: `Mis à jour le` })
-      .setTimestamp();
-
-    return message.reply({ embeds: [embed] });
+    return V2.reply(message, V2.panel(
+      `${e('cat_information')} **Compteur — ${message.guild.name}**`,
+      V2.fieldBlock([
+        { name: `${e('ui_chat')} Messages totaux`, value: formatNumber(totals.messages) },
+        { name: `${e('ui_mic')} Temps vocal total`, value: formatDuration(totals.voice) },
+        { name: `${e('ui_members')} Utilisateurs actifs`, value: formatNumber(totals.users) },
+        { name: `${e('ui_speaker')} En vocal maintenant`, value: `${activeSessions} utilisateur(s)` },
+        { name: `${e('btn_calendar')} Actifs (7j)`, value: `${recentUsers} utilisateur(s)` },
+        { name: `${e('ui_user')} Membres totaux`, value: formatNumber(message.guild.memberCount) },
+        { name: 'Top 5 salons', value: chanLines || '*Aucun salon enregistré*' },
+      ]),
+      { footer: 'Mis à jour le' },
+    ));
   },
 };

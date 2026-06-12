@@ -7,8 +7,8 @@
 // Enforce : flood, mention spam, messages répétés, caps.
 // ═══════════════════════════════════════════════
 
-const { PermissionFlagsBits } = require('discord.js');
-const { getAntispamConfig, getWhitelistRoles } = require('../core/antispam-helper');
+const { getAntispamConfig } = require('../core/antispam-helper');
+const registry = require('../core/security-registry');
 const { applySanction } = require('../core/apply-sanction');
 
 // État en mémoire par guild:user — fenêtres glissantes
@@ -101,14 +101,15 @@ module.exports = {
     const config = getAntispamConfig(message.guild.id);
     if (!config?.enabled) return;
 
-    // Modérateurs et rôles whitelistés exemptés
-    if (message.member?.permissions?.has(PermissionFlagsBits.ManageMessages)) return;
-    const wlRoles = getWhitelistRoles(message.guild.id);
-    if (wlRoles.length && message.member?.roles.cache.some(r => wlRoles.includes(r.id))) return;
+    // Exemption VAULT-ONLY (SOC Phase 1) — le hack ManageMessages est supprimé.
+    if (registry.isExempt(message, 'antispam')) return;
 
     const hit = detect(message, config);
     if (!hit || hit.sanction === 'none') return;
 
-    await applySanction(message, 'antispam', hit.sanction, hit.reason, config.logs_channel_id);
+    // Ladder : plancher = la sanction configurée du sous-type détecté.
+    const res = registry.sanctionForTrigger(message.guild.id, message.author.id, 'antispam', hit.sanction);
+    await applySanction(message, 'antispam', res.action, hit.reason, config.logs_channel_id,
+      { durationMs: res.durationMs, offenseCount: res.count });
   },
 };

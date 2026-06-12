@@ -11,7 +11,8 @@
 // Les détecteurs eux-mêmes sont créés par les prompts 2/3 du Pack Forteresse.
 
 const storage = require('../core/security-storage');
-const { applyPunishment } = require('../core/security-punishments');
+const registry = require('../core/security-registry');
+const { applySanction } = require('../core/apply-sanction');
 
 // Cache des modules détecteurs (évite N require par message)
 const detectorCache = new Map();
@@ -60,22 +61,10 @@ module.exports = {
     const active = allFeatures.filter(f => f.enabled);
     if (active.length === 0) return;
 
-    // ── Whitelist helper ──────────────────────────────────────────────────
-    const roleIds = message.member ? [...message.member.roles.cache.keys()] : [];
-    const channelId = message.channel.id;
-
-    function isWhitelistedFor(feature) {
-      if (storage.isWhitelisted(guildId, 'user',    userId,    feature)) return true;
-      if (storage.isWhitelisted(guildId, 'channel', channelId, feature)) return true;
-      for (const rid of roleIds) {
-        if (storage.isWhitelisted(guildId, 'role', rid, feature)) return true;
-      }
-      return false;
-    }
-
-    // ── Dispatch ──────────────────────────────────────────────────────────
+    // ── Dispatch — exemption VAULT-ONLY + ladder (SOC Phase 1) ────────────
     for (const config of active) {
-      if (isWhitelistedFor(config.feature)) continue;
+      if (config.feature.startsWith('_')) continue; // lignes techniques (_settings)
+      if (registry.isExempt(message, config.feature)) continue;
 
       const detector = loadDetector(config.feature);
       if (!detector) continue; // détecteur pas encore implémenté
@@ -83,7 +72,13 @@ module.exports = {
       try {
         const result = await detector.check(message, config);
         if (result?.triggered) {
-          await applyPunishment(config.action, message, config.feature, result.reason || 'Règle déclenchée');
+          // Sanction résolue par le ladder, plancher = config.action du module.
+          const res = registry.sanctionForTrigger(guildId, userId, config.feature, config.action);
+          await applySanction(
+            message, config.feature, res.action,
+            result.reason || 'Règle déclenchée', null,
+            { durationMs: res.durationMs, offenseCount: res.count },
+          );
           // Une seule punition par message — on arrête
           return;
         }
